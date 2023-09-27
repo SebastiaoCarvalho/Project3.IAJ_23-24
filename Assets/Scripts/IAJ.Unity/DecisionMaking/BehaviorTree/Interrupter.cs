@@ -12,6 +12,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         private Result _result = Result.Running;
         private bool _interrupt = false;
 
+        public Interrupter(Task child) : base(child) {}
+
         public override Result Run()
         {
             if (_interrupt){
