@@ -16,17 +16,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         {
             if (_interrupt){
                 _interrupt = false;
-                return Result.Failure;
+                return _result;
             } 
             _result = this.child.Run();
             return _result;
         }
-
-        /* public override void Terminate()
-        {
-            if (_isRunning)
-                child.Terminate();
-        } */
 
         public void SetResult(Result result) {
             _result = result;
