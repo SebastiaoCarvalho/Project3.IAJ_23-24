@@ -11,7 +11,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
     public class ParallelTask : CompositeTask {
 
         List<Task> terminated = new List<Task>();
-        List<Task> running = new List<Task>();
         int index = 0;
         Result result = Result.Running;
 
@@ -24,6 +23,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
             }     
             if (result == Result.Success) {
                 terminated.Clear();
+                index = 0;
                 return result;
             }
             if (result != Result.Running) terminated.Add(child);
