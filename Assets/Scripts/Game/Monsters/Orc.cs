@@ -44,10 +44,8 @@ namespace Assets.Scripts.Game.NPCs
             var position1 = closest.transform.GetChild(0).position;
             var position2 = closest.transform.GetChild(1).position;
 
-            //TODO Create a Behavior tree that combines Patrol with other behaviors...
-            //var mainTree = new Patrol(this, position1, position2);
-
-            this.BehaviourTree = new BasicTree(this, Target);
+            //Create a Behavior tree that combines Patrol with other behaviors...
+            this.BehaviourTree = new PatrolAndReactTree(this, Target, position1, position2);
          }
 
     }
