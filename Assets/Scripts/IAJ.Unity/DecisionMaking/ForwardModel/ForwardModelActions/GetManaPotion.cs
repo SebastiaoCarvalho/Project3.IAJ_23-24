@@ -1,28 +1,28 @@
-﻿using Assets.Scripts.Game;
+using Assets.Scripts.Game;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions
 {
-    public class GetHealthPotion : WalkToTargetAndExecuteAction
+    public class GetManaPotion : WalkToTargetAndExecuteAction
     {
-        public GetHealthPotion(AutonomousCharacter character, GameObject target) : base("GetHealthPotion",character,target)
+        public GetManaPotion(AutonomousCharacter character, GameObject target) : base("GetManaPotion",character,target)
         {
         }
 
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return Character.baseStats.HP < Character.baseStats.MaxHP;
+            return Character.baseStats.Mana < 10; // FIXME
         }
 
         public override bool CanExecute(WorldModel worldModel)
         {
             if (!base.CanExecute(worldModel)) return false;
 
-            var currentHP = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            return currentHP < maxHP;
+            var currentMana = (int)worldModel.GetProperty(Properties.MANA);
+            var maxMana = 10; // FIXME
+            return currentMana < maxMana;
         }
 
         public override void Execute()
@@ -40,15 +40,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
                 change -= goal.InsistenceValue;
             }
  
+
             return change;
         }
 
         public override void ApplyActionEffects(WorldModel worldModel)
         {
             base.ApplyActionEffects(worldModel);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            worldModel.SetProperty(Properties.HP, maxHP);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f);
+            var maxMana = 10; // FIXME
+            worldModel.SetProperty(Properties.MANA, maxMana);
+            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f); // FIXME : maybe this goal should not be here
 
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name, false);
@@ -56,10 +57,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public override float GetHValue(WorldModel worldModel)
         {
-            var currentHP = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            var currentMana = (int)worldModel.GetProperty(Properties.MANA);
+            var maxMana = 10; // FIXME
 
-            return (currentHP / maxHP) + base.GetHValue(worldModel);
+            return (currentMana / maxMana) + base.GetHValue(worldModel);
         }
     }
 }

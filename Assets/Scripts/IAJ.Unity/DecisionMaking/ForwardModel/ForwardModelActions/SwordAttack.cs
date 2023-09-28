@@ -59,7 +59,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             {
                 change += -this.expectedXPChange;
             }
-  
+
             return change;
         }
 
