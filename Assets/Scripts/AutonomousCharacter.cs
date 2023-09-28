@@ -140,7 +140,7 @@ public class AutonomousCharacter : NPC
         foreach (var enemy in GameObject.FindGameObjectsWithTag("Skeleton"))
         {
             this.Actions.Add(new SwordAttack(this, enemy));
-            //this.Actions.Add(new DivineSmite(this, enemy));
+            this.Actions.Add(new DivineSmite(this, enemy));
         }
 
         foreach (var enemy in GameObject.FindGameObjectsWithTag("Orc"))
@@ -165,12 +165,12 @@ public class AutonomousCharacter : NPC
 
         foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
         {
-            //this.Actions.Add(new GetManaPotion(this, potion));
+            this.Actions.Add(new GetManaPotion(this, potion));
         }
 
         //Then we have a series of extra actions available to Sir Uthgard
         this.Actions.Add(new LevelUp(this));
- 
+        this.Actions.Add(new ShieldOfFaith(this));
 
 
 

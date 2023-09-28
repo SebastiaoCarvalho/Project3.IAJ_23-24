@@ -13,7 +13,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return Character.baseStats.Mana < 10; // FIXME
+            return Character.baseStats.Mana < Character.baseStats.MaxMana;
         }
 
         public override bool CanExecute(WorldModel worldModel)

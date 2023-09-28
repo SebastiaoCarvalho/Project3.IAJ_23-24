@@ -16,8 +16,10 @@ namespace Assets.Scripts.Game
             public string Name;
             public int HP;
             public int ShieldHP;
+            public int MaxShieldHp;
             public int MaxHP;
             public int Mana;
+            public int MaxMana;
             public int XP;
             public float Time;
             public int Money;

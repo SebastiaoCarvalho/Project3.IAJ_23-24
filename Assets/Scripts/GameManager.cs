@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour
     {
         if (enemy != null && enemy.activeSelf && InDivineSmiteRange(enemy) && this.Character.baseStats.Mana >= 2)
         {
-            if (enemy.tag.Equals("Skeleton"))
+            if (enemy.CompareTag("Skeleton"))
             {
                 this.Character.baseStats.XP += 3;
                 this.Character.AddToDiary(" I Smited " + enemy.name);
@@ -272,6 +272,7 @@ public class GameManager : MonoBehaviour
 
     public void ShieldOfFaith()
     {
+        this.GetComponent<AudioSource>().Play();
         if (this.Character.baseStats.Mana >= 5)
         {
             this.Character.baseStats.ShieldHP = 5;

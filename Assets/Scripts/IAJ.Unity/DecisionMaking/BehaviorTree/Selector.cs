@@ -21,9 +21,27 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         public override Result Run()
         {
 
-            // TODO implement
+            if (this.currentChild < this.children.Count)
+            {
+                Result result = this.children[this.currentChild].Run();
 
-
+                if (result == Result.Failure)
+                {
+                    this.currentChild++;
+                    if (this.currentChild < this.children.Count)
+                        return Result.Running;
+                    else
+                    {
+                        this.currentChild = 0;
+                        return Result.Failure;
+                    }
+                }
+                else
+                {
+                    return result;
+                }
+            }
+            
             return Result.Failure;
 
         }

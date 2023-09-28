@@ -21,7 +21,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.BehaviourTrees
                 new IsCharacterNearTarget(character, target, character.enemyStats.AwakeDistance),
                 new Pursue(character, target, character.enemyStats.WeaponRange),
                 new LightAttack(character),
-                new MoveTo(character,character.DefaultPosition,1.0f)
+                new MoveTo(character, character.DefaultPosition,1.0f)
             };
 
         }

@@ -6,23 +6,23 @@ using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions
 {
-    public class ShieldOfFaith : WalkToTargetAndExecuteAction
+    public class ShieldOfFaith : Action
     {
-        private float expectedHPChange;
-        private float expectedXPChange;
-        private int xpChange;
+        private float expectedShieldChange;
         private int manaChange;
+        public AutonomousCharacter Character;
 
-        public ShieldOfFaith(AutonomousCharacter character, GameObject target) : base("ShieldOfFaith",character,target)
+        public ShieldOfFaith(AutonomousCharacter character) : base("ShieldOfFaith")
         {
+            this.
            manaChange = 5;
-           expectedHPChange = 5; // FIXME : use this or another property
+           expectedShieldChange = 5; // FIXME : use this or another property
         }
 
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return Character.baseStats.ShieldHP < 5; // FIXME
+            return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp; // FIXME
         }
 
         public override bool CanExecute(WorldModel worldModel)
@@ -36,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         {
             var change = base.GetGoalChange(goal);
             if (goal.Name == AutonomousCharacter.SURVIVE_GOAL) {
-                change += - this.expectedHPChange;
+                change += - this.expectedShieldChange;
             }
             return change;
         }
@@ -55,8 +55,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name, false);
-            worldModel.SetProperty(Properties.ShieldHP, 5); // FIXME
+            worldModel.SetProperty(Properties.ShieldHP, Character.baseStats.MaxShieldHp);
             worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
         }
 
@@ -64,7 +63,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         {
             var hp = (int)worldModel.GetProperty(Properties.HP);
             
-            if (hp > this.expectedHPChange)
+            if (hp > this.expectedShieldChange)
             {
                 return base.GetHValue(worldModel)/1.5f;
             }
