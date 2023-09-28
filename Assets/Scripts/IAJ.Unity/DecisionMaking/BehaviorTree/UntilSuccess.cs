@@ -1,13 +1,13 @@
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
 {
-    public class SuccessTask : Decorator {
+    public class UntilSuccess : Decorator {
 
-        public SuccessTask(Task child) : base(child) {}
+        public UntilSuccess(Task child) : base(child) {}
 
         public override Result Run()
         {
             var result = this.child.Run();
-            if (result != Result.Running)
+            if (result == Result.Success)
             {
                 return Result.Success;
             }

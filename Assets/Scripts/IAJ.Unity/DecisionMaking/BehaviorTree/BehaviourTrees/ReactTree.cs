@@ -19,13 +19,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.BehaviourTrees
             this.children = new List<Task>()
             {
                 new IsCharacterNearTarget(character, target, character.enemyStats.AwakeDistance),
-                new PerformInterruption(interrupter, Result.Failure),
-                new SuccessTask(new Sequence(new List<Task>()
-                        {
-                            new Pursue(character, target, character.enemyStats.WeaponRange),
-                            new LightAttack(character)
-                        })
-                    )
+                new PerformInterruption(interrupter, Result.Failure)
             };
 
         }
