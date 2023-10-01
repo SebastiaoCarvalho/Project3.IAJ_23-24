@@ -2,6 +2,8 @@
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using UnityEngine;
+using System.Linq;
+
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class GOBDecisionMaking
@@ -34,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
             foreach (var goal in goals)
             {
-               // Calculate the new value after the action
+                // Calculate the new value after the action
                 var newValue = goal.InsistenceValue + action.GetGoalChange(goal);
 
                 // The change rate is how much the goals changes per time
@@ -53,11 +55,28 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             InProgress = true;
             Action bestAction = null;
             var bestValue = float.PositiveInfinity;
-            var secondBestValue = float.PositiveInfinity;
-            var thirdBestValue = float.PositiveInfinity;
+            secondBestAction = null;
+            thirdBestAction = null;
+            ActionDiscontentment.Clear();
 
-            //TODO implement                
-            
+            float value;
+            foreach (var action in actions)
+            {
+                if (action.CanExecute())
+                {
+                    value = CalculateDiscontentment(action, goals);
+                    ActionDiscontentment.Add(action, value);
+                    if (value < bestValue)
+                    {
+                        bestValue = value;
+                        bestAction = action;
+                    }
+                }
+            }
+
+            var BestActions = ActionDiscontentment.OrderBy(pair => pair.Value).Take(3).ToList();
+            secondBestAction = BestActions[1].Key;
+            thirdBestAction = BestActions[2].Key;
             InProgress = false;
             return bestAction;
         }
