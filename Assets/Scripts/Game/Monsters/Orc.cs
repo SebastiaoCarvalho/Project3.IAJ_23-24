@@ -25,19 +25,6 @@ namespace Assets.Scripts.Game.NPCs
             this.enemyStats.WeaponRange = 3;
         }
 
-        void FixedUpdate() // FIXME : when interruptor is created maybe use that instead of this
-        {
-            if (GameManager.Instance.gameEnded) return;
-            if (usingBehaviourTree)
-            {
-                if(this.BehaviourTree != null) 
-                    this.BehaviourTree.Run();
-                else 
-                    this.BehaviourTree = new BasicTree(this,Target);
-            }
-                    
-        }
-
         public override void InitializeBehaviourTree()
         {
             var patrols = GameObject.FindGameObjectsWithTag("Patrol");

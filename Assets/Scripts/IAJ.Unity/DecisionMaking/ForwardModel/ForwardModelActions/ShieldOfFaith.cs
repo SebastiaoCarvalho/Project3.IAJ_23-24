@@ -14,22 +14,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public ShieldOfFaith(AutonomousCharacter character) : base("ShieldOfFaith")
         {
-            this.
-           manaChange = 5;
-           expectedShieldChange = 5; // FIXME : use this or another property
+            this.manaChange = 5;
+            this.Character = character;
+            this.expectedShieldChange = 5; 
         }
 
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp; // FIXME
+            return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp;
         }
 
         public override bool CanExecute(WorldModel worldModel)
         {
             if (!base.CanExecute(worldModel)) return false;
             int shieldHP = (int)worldModel.GetProperty(Properties.ShieldHP);
-            return shieldHP < 5; // FIXME
+            int maxShieldHP = (int)worldModel.GetProperty(Properties.MaxShieldHP);
+            return shieldHP < maxShieldHP; 
         }
 
         public override float GetGoalChange(Goal goal)
@@ -52,10 +53,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             base.ApplyActionEffects(worldModel);
 
             int mana = (int)worldModel.GetProperty(Properties.MANA);
+            int maxShieldHP = (int)worldModel.GetProperty(Properties.MaxShieldHP);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(Properties.ShieldHP, Character.baseStats.MaxShieldHp);
+            worldModel.SetProperty(Properties.ShieldHP, maxShieldHP);
             worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
         }
 

@@ -21,7 +21,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             if (!base.CanExecute(worldModel)) return false;
 
             var currentMana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = 10; // FIXME
+            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
             return currentMana < maxMana;
         }
 
@@ -47,9 +47,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override void ApplyActionEffects(WorldModel worldModel)
         {
             base.ApplyActionEffects(worldModel);
-            var maxMana = 10; // FIXME
+            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
             worldModel.SetProperty(Properties.MANA, maxMana);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f); // FIXME : maybe this goal should not be here
 
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name, false);
@@ -58,7 +57,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override float GetHValue(WorldModel worldModel)
         {
             var currentMana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = 10; // FIXME
+            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
 
             return (currentMana / maxMana) + base.GetHValue(worldModel);
         }

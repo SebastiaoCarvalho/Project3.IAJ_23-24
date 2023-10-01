@@ -12,22 +12,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         private float expectedXPChange;
         private int xpChange;
         private int manaChange;
-        private int enemyAC;
-        private int enemySimpleDamage;
-        //how do you like lambda's in c#?
-        private Func<int> dmgRoll;
 
         public DivineSmite(AutonomousCharacter character, GameObject target) : base("DivineSmite",character,target)
         {
-            if (target.tag.Equals("Skeleton"))
+            if (target.CompareTag("Skeleton"))
             {
-                this.dmgRoll = () => RandomHelper.RollD6();
-                this.enemySimpleDamage = 3;
                 this.expectedHPChange = 3.5f;
                 this.xpChange = 3;
                 this.manaChange = 2;
                 this.expectedXPChange = 2.7f;
-                this.enemyAC = 10;
             }
         }
 
