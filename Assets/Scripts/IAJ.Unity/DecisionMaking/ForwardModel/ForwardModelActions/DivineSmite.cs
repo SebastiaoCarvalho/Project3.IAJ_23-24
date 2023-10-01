@@ -31,6 +31,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             {
                 change += -this.expectedXPChange;
             }
+            if (goal.Name == AutonomousCharacter.SURVIVE_GOAL)
+            {
+                change += -this.expectedHPChange;
+            }
             return change;
         }
 
