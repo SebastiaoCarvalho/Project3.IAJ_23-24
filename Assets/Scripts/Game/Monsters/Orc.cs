@@ -15,6 +15,8 @@ namespace Assets.Scripts.Game.NPCs
     {
         public bool HeardShout;
         public Vector3 ShoutPosition;
+        public bool IsAttacking;
+
         public Orc()
         {
             this.enemyStats.Type = "Orc";
@@ -26,6 +28,7 @@ namespace Assets.Scripts.Game.NPCs
             this.enemyStats.AwakeDistance = 15;
             this.enemyStats.WeaponRange = 3;
             this.HeardShout = false;
+            this.IsAttacking = false;
         }
 
         public override void InitializeBehaviourTree()
@@ -55,10 +58,7 @@ namespace Assets.Scripts.Game.NPCs
                     orcs.Add(orc.GetComponent<Orc>());
             }
 
-            //TODO Create a Behavior tree that combines Patrol with other behaviors...
-            //var mainTree = new Patrol(this, position1, position2);
             this.BehaviourTree = new PatrolAndReactTree(this, Target, position1, position2, orcs);
-            //this.BehaviourTree = new OrcBasicTree(this, Target, orcs);
          }
 
          public void Shout(List<Orc> targets) {
@@ -67,8 +67,10 @@ namespace Assets.Scripts.Game.NPCs
          }
 
          public void hearShout(Orc source) {
-            HeardShout = true;
-            ShoutPosition = source.transform.position;
+            if (!this.IsAttacking) {
+                HeardShout = true;
+                ShoutPosition = source.transform.position;
+            }
          }
 
     }

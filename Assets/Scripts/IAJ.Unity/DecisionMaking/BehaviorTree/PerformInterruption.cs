@@ -20,8 +20,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
 
         public override Result Run()
         {
-            if (_interrupter._running) 
-                _interrupter.Interrupt(_desiredResult);
+            _interrupter.Interrupt(_desiredResult);
             
             return Result.Success;
         }

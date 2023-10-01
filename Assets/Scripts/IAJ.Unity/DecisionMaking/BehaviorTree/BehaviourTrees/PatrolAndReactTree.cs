@@ -29,12 +29,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.BehaviourTrees
             Sequence LookBehavior = new Sequence(new List<Task>{
                 new UntilSuccess(new ReactTree(
                     new IsCharacterNearTarget(character, target, character.enemyStats.AwakeDistance),
-                    new List<Interrupter>() {PatrolBehavior, ListenBehavior})), 
-                new Sequence(new List<Task>{
-                    new Shout(character, otherOrcs),
-                    new Pursue(character, target, character.enemyStats.WeaponRange), 
-                    new LightAttack(character)
-                })
+                    new List<Interrupter>() {PatrolBehavior, ListenBehavior})),
+                new OrcAttackTree(character, target, otherOrcs)
             });
 
             this.children = new List<Task>()

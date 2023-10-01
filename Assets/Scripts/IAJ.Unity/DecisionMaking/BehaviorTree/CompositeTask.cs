@@ -23,6 +23,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
 
         public override void Reset() {
             currentChild = 0;
+            foreach (Task child in children) {
+                child.Reset();
+            }
         }
 
     }

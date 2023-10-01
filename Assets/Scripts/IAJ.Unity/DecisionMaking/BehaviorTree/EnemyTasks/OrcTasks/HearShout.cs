@@ -19,7 +19,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.EnemyTasks.OrcTas
         public override Result Run()
         {
             if (character.HeardShout) {
-                character.HeardShout = false;
                 return Result.Success;
             }
             return Result.Failure;

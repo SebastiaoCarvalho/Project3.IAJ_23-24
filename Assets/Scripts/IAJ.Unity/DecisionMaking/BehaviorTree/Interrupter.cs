@@ -13,7 +13,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         private Result _result = Result.Running;
         private bool _interrupt = false;
 
-        public bool _running = true;
+        public bool _running = false;
 
         public Interrupter(Task child) : base(child) {}
 
@@ -22,8 +22,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
             _running = true;
 
             if (_interrupt) {
-                _interrupt = false;
-                _running = false;
+                Reset();
                 return _result;
             } 
             _result = this.child.Run();
@@ -31,9 +30,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         }
 
         public void Interrupt(Result result) {
-            _result = result;
-            _interrupt = true;
-            this.child.Reset();
+            if (_running) {
+                _result = result;
+                _interrupt = true;
+            }
+        }
+
+        public override void Reset() {
+            base.Reset();
+            _interrupt = false;
+            _running = false;
         }
 
     }

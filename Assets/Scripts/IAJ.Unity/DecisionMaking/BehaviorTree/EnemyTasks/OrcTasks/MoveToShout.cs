@@ -23,7 +23,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.EnemyTasks
         public override Result Run()
         {
             Target = orc.ShoutPosition;
-            return base.Run();
+            Result result = base.Run();
+
+            if (result == Result.Success)
+                orc.HeardShout = false;
+        
+            return result;
         }
 
     }
