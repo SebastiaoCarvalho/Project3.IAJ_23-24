@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
         int damage = 0;
 
         Monster.EnemyStats enemyData = enemy.GetComponent<Monster>().enemyStats;
-
+        
         if (enemy != null && enemy.activeSelf && InMeleeRange(enemy))
         {
             this.Character.AddToDiary(" I Sword Attacked " + enemy.name);
@@ -405,10 +405,10 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private bool CheckRange(GameObject obj, float maximumSqrDistance)
+    private bool CheckRange(GameObject obj, float maximumDistance)
     {
-        var distance = (obj.transform.position - this.Character.gameObject.transform.position).sqrMagnitude;
-        return distance <= maximumSqrDistance;
+        var distance = (obj.transform.position - this.Character.gameObject.transform.position).magnitude;
+        return distance <= maximumDistance;
     }
 
 

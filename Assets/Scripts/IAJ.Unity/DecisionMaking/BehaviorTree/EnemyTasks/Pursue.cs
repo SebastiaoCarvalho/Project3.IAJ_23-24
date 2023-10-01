@@ -29,6 +29,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.EnemyTasks
         {
             if (Target == null)
                 return Result.Failure;
+                
             var distance = Vector3.Distance(Character.transform.position, this.Target.transform.position);
 
             if (distance <= range)

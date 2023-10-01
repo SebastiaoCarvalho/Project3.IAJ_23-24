@@ -20,30 +20,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
         // children completely, it will return a failure status code
         public override Result Run()
         {
+            if (currentChild < children.Count) {
+                Result result = children[currentChild].Run();
 
-            if (this.currentChild < this.children.Count)
-            {
-                Result result = this.children[this.currentChild].Run();
-
-                if (result == Result.Failure)
-                {
-                    this.currentChild++;
-                    if (this.currentChild < this.children.Count)
-                        return Result.Running;
-                    else
-                    {
-                        this.currentChild = 0;
-                        return Result.Failure;
-                    }
+                if (result == Result.Running) {
+                    return Result.Running;
                 }
-                else
-                {
-                    return result;
+                else if (result == Result.Failure) {
+                    currentChild++;
+                    return Result.Running;
+                }
+                else {
+                    Reset();
+                    return Result.Success;
                 }
             }
-            
+            Reset();
             return Result.Failure;
-
         }
     }
 }

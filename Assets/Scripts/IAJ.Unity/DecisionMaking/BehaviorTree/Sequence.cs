@@ -31,7 +31,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
 
                 else if(result == Result.Failure)
                 {
-                    currentChild = 0;
+                    Reset();
                     return Result.Failure;
                 }
                 else
@@ -41,7 +41,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
                         return Result.Running;
                     else
                     {
-                        currentChild = 0;
+                        Reset();
                         return Result.Success;
                     }
                 }

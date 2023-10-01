@@ -21,6 +21,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
 
         public CompositeTask() { }
 
+        public override void Reset() {
+            currentChild = 0;
+        }
 
     }
 }

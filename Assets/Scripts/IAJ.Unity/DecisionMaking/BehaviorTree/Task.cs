@@ -17,5 +17,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree
             return Result.Failure;
         }
 
+        public virtual void Reset() {}
     }
 }
