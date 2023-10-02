@@ -32,6 +32,8 @@ namespace Assets.Scripts.Game
             //TIP: this code can be optimized by using a dictionary with lambda functions instead of if's  
             if (propertyName.Equals(Properties.MANA)) return this.GameManager.Character.baseStats.Mana;
 
+            if (propertyName.Equals(Properties.MAXMANA)) return this.GameManager.Character.baseStats.MaxMana;
+
             if (propertyName.Equals(Properties.XP)) return this.GameManager.Character.baseStats.XP;
 
             if (propertyName.Equals(Properties.MAXHP)) return this.GameManager.Character.baseStats.MaxHP;
@@ -39,6 +41,8 @@ namespace Assets.Scripts.Game
             if (propertyName.Equals(Properties.HP)) return this.GameManager.Character.baseStats.HP;
 
             if (propertyName.Equals(Properties.ShieldHP)) return this.GameManager.Character.baseStats.ShieldHP;
+
+            if (propertyName.Equals(Properties.MaxShieldHP)) return this.GameManager.Character.baseStats.MaxShieldHp;
 
             if (propertyName.Equals(Properties.MONEY)) return this.GameManager.Character.baseStats.Money;
 

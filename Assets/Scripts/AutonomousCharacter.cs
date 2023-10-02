@@ -257,9 +257,9 @@ public class AutonomousCharacter : NPC
             {
                 this.GOBDecisionMaking.InProgress = true;
             }
-            //else if ()  //Add here other Algorithms...
+            else if (GOAPActive)
             {
-                    //this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
+                this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
             }
         }
 
@@ -405,7 +405,7 @@ public class AutonomousCharacter : NPC
             var actionText = "";
             foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
             {
-                actionText += "\n" + action.Name;
+                if (action != null) actionText += "\n" + action.Name;
             }
             this.BestActionSequence.text = "Best Action Sequence: " + actionText;
             this.BestActionText.text = "Best Action: " + GOAPDecisionMaking.BestAction.Name;
