@@ -22,7 +22,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override bool CanExecute()
         {
             if (!base.CanExecute()) return false;
-            return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp;
+            int mana = Character.baseStats.Mana;
+            return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp && mana >= this.manaChange ;
         }
 
         public override bool CanExecute(WorldModel worldModel)
@@ -30,7 +31,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             if (!base.CanExecute(worldModel)) return false;
             int shieldHP = (int)worldModel.GetProperty(Properties.ShieldHP);
             int maxShieldHP = (int)worldModel.GetProperty(Properties.MaxShieldHP);
-            return shieldHP < maxShieldHP; 
+            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            return shieldHP < maxShieldHP && mana >= this.manaChange; 
         }
 
         public override float GetGoalChange(Goal goal)

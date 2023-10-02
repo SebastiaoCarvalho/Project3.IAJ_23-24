@@ -24,6 +24,20 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             }
         }
 
+        public override bool CanExecute()
+        {
+            if (!base.CanExecute()) return false;
+            int mana = Character.baseStats.Mana;
+            return mana >= this.manaChange;
+        }
+
+        public override bool CanExecute(WorldModel worldModel)
+        {
+            if (!base.CanExecute(worldModel)) return false;
+            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            return mana >= this.manaChange;
+        }
+
         public override float GetGoalChange(Goal goal)
         {
             var change = base.GetGoalChange(goal);

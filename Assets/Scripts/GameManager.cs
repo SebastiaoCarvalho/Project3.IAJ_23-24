@@ -272,7 +272,7 @@ public class GameManager : MonoBehaviour
 
     public void ShieldOfFaith()
     {
-        this.GetComponent<AudioSource>().Play();
+        /* this.GetComponent<AudioSource>().Play(); */
         if (this.Character.baseStats.Mana >= 5)
         {
             this.Character.baseStats.ShieldHP = 5;
