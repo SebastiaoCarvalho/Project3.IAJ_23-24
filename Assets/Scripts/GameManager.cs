@@ -204,7 +204,7 @@ public class GameManager : MonoBehaviour
 
             Monster monster = enemy.GetComponent<Monster>();
 
-            if (enemy != null && enemy.activeSelf && InMeleeRange(enemy))
+            if (enemy.activeSelf && monster.InWeaponRange(GameObject.FindGameObjectWithTag("Player")))
             {
 
                 this.Character.AddToDiary(" I was Attacked by " + enemy.name);
