@@ -75,8 +75,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             }
 
             var BestActions = ActionDiscontentment.OrderBy(pair => pair.Value).Take(3).ToList();
-            secondBestAction = BestActions[1].Key;
-            thirdBestAction = BestActions[2].Key;
+            secondBestAction = BestActions.Count >= 2 ? BestActions[1].Key : null;
+            thirdBestAction = BestActions.Count >= 3 ? BestActions[2].Key : null;
             InProgress = false;
             return bestAction;
         }

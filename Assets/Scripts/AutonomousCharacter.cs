@@ -363,13 +363,13 @@ public class AutonomousCharacter : NPC
                 {
                     var bestDiscont = this.GOBDecisionMaking.ActionDiscontentment[action];
                     Action secondBestAction = this.GOBDecisionMaking.secondBestAction;
-                    var secondBestDiscont = this.GOBDecisionMaking.ActionDiscontentment[secondBestAction];
+                    var secondBestDiscont = secondBestAction != null ? this.GOBDecisionMaking.ActionDiscontentment[secondBestAction] : 0.0f;
                     Action thirdBestAction = this.GOBDecisionMaking.thirdBestAction;
-                    var thirdBestDiscont = this.GOBDecisionMaking.ActionDiscontentment[thirdBestAction];
+                    var thirdBestDiscont = thirdBestAction != null ? this.GOBDecisionMaking.ActionDiscontentment[thirdBestAction] : 0.0f;
                     AddToDiary(" I decided to " + action.Name);
                     this.BestActionText.text = "Best Action: " + action.Name + ":" + bestDiscont.ToString("F2") + "\n";
-                    this.BestActionSequence.text = " Second Best:" + secondBestAction.Name + ":" + secondBestDiscont.ToString("F2") + "\n"
-                        + " Third Best:" + thirdBestAction.Name + ":" + thirdBestDiscont.ToString("F2") + "\n";
+                    this.BestActionSequence.text = " Second Best:" + (secondBestAction != null ? secondBestAction.Name : "null") + ":" + secondBestDiscont.ToString("F2") + "\n"
+                        + " Third Best:" + (thirdBestAction != null ? thirdBestAction.Name : "null") + ":" + thirdBestDiscont.ToString("F2") + "\n";
                 }
 
             }
