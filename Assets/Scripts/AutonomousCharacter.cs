@@ -121,7 +121,7 @@ public class AutonomousCharacter : NPC
             ChangeRate = 0.4f
         };
 
-        this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 0.3f)
+        this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 0.6f)
         {
             ChangeRate = 1f
         };
@@ -174,9 +174,8 @@ public class AutonomousCharacter : NPC
         //Then we have a series of extra actions available to Sir Uthgard
         this.Actions.Add(new LevelUp(this));
         this.Actions.Add(new ShieldOfFaith(this));
-
-
-
+        this.Actions.Add(new Teleport(this));
+        this.Actions.Add(new Rest(this));
 
 
         // Initialization of Decision Making Algorithms
