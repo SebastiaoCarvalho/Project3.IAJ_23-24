@@ -49,7 +49,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             var goalValue = worldModel.GetGoalValue(AutonomousCharacter.GET_RICH_GOAL);
             worldModel.SetGoalValue(AutonomousCharacter.GET_RICH_GOAL, goalValue - 5.0f);
-
             var money = (int)worldModel.GetProperty(Properties.MONEY);
             worldModel.SetProperty(Properties.MONEY, money + 5);
 

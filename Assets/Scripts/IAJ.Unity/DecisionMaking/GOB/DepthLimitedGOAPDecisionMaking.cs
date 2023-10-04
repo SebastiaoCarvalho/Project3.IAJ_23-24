@@ -8,7 +8,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class DepthLimitedGOAPDecisionMaking
     {
-        public const int MAX_DEPTH = 2;
+        public const int MAX_DEPTH = 3;
         public int ActionCombinationsProcessedPerFrame { get; set; }
         public float TotalProcessingTime { get; set; }
         public int TotalActionCombinationsProcessed { get; set; }
@@ -59,7 +59,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                 }
                 if (this.CurrentDepth >= MAX_DEPTH) {
                     var currentValue = Models[CurrentDepth].CalculateDiscontentment(Goals);
-
+                    TotalActionCombinationsProcessed++;
                     if (currentValue < BestDiscontentmentValue) {
                         BestDiscontentmentValue = currentValue;
                         this.BestAction = LevelAction[0];
@@ -76,6 +76,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                     Models[CurrentDepth + 1] = Models[CurrentDepth].GenerateChildWorldModel();
                     nextAction.ApplyActionEffects(Models[CurrentDepth + 1]);
                     processedActions++;
+                    if ((int) Models[CurrentDepth + 1].GetProperty(Properties.HP) <= 0) 
+                        continue;
                     LevelAction[CurrentDepth] = nextAction;
                     CurrentDepth++;
                 }

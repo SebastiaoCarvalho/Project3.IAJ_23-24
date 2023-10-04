@@ -102,12 +102,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
             worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue + remainingDamage);
 
-
             //calculate Hit
             //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
             int attackRoll = RandomHelper.RollD20() + 7;
 
-            if (attackRoll >= enemyAC || GameManager.Instance.StochasticWorld)
+            if (attackRoll >= enemyAC || ! GameManager.Instance.StochasticWorld)
             {
                 //there was an hit, enemy is destroyed, gain xp
                 //disables the target object so that it can't be reused again

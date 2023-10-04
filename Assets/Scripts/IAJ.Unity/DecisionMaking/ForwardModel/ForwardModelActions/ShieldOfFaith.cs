@@ -61,6 +61,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(Properties.ShieldHP, maxShieldHP);
             worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
+            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedShieldChange));
         }
 
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS

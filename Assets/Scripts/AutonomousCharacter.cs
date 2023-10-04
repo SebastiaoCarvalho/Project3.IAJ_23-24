@@ -115,7 +115,7 @@ public class AutonomousCharacter : NPC
         this.GetRichGoal = new Goal(GET_RICH_GOAL, 0.5f)
         {
             InsistenceValue = 5.0f,
-            ChangeRate = 0.2f
+            ChangeRate = 0.4f
         };
 
         this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 0.3f)
