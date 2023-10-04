@@ -67,9 +67,9 @@ namespace Assets.Scripts.Game.NPCs
             var shout = this.GetComponent<AudioSource>();
             shout.Play();
 
-            AlertSprite.transform.position = this.transform.position;
+            AlertSprite.transform.position = new Vector3(this.transform.position.x, 4, this.transform.position.z);
             var animation = Instantiate(AlertSprite);
-            Destroy(animation, 2);
+            Destroy(animation, 1.5f);
 
             foreach(Orc target in targets)
                 target.hearShout(this);
