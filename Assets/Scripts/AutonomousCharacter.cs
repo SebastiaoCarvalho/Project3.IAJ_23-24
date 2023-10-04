@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
 using Assets.Scripts.Game;
 using Assets.Scripts.Game.NPCs;
@@ -46,6 +47,7 @@ public class AutonomousCharacter : NPC
     [Header("Decision Algorithm Options")]
     public bool GOBActive;
     public bool GOAPActive;
+    public bool MCTSActive;
  
     [Header("Character Info")]
     public bool Resting = false;
@@ -61,6 +63,7 @@ public class AutonomousCharacter : NPC
     public Action CurrentAction { get; private set; }
     public GOBDecisionMaking GOBDecisionMaking { get; set; }
     public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
+    public MCTS MCTSDecisionMaking { get; set; }
 
     public GameObject nearEnemy { get; private set; }
 
@@ -186,6 +189,11 @@ public class AutonomousCharacter : NPC
                 var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
                 this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             }
+            else if (this.MCTSActive)
+            {
+                var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
+                this.MCTSDecisionMaking = new MCTS(worldModel);
+            }
         }
 
         DiaryText.text += "My Diary \n I awoke. What a wonderful day to kill Monsters! \n";
@@ -258,8 +266,13 @@ public class AutonomousCharacter : NPC
                 this.GOBDecisionMaking.InProgress = true;
             }
             else if (GOAPActive)
+            //else if ()  //Add here other Algorithms...
             {
                 this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
+            }
+            else if (MCTSActive)
+            {
+                this.MCTSDecisionMaking.InitializeMCTSearch();
             }
         }
 
@@ -299,6 +312,10 @@ public class AutonomousCharacter : NPC
         else if (this.GOBActive)
         {
             this.UpdateGOB();
+        }
+        else if (this.MCTSActive)
+        {
+            this.UpdateMCTS();
         }
 
         if (this.CurrentAction != null)
@@ -417,11 +434,11 @@ public class AutonomousCharacter : NPC
         }
     }
 
-/*    private void UpdateMCTS()
+    private void UpdateMCTS()
     {
         if (this.MCTSDecisionMaking.InProgress)
         {
-            var action = this.MCTSDecisionMaking.Run();
+            var action = this.MCTSDecisionMaking.ChooseAction();
             if (action != null)
             {
                 this.CurrentAction = action;
@@ -445,7 +462,7 @@ public class AutonomousCharacter : NPC
             this.BestActionSequence.text = "Best Action Sequence: " + actionText;
 
             //Debug: What is the predicted state of the world?
-            var endState = MCTSDecisionMaking.BestActionSequenceWorldState;
+            var endState = MCTSDecisionMaking.BestActionSequenceEndState; // previously BestActionSequenceWorldState
             var text = "";
             if (endState != null)
             {
@@ -463,7 +480,7 @@ public class AutonomousCharacter : NPC
             this.BestActionSequence.text = "Best Action Sequence:\nNone";
             this.BestActionText.text = "";
         }
-    }*/
+    }
 
 
     void DrawPath()
