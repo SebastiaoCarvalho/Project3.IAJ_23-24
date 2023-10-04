@@ -17,6 +17,8 @@ namespace Assets.Scripts.Game.NPCs
         public Vector3 ShoutPosition;
         public bool IsAttacking;
 
+        public GameObject AlertSprite;
+
         public Orc()
         {
             this.enemyStats.Type = "Orc";
@@ -62,6 +64,13 @@ namespace Assets.Scripts.Game.NPCs
          }
 
          public void Shout(List<Orc> targets) {
+            var shout = this.GetComponent<AudioSource>();
+            shout.Play();
+
+            AlertSprite.transform.position = this.transform.position;
+            var animation = Instantiate(AlertSprite);
+            Destroy(animation, 2);
+
             foreach(Orc target in targets)
                 target.hearShout(this);
          }
