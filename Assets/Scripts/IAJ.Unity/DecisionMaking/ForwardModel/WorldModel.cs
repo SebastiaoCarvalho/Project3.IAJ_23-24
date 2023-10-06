@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Assets.Scripts.IAJ.Unity.Utils;
+using Assets.Scripts.Game;
+using System;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
 {
     public class WorldModel
     {
-        private Dictionary<string, object> Properties { get; set; }
+        protected const int PROPERTIES_NUMBER = 11;
+        protected object[] PropertiesArray { get; set; }
+        protected GameObject[] DisposableObjectsArray { get; set; }
         private List<Action> Actions { get; set; }
         protected IEnumerator<Action> ActionEnumerator { get; set; } 
 
@@ -17,7 +21,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
 
         public WorldModel(List<Action> actions)
         {
-            this.Properties = new Dictionary<string, object>();
             this.GoalValues = new Dictionary<string, float>();
             this.Actions = new List<Action>(actions);
             this.Actions.Shuffle();
@@ -26,34 +29,87 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
 
         public WorldModel(WorldModel parent)
         {
-            this.Properties = new Dictionary<string, object>();
             this.GoalValues = new Dictionary<string, float>();
             this.Actions = new List<Action>(parent.Actions);
             this.Actions.Shuffle();
             this.Parent = parent;
+            InitializePropertiesArray();
+            InitializeDisposableObjectsArray();
             this.ActionEnumerator = this.Actions.GetEnumerator();
+        }
+
+        public virtual void InitializePropertiesArray()
+        {
+            this.PropertiesArray = new object[PROPERTIES_NUMBER];
+            for(int i = 0; i < PROPERTIES_NUMBER; i++) {
+                this.PropertiesArray[i] = this.Parent.PropertiesArray[i];
+            }
+        }
+
+        public virtual void InitializeDisposableObjectsArray()
+        {
+            int size = GameManager.Instance.InitialDisposableObjectsCount;
+            this.DisposableObjectsArray = new GameObject[GameManager.Instance.InitialDisposableObjectsCount];
+            for(int i = 0; i < size; i++) {
+                this.DisposableObjectsArray[i] = this.Parent.DisposableObjectsArray[i];
+            }
         }
 
         public virtual object GetProperty(string propertyName)
         {
             //recursive implementation of WorldModel
-            if (this.Properties.ContainsKey(propertyName))
+            var index = this.GetPropertyIndex(propertyName);
+            if (index != -1)
             {
-                return this.Properties[propertyName];
+                return this.PropertiesArray[index];
             }
-            else if (this.Parent != null)
+            return SearchDisposableObject(propertyName);
+        }
+
+        private int GetPropertyIndex(string propertyName)
+        {
+            return propertyName switch
             {
-                return this.Parent.GetProperty(propertyName);
+                Properties.HP => 0,
+                Properties.MANA => 1,
+                Properties.MONEY => 2,
+                Properties.LEVEL => 3,
+                Properties.XP => 4,
+                Properties.ShieldHP => 5,
+                Properties.POSITION => 6,
+                Properties.TIME => 7,
+                Properties.MAXHP => 8,
+                Properties.MAXMANA => 9,
+                Properties.MaxShieldHP => 10,
+                _ => -1,
+            };
+        }
+
+        private object SearchDisposableObject(string objectName)
+        {
+            for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
+                if(this.DisposableObjectsArray[i] != null && this.DisposableObjectsArray[i].name == objectName) {
+                    return this.DisposableObjectsArray[i].activeSelf;
+                }
             }
-            else
-            {
-                return null;
-            }
+            return false;
         }
 
         public virtual void SetProperty(string propertyName, object value)
         {
-            this.Properties[propertyName] = value;
+            var index = this.GetPropertyIndex(propertyName);
+            if (index != -1)
+            {
+                this.PropertiesArray[index] = value;
+                return;
+            }
+            if (! (bool) value) {
+                for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
+                    if(this.DisposableObjectsArray[i] != null && this.DisposableObjectsArray[i].name == propertyName) {
+                        this.DisposableObjectsArray[i] = null;
+                    }
+            }
+            }
         }
 
         public virtual float GetGoalValue(string goalName)

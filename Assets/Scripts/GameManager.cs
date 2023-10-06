@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemies { get; set; }
     public List<FormationManager> Formations { get; set; }
     public Dictionary<string, List<GameObject>> disposableObjects { get; set; }
+    public int InitialDisposableObjectsCount { get; set; }
     public bool WorldChanged { get; set; }
 
     private float nextUpdateTime = 0.0f;
@@ -58,6 +59,7 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
         UpdateDisposableObjects();
+        this.InitialDisposableObjectsCount = this.disposableObjects.Count;
         this.WorldChanged = false;
         this.Character = GameObject.FindGameObjectWithTag("Player").GetComponent<AutonomousCharacter>();
 
