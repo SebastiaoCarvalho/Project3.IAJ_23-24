@@ -17,6 +17,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsPerFrame { get; set; }
+        public int MaxPlayoutIterations { get; set; }
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
@@ -30,14 +31,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
         
-        
+        // playing as enemy might not be working
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
             this.InProgress = false;
             this.InitialState = currentStateWorldModel; //previously CurrentStateWorldModel
-            this.MaxIterations = 500;
-            this.MaxIterationsPerFrame = 5;
+            this.MaxIterations = 1000;
+            this.MaxIterationsPerFrame = 100;
+            this.MaxPlayoutIterations = 3;
             this.RandomGenerator = new System.Random();
         }
 
@@ -70,6 +72,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
             FrameCurrentIterations = 0;
+            var CurrentPlayoutIterations = 0;
 
             while (CurrentIterations <= MaxIterations)
             {
@@ -80,28 +83,20 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     return null;
                 }
                 selectedNode = Selection(InitialNode);
-                reward = Playout(new WorldModel(selectedNode.State));
-                //Debug.Log(reward);
-                Backpropagate(selectedNode, reward);
+
+                CurrentPlayoutIterations = 0;
+                while (CurrentPlayoutIterations++ < MaxPlayoutIterations) {
+                    reward = Playout(selectedNode.State.GenerateChildWorldModel());
+                    Backpropagate(selectedNode, reward);
+                }
 
                 CurrentIterations++;
                 FrameCurrentIterations++;
-                //Debug.Log(CurrentIterations);
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
             this.InProgress = false;
             return BestAction(InitialNode);
-
-            //while within computational budget
-
-                //Selection + Expansion
-
-                //Playout
-
-                //Backpropagation
-
-            // return best initial child
         }
 
         // Selection and Expantion
@@ -114,27 +109,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             CurrentDepth = 0;
 
-            while (!currentNode.State.IsTerminal()) { // also is next action null bc state :|
+            while (!currentNode.State.IsTerminal()) {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null)
                 {
-                    //Debug.Log("expanding");
                     return this.Expand(currentNode, nextAction);
                 }
                 else if (nextAction == null) {
-                    bestChild = BestUCTChild(currentNode); // this is UCT I believe
+                    bestChild = BestUCTChild(currentNode);
                     currentNode = bestChild;
                     CurrentDepth++;
-                    //currentNode = bestChild != null ? bestChild : currentNode;
                 }
-
             }
-
-            //   while(!currentNode.State.IsTerminal())
-
-                // nextAction = currentNode.State.GetNextAction();
-
-                //Expansion
 
             if (CurrentDepth > MaxSelectionDepthReached)
             {
@@ -148,18 +134,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             // is terminal is always for player, getScore is always from player perspective
             // playout and return a result for initialStateForPlayout
-            //Debug.Log("playout");
 
             CurrentDepth = 0;
             var currentState = initialStateForPlayout;
             Action[] executableActions = currentState.GetExecutableActions();
 
-            //player?
-
             while (!currentState.IsTerminal())
             {
-                Debug.Log("hererererer");
-                //var index = (int) RandomHelper.RandomBinomial(executableActions.Length-1);
                 var index = RandomGenerator.Next(executableActions.Length);
                 executableActions[index].ApplyActionEffects(currentState);
                 currentState.CalculateNextPlayer();
@@ -181,11 +162,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var currentNode = node;
 
             while (currentNode != null) {
-                if (currentNode.PlayerID == 0)
+                if (currentNode.Parent == null || currentNode.Parent.PlayerID == 0)
                 {
                     currentNode.Q += reward;
                 }
-                else if (currentNode.PlayerID == 1)
+                else if (currentNode.Parent.PlayerID == 1)
                 {
                     currentNode.Q += 1 - reward;
                 }
@@ -198,25 +179,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             // here we create a new node from applying the action to the parent and do playout
             WorldModel newState = parent.State.GenerateChildWorldModel();
-            //Debug.Log(action.Name);
             action.ApplyActionEffects(newState);
             newState.CalculateNextPlayer();
-            // insert newState in the MCTS tree = newNode
             MCTSNode newNode = new MCTSNode(newState) {
                 Parent = parent,
                 Action = action,
-                PlayerID = parent.State.GetNextPlayer(),
+                PlayerID = newState.GetNextPlayer(),
                 N = 0,
                 Q = 0
-                // player?
             };
 
             parent.ChildNodes.Add(newNode);
-
-            //var result = this.Playout(newState);
-            // make the newState actions be this action
-            //ToDo
-            //Backpropagate(newNode, result);
 
             return newNode;
         }
@@ -224,20 +197,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected virtual MCTSNode BestUCTChild(MCTSNode node)
         {
             // go for each child and check which value is best
-            //ToDo
             List<MCTSNode> childNodes = node.ChildNodes;
             MCTSNode bestChild = null;
-            double bestChildUCT = double.MinValue;
-            double childUCT;
+            double bestChildValue = double.MinValue;
+            double childValue;
 
             foreach (MCTSNode child in childNodes)
             {
-                childUCT = child.N != 0 ? child.Q/child.N + C * Math.Sqrt(Math.Log(node.N)/child.N) : double.PositiveInfinity;
+                childValue = child.N != 0 ? child.Q/child.N + C * Math.Sqrt(Math.Log(node.N)/child.N) : double.PositiveInfinity;
 
-                if (childUCT > bestChildUCT)
+                if (childValue > bestChildValue)
                 {
                     bestChild = child;
-                    bestChildUCT = childUCT;
+                    bestChildValue = childValue;
                 }
             }
 
@@ -248,17 +220,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //the exploration factor
         protected MCTSNode BestChild(MCTSNode node)
         {
-            //ToDo
             List<MCTSNode> childNodes = node.ChildNodes;
             MCTSNode bestChild = null;
-            float bestChildWinRate = float.MinValue;
-            float childWinRate;
-            //Debug.Log("childs");
-            //Debug.Log(childNodes.Count);
+            double bestChildWinRate = double.MinValue;
+            double childWinRate;
 
             foreach (MCTSNode child in childNodes)
             {
-                childWinRate = child.Q/child.N;
+                childWinRate = child.N != 0 ? child.Q/child.N : double.PositiveInfinity;
                 if (childWinRate > bestChildWinRate)
                 {
                     bestChild = child;
@@ -284,9 +253,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             while(!node.State.IsTerminal()) //not doing this??
             {
-                Debug.Log("In here");
-                bestChild = this.BestChild(node);
-                if (bestChild == null) break;
+                //Debug.Log("In here");
+                bestChild = this.BestChild(node); // here??
+                if (bestChild == null) {
+                    //Debug.Log("it broke");
+                    break;
+                }
                 this.BestActionSequence.Add(bestChild.Action);
                 node = bestChild;
                 this.BestActionSequenceEndState = node.State; // previously BestActionSequenceWorldState

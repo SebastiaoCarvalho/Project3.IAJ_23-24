@@ -45,8 +45,8 @@ namespace Assets.Scripts.Game
 
             // TODO : Should Time and other factors be taken into accoun?
 
-            if (HP <= 0) return 0.0f;
-            else if (money == 25)
+            if (HP <= 0 || time >= GameManager.GameConstants.TIME_LIMIT) return 0.0f;
+            else if (this.NextPlayer == 0 && money == 25 && HP > 0)
             {
                 return 1.0f;
             }
