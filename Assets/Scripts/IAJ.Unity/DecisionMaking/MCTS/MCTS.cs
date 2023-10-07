@@ -30,13 +30,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected CurrentStateWorldModel InitialState { get; set; }
         protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
-        
-        // playing as enemy might not be working
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
             this.InProgress = false;
-            this.InitialState = currentStateWorldModel; //previously CurrentStateWorldModel
+            this.InitialState = currentStateWorldModel;
             this.MaxIterations = 1000;
             this.MaxIterationsPerFrame = 100;
             this.MaxPlayoutIterations = 3;
@@ -50,7 +48,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxPlayoutDepthReached = 0;
             this.MaxSelectionDepthReached = 0;
             this.CurrentIterations = 0;
-            this.FrameCurrentIterations = 0; //previously CurrentIterationsInFrame
+            this.FrameCurrentIterations = 0;
             this.TotalProcessingTime = 0.0f;
  
             // create root node n0 for state s0
@@ -76,7 +74,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             while (CurrentIterations <= MaxIterations)
             {
-                // TODO: where do we see max depth reached
                 if (FrameCurrentIterations > MaxIterationsPerFrame)
                 {
                     this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
@@ -115,11 +112,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 {
                     return this.Expand(currentNode, nextAction);
                 }
-                else if (nextAction == null) {
-                    bestChild = BestUCTChild(currentNode);
-                    currentNode = bestChild;
-                    CurrentDepth++;
-                }
+
+                bestChild = BestUCTChild(currentNode);
+                currentNode = bestChild;
+                CurrentDepth++;
             }
 
             if (CurrentDepth > MaxSelectionDepthReached)
@@ -158,7 +154,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            //ToDo, do not forget to later consider two advesary moves...
             var currentNode = node;
 
             while (currentNode != null) {
@@ -166,7 +161,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 {
                     currentNode.Q += reward;
                 }
-                else if (currentNode.Parent.PlayerID == 1)
+                else
                 {
                     currentNode.Q += 1 - reward;
                 }
@@ -222,12 +217,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             List<MCTSNode> childNodes = node.ChildNodes;
             MCTSNode bestChild = null;
-            double bestChildWinRate = double.MinValue;
-            double childWinRate;
+            float bestChildWinRate = float.MinValue;
+            float childWinRate;
 
             foreach (MCTSNode child in childNodes)
             {
-                childWinRate = child.N != 0 ? child.Q/child.N : double.PositiveInfinity;
+                childWinRate = child.N != 0 ? child.Q/child.N : float.PositiveInfinity;
                 if (childWinRate > bestChildWinRate)
                 {
                     bestChild = child;
@@ -251,17 +246,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.BestActionSequence.Add(bestChild.Action);
             node = bestChild;
 
-            while(!node.State.IsTerminal()) //not doing this??
+            while(!node.State.IsTerminal())
             {
-                //Debug.Log("In here");
-                bestChild = this.BestChild(node); // here??
+                bestChild = this.BestChild(node);
                 if (bestChild == null) {
-                    //Debug.Log("it broke");
                     break;
                 }
                 this.BestActionSequence.Add(bestChild.Action);
                 node = bestChild;
-                this.BestActionSequenceEndState = node.State; // previously BestActionSequenceWorldState
+                this.BestActionSequenceEndState = node.State;
             }
 
             return this.BestFirstChild.Action;
