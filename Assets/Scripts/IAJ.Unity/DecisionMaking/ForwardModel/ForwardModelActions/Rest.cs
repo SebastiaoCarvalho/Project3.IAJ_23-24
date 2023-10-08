@@ -29,7 +29,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             if (!base.CanExecute(worldModel)) return false;
             int hp = (int)worldModel.GetProperty(Properties.HP);
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            return hp < maxHP;; 
+            return hp < maxHP;
         }
 
         public override float GetGoalChange(Goal goal)
@@ -56,10 +56,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             base.ApplyActionEffects(worldModel);
 
             int hp = (int)worldModel.GetProperty(Properties.HP);
+            int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(Properties.HP, hp + this.expectedHPChange);
+            worldModel.SetProperty(Properties.HP, Math.Max(hp + this.expectedHPChange, maxHP));
         }
 
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS
