@@ -59,7 +59,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             var currentHP = (int)worldModel.GetProperty(Properties.HP);
             var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
 
-            return (currentHP / maxHP) + base.GetHValue(worldModel);
+            return - (maxHP / currentHP) * 5 + base.GetHValue(worldModel);
         }
     }
 }

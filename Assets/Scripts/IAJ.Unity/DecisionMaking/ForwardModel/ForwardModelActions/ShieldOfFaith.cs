@@ -66,13 +66,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS
         {
+            // if low hp and low shields
+
             var hp = (int)worldModel.GetProperty(Properties.HP);
-            
-            if (hp > this.expectedShieldChange)
-            {
-                return base.GetHValue(worldModel)/1.5f;
-            }
-            return 10.0f;
+            var maxHp = (int)worldModel.GetProperty(Properties.MAXHP);
+            var shieldHp = (int)worldModel.GetProperty(Properties.ShieldHP);
+            var maxShieldHp = (int)worldModel.GetProperty(Properties.MaxShieldHP);
+
+            return base.GetHValue(worldModel) - (hp/(float)maxHp) * 0.5f - (shieldHp/(float)maxShieldHp) * 0.5f;
         }
     }
 }

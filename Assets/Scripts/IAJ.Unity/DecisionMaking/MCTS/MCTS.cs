@@ -18,12 +18,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxIterations { get; set; }
         public int MaxIterationsPerFrame { get; set; }
         public int MaxPlayoutIterations { get; set; }
-        public int MaxPlayoutDepthReached { get; private set; }
-        public int MaxSelectionDepthReached { get; private set; }
-        public float TotalProcessingTime { get; private set; }
+        public int MaxPlayoutDepthReached { get; set; }
+        public int MaxSelectionDepthReached { get; set; }
+        public float TotalProcessingTime { get; set; }
         public MCTSNode BestFirstChild { get; set; }
-        public List<Action> BestActionSequence { get; private set; }
-        public WorldModel BestActionSequenceEndState { get; private set; }
+        public List<Action> BestActionSequence { get; set; }
+        public WorldModel BestActionSequenceEndState { get; set; }
         protected int CurrentIterations { get; set; }
         protected int CurrentDepth { get; set; }
         protected int FrameCurrentIterations { get; set; }
@@ -245,6 +245,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.BestActionSequence = new List<Action>();
             this.BestActionSequence.Add(bestChild.Action);
             node = bestChild;
+            this.BestActionSequenceEndState = node.State;
 
             while(!node.State.IsTerminal())
             {

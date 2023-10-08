@@ -2,6 +2,7 @@
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using Assets.Scripts.IAJ.Unity.Utils;
 using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions
@@ -86,6 +87,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             else
             {
                 damage = this.enemySimpleDamage;
+                if (damage <= 0) {
+                    Debug.Log("wtf");
+                }
             }
             //calculate player's damage
             int remainingDamage = damage - shieldHp;
@@ -94,7 +98,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             if(remainingDamage > 0)
             {
-                remainingHP = (hp - remainingDamage);
+                remainingHP = hp - remainingDamage;
                 worldModel.SetProperty(Properties.HP, remainingHP);
             }
 
@@ -118,12 +122,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override float GetHValue(WorldModel worldModel)
         {
             var hp = (int)worldModel.GetProperty(Properties.HP);
-            
-            if (hp > this.expectedHPChange)
+            var maxHp = (int)worldModel.GetProperty(Properties.HP);
+
+            int xp = (int)worldModel.GetProperty(Properties.XP);
+            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+
+            xp = xp > level * 10 ? 1 : xp;
+
+
+            if (hp > this.expectedHPChange) // you should survive
             {
-                return base.GetHValue(worldModel)/1.5f;
+                return base.GetHValue(worldModel) + (this.expectedHPChange/maxHp) * 0.6f + (level * 10)/this.expectedXPChange * 0.4f; // normalize from 0 to 1
+                //base.GetHValue(worldModel)/1.5f;
+                // see this difference
             }
-            return 10.0f;
+            return 1000.0f;
         }
     }
 }

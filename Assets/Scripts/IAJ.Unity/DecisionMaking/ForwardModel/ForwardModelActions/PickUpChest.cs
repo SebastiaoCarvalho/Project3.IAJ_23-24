@@ -58,7 +58,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public override float GetHValue(WorldModel worldModel)
         {
-            return base.GetHValue(worldModel);
+            // get money property if 20 go for it
+            // else return a lower value that's still decent
+            // count with distance
+            var money = (int)worldModel.GetProperty(Properties.MONEY);
+
+            if (money == 20 || base.GetHValue(worldModel) < 0.1) {
+                return base.GetHValue(worldModel) - 50.0f;
+            }
+            return base.GetHValue(worldModel) - 15.0f;
         }
     }
 }

@@ -48,6 +48,7 @@ public class AutonomousCharacter : NPC
     public bool GOBActive;
     public bool GOAPActive;
     public bool MCTSActive;
+    public bool MCTSBiasedPlayoutActive;
  
     [Header("Character Info")]
     public bool Resting = false;
@@ -64,6 +65,7 @@ public class AutonomousCharacter : NPC
     public GOBDecisionMaking GOBDecisionMaking { get; set; }
     public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
     public MCTS MCTSDecisionMaking { get; set; }
+    public MCTSBiasedPlayout MCTSBiasedDecisionMaking { get; set; }
 
     public GameObject nearEnemy { get; private set; }
 
@@ -193,6 +195,11 @@ public class AutonomousCharacter : NPC
                 var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
                 this.MCTSDecisionMaking = new MCTS(worldModel);
             }
+            else if (this.MCTSBiasedPlayoutActive)
+            {
+                var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
+                this.MCTSBiasedDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            }
         }
 
         DiaryText.text += "My Diary \n I awoke. What a wonderful day to kill Monsters! \n";
@@ -273,6 +280,10 @@ public class AutonomousCharacter : NPC
             {
                 this.MCTSDecisionMaking.InitializeMCTSearch();
             }
+            else if (MCTSBiasedPlayoutActive)
+            {
+                this.MCTSBiasedDecisionMaking.InitializeMCTSearch();
+            }
         }
 
         if (this.controlledByPlayer)
@@ -315,6 +326,10 @@ public class AutonomousCharacter : NPC
         else if (this.MCTSActive)
         {
             this.UpdateMCTS();
+        }
+        else if (this.MCTSBiasedPlayoutActive)
+        {
+            this.UpdateMCTSBiased();
         }
 
         if (this.CurrentAction != null)
@@ -462,6 +477,54 @@ public class AutonomousCharacter : NPC
 
             //Debug: What is the predicted state of the world?
             var endState = MCTSDecisionMaking.BestActionSequenceEndState; // previously BestActionSequenceWorldState
+            var text = "";
+            if (endState != null)
+            {
+                text += "Predicted World State:\n";
+                text += "My Level:" + endState.GetProperty(Properties.LEVEL) + "\n";
+                text += "My HP:" + endState.GetProperty(Properties.HP) + "\n";
+                text += "My Money:" + endState.GetProperty(Properties.MONEY) + "\n";
+                text += "Time Passsed:" + endState.GetProperty(Properties.TIME) + "\n";
+                this.BestActionText.text = text;
+            }
+            else this.BestActionText.text = "No EndState was found";
+        }
+        else
+        {
+            this.BestActionSequence.text = "Best Action Sequence:\nNone";
+            this.BestActionText.text = "";
+        }
+    }
+
+    private void UpdateMCTSBiased()
+    {
+        if (this.MCTSBiasedDecisionMaking.InProgress)
+        {
+            var action = this.MCTSBiasedDecisionMaking.ChooseAction();
+            if (action != null)
+            {
+                this.CurrentAction = action;
+                AddToDiary(" I decided to " + action.Name);
+            }
+        }
+        // Statistical and Debug data
+        this.TotalProcessingTimeText.text = "Process. Time: " + this.MCTSBiasedDecisionMaking.TotalProcessingTime.ToString("F");
+
+        this.ProcessedActionsText.text = "Max Depth: " + this.MCTSBiasedDecisionMaking.MaxPlayoutDepthReached.ToString();
+
+        if (this.MCTSBiasedDecisionMaking.BestFirstChild != null)
+        {
+            var q = this.MCTSBiasedDecisionMaking.BestFirstChild.Q / this.MCTSBiasedDecisionMaking.BestFirstChild.N;
+            this.BestDiscontentmentText.text = "Best Exp. Q value: " + q.ToString("F05");
+            var actionText = "";
+            foreach (var action in this.MCTSBiasedDecisionMaking.BestActionSequence)
+            {
+                actionText += "\n" + action.Name;
+            }
+            this.BestActionSequence.text = "Best Action Sequence: " + actionText;
+
+            //Debug: What is the predicted state of the world?
+            var endState = MCTSBiasedDecisionMaking.BestActionSequenceEndState; // previously BestActionSequenceWorldState
             var text = "";
             if (endState != null)
             {
