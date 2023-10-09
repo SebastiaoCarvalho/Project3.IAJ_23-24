@@ -49,9 +49,11 @@ namespace Assets.Scripts.Game
         public override void InitializeDisposableObjectsArray()
         {
             int size = GameManager.Instance.InitialDisposableObjectsCount;
-            this.DisposableObjectsArray = new GameObject[GameManager.Instance.InitialDisposableObjectsCount];
+            this.DisposableObjectsArray = new GameObject[size];
+            this.ObjectsExist = new bool[size];
             for(int i = 0; i < size; i++) {
                 this.DisposableObjectsArray[i] = this.GameManager.disposableObjects.Values.ToArray()[i][0];
+                this.ObjectsExist[i] = this.DisposableObjectsArray[i].activeSelf;
             }
         }
         public override object GetProperty(string propertyName)

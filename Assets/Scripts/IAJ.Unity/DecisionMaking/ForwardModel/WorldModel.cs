@@ -12,6 +12,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
         protected const int PROPERTIES_NUMBER = 11;
         protected object[] PropertiesArray { get; set; }
         protected GameObject[] DisposableObjectsArray { get; set; }
+        protected bool[] ObjectsExist { get; set; }
         private List<Action> Actions { get; set; }
         protected IEnumerator<Action> ActionEnumerator { get; set; } 
 
@@ -63,7 +64,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
             {
                 return this.PropertiesArray[index];
             }
-            return SearchDisposableObject(propertyName);
+            return SearchDisposableObjectExists(propertyName);
         }
 
         private int GetPropertyIndex(string propertyName)
@@ -85,14 +86,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
             };
         }
 
-        private object SearchDisposableObject(string objectName)
+        private object SearchDisposableObjectExists(string objectName)
         {
             for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
                 if(this.DisposableObjectsArray[i] != null && this.DisposableObjectsArray[i].name == objectName) {
-                    return this.DisposableObjectsArray[i].activeSelf;
+                    return this.ObjectsExist[i];
                 }
             }
-            return false;
+            return null;
         }
 
         public virtual void SetProperty(string propertyName, object value)
@@ -103,12 +104,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
                 this.PropertiesArray[index] = value;
                 return;
             }
-            if (! (bool) value) {
-                for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
-                    if(this.DisposableObjectsArray[i] != null && this.DisposableObjectsArray[i].name == propertyName) {
-                        this.DisposableObjectsArray[i] = null;
-                    }
-            }
+            for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
+                if(this.DisposableObjectsArray[i].name == propertyName) {
+                    this.ObjectsExist[i] = (bool) value;
+                }
             }
         }
 
