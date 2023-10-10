@@ -2,6 +2,7 @@
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using UnityEngine;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
+using System;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions
 {
@@ -85,10 +86,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public override float GetHValue(WorldModel worldModel)
         {
-            //var time = (float) worldModel.GetProperty(Properties.TIME);
             var duration = this.GetDuration();
+            var time = (float) worldModel.GetProperty(Properties.TIME);
 
-            return duration/150.0f;
+            return (float) Math.Exp(- duration / (150 - time));
         }
     }
 }

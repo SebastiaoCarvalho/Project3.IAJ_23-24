@@ -59,12 +59,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS
         {
             var hp = (int)worldModel.GetProperty(Properties.HP);
-            
-            if (hp > 5)
-            {
-                return base.GetHValue(worldModel)/1.5f;
-            }
-            return 10.0f;
+            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            var mana = (int)worldModel.GetProperty(Properties.MANA);
+            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
+            var money = (int)worldModel.GetProperty(Properties.MONEY);
+
+            return (hp/(float)maxHP) * 0.6f + (mana/(float)maxMana) * 0.1f + money/(float)25 * 0.3f;
         }
     }
 }

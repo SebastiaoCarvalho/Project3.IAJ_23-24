@@ -59,7 +59,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             var currentMana = (int)worldModel.GetProperty(Properties.MANA);
             var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
 
-            return (currentMana / maxMana) + base.GetHValue(worldModel);
+            return currentMana / (float) maxMana * 0.5f  + base.GetHValue(worldModel) * 0.5f;
         }
     }
 }

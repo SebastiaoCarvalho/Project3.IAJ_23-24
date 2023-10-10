@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using Assets.Scripts.Game;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions
 {
@@ -63,13 +64,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return change;
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(WorldModel worldModel) // FIXME : maybe factor in time and other stuff?
         {
             // if you are close to leveling up, choose this
             int xp = (int)worldModel.GetProperty(Properties.XP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
-
-            return -100.0f;
+            return xp > level * 10 ? 0.0f : 1.0f;
+            
         }
     }
 }

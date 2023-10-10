@@ -53,6 +53,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             double lowerProbability = 0.0d;
             for (int i = 0; i < actions.Length; i++)
             {
+                // Debug.Log(actions[i].Name + " " + actions[i].GetHValue(worldModel) + " " + Math.Exp(-actions[i].GetHValue(worldModel)) + " " + totalWeight);
                 double normalizedWeight = Math.Exp(-actions[i].GetHValue(worldModel))/totalWeight;
                 normalizedWeights[i] = normalizedWeight;
                 lowerProbability += normalizedWeight;

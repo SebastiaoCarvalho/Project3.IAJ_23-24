@@ -126,14 +126,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             int xp = (int)worldModel.GetProperty(Properties.XP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
 
-            xp = xp > level * 10 ? 1 : xp;
-
 
             if (hp > this.expectedHPChange) // you should survive
             {
-                return base.GetHValue(worldModel) + (this.expectedHPChange/maxHp) * 0.6f + (level * 10)/this.expectedXPChange * 0.4f; // normalize from 0 to 1
-                //base.GetHValue(worldModel)/1.5f;
-                // see this difference
+                return base.GetHValue(worldModel) * 0.5f + ((float) Math.Min(this.expectedHPChange/maxHp, 1)) * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f; // normalize from 0 to 1
             }
             return 1000.0f;
         }
