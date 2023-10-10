@@ -22,9 +22,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected override float Playout(WorldModel initialStateForPlayout)
         {
-            // is terminal is always for player, getScore is always from player perspective
-            // playout and return a result for initialStateForPlayout
-
             CurrentDepth = 0;
             var currentState = initialStateForPlayout;
             Action[] executableActions = currentState.GetExecutableActions();
@@ -46,40 +43,35 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             return currentState.GetScore();
         }
-        
-        private double[] NormalizeWeights(Action[] items, WorldModel worldModel)
-        {
-            //Math.Exp(items.GetHValue(worldModel))
-            double[] normalizedWeights = new double[items.Length];
 
-            double totalWeight = items.Select(item => Math.Exp(-item.GetHValue(worldModel))).Sum();
+        private double[] NormalizeWeights(Action[] actions, WorldModel worldModel)
+        {
+            double[] normalizedWeights = new double[actions.Length];
+
+            double totalWeight = actions.Select(action => Math.Exp(-action.GetHValue(worldModel))).Sum();
 
             double lowerProbability = 0.0d;
-            //Console.WriteLine("Normalization Debug");
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < actions.Length; i++)
             {
-                double normalizedWeight = Math.Exp(-items[i].GetHValue(worldModel))/totalWeight;
+                double normalizedWeight = Math.Exp(-actions[i].GetHValue(worldModel))/totalWeight;
                 normalizedWeights[i] = normalizedWeight;
-                //item.NormalizedWeight = item.GetHValue(worldModel) / totalWeight;
-                //Console.WriteLine($"{item.Name} [{lowerProbability}-{lowerProbability + item.NormalizedWeight})");
                 lowerProbability += normalizedWeight;
             }
 
             return normalizedWeights;
         }
 
-        private Action RandomChoose(Action[] items, double[] weights, WorldModel worldModel)
+        private Action RandomChoose(Action[] actions, double[] weights, WorldModel worldModel)
         {
             double eventProbability = RandomGenerator.NextDouble();
-            //Console.WriteLine("Extraction Debug : pEvent = " + eventProbability);
 
             double lowerProbability = 0.0d;
             Action candidate = null;
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < actions.Length; i++)
             {
                 if (lowerProbability <= eventProbability && eventProbability < (lowerProbability + weights[i]))
                 {
-                    candidate = items[i];
+                    candidate = actions[i];
                     break;
                 }
                 lowerProbability += weights[i];
@@ -87,15 +79,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             if (candidate == null)
             {
-                //you should never land here, but maybe rounding error may be unexpected, anyway if you are here you meant to choose the last peace
-                //Console.WriteLine("Item not choosed");
-                candidate = items.Last();
+                candidate = actions.Last();
             }
 
-            //Console.WriteLine("Extraction Debug : Item selected -> " + candidate.Name);
             return candidate;
         }
-
     }
-
 }
