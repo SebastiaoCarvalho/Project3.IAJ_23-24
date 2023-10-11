@@ -19,7 +19,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.BehaviourTrees
             // To create a new tree you need to create each branck which is done using the constructors of different tasks
             // Additionally it is possible to create more complex behaviour by combining different tasks and composite tasks...
     
-            Interrupter PatrolBehavior = new Interrupter(new PatrolTree(character, position1, position2));
+            Interrupter PatrolBehavior = new Interrupter(new CanExecuteGuard(character, new PatrolTree(character, position1, position2)));
             Interrupter ListenBehavior = new Interrupter(new Sequence(new List<Task>{
                 new UntilSuccess(new ReactTree(
                     new HearShout(character), 

@@ -5,6 +5,7 @@ using Assets.Scripts.IAJ.Unity.Utils;
 using UnityEngine.AI;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.BehaviorTree.BehaviourTrees;
+using Assets.Scripts.IAJ.Unity.Formations;
 using System.Collections.Generic;
 
 namespace Assets.Scripts.Game.NPCs
@@ -34,7 +35,9 @@ namespace Assets.Scripts.Game.NPCs
         public GameObject Target { get; set; }
         public Task BehaviourTree;
 
+        public FormationManager FormationManager;
         public bool usingFormation;
+        public bool formationLeader;
 
         public Vector3 DefaultPosition { get; private set; }
 
@@ -109,5 +112,9 @@ namespace Assets.Scripts.Game.NPCs
             return Vector3.Distance(this.transform.position, target.transform.position) <= enemyStats.WeaponRange;
         }
 
+        public virtual void SetFormationLeader()
+        {
+            // empty
+        }
     }
 }

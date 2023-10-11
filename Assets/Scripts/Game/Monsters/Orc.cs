@@ -71,6 +71,8 @@ namespace Assets.Scripts.Game.NPCs
             var animation = Instantiate(AlertSprite);
             Destroy(animation, 1.5f);
 
+            GameManager.Instance.BreakFormations();
+
             foreach(Orc target in targets)
                 target.hearShout(this);
          }
@@ -82,5 +84,8 @@ namespace Assets.Scripts.Game.NPCs
             }
          }
 
+         public override void SetFormationLeader() {
+            this.formationLeader = true;
+         }
     }
 }

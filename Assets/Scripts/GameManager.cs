@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Game.NPCs;
+using Assets.Scripts.IAJ.Unity.Formations;
 
 public class GameManager : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> orcs { get; set; }
     public List<GameObject> dragons { get; set; }
     public List<GameObject> enemies { get; set; }
+    public List<FormationManager> Formations { get; set; }
     public Dictionary<string, List<GameObject>> disposableObjects { get; set; }
     public bool WorldChanged { get; set; }
 
@@ -55,6 +57,17 @@ public class GameManager : MonoBehaviour
         UpdateDisposableObjects();
         this.WorldChanged = false;
         this.Character = GameObject.FindGameObjectWithTag("Player").GetComponent<AutonomousCharacter>();
+
+        List<Monster> monsters = new List<Monster>();
+        monsters.Add(GameObject.Find("TriangleFormationAnchor").GetComponent<OrcAnchorPoint>());
+        GameObject leader = GameObject.Find("Orc5");
+        monsters.Add(leader.GetComponent<Orc>());
+        monsters.Add(GameObject.Find("Orc4").GetComponent<Orc>());
+        monsters.Add(GameObject.Find("Orc3").GetComponent<Orc>());
+        
+        Formations = new List<FormationManager>();
+        //Formations.Add(new FormationManager(monsters, new LineFormation(), leader.transform.position, leader.transform.forward));
+        Formations.Add(new FormationManager(monsters, new TriangleFormation(), GameObject.Find("TriangleFormationAnchor").transform.position, GameObject.Find("TriangleFormationAnchor").transform.forward));
 
         this.initialPosition = this.Character.gameObject.transform.position;
     }
@@ -115,13 +128,15 @@ public class GameManager : MonoBehaviour
     {
         if (!this.gameEnded)
         {
-
             if (Time.time > this.nextUpdateTime)
             {
                 this.nextUpdateTime = Time.time + GameConstants.UPDATE_INTERVAL;
                 this.Character.baseStats.Time += GameConstants.UPDATE_INTERVAL;
             }
 
+            foreach (FormationManager formation in Formations) {
+                formation.UpdateSlots();
+            }
 
             this.HPText.text = "HP: " + this.Character.baseStats.HP;
             this.XPText.text = "XP: " + this.Character.baseStats.XP;
@@ -146,10 +161,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RemoveOrcFromFormation(Monster enemy)
+    {
+        foreach (FormationManager formation in Formations) {
+            formation.SlotAssignment.Remove(enemy);
+        }
+    }
+
+    public void BreakFormations()
+    {
+        foreach (FormationManager formation in Formations) {
+            formation.BreakFormation();
+        }
+
+        Formations.Clear();
+    }
+
     public void SwordAttack(GameObject enemy)
     {
         int damage = 0;
 
+        Monster monster = enemy.GetComponent<Monster>();
         Monster.EnemyStats enemyData = enemy.GetComponent<Monster>().enemyStats;
         
         if (enemy != null && enemy.activeSelf && InMeleeRange(enemy))
@@ -166,6 +198,7 @@ public class GameManager : MonoBehaviour
                 if (attackRoll >= enemyData.AC)
                 {
                     //there was an hit, enemy is destroyed, gain xp
+                    RemoveOrcFromFormation(monster);
                     this.enemies.Remove(enemy);
                     this.disposableObjects[enemy.name].Remove(enemy);
                     enemy.SetActive(false);
@@ -175,6 +208,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 damage = enemyData.SimpleDamage;
+                RemoveOrcFromFormation(monster);
                 this.enemies.Remove(enemy);
                 this.disposableObjects[enemy.name].Remove(enemy);
                 enemy.SetActive(false);
@@ -220,6 +254,7 @@ public class GameManager : MonoBehaviour
                     if (attackRoll >= monster.enemyStats.AC)
                     {
                         //there was an hit, enemy is destroyed, gain xp
+                        RemoveOrcFromFormation(monster);
                         this.enemies.Remove(enemy);
                         this.disposableObjects.Remove(enemy.name);
                         enemy.SetActive(false);
@@ -229,6 +264,7 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     damage = monster.enemyStats.SimpleDamage;
+                    RemoveOrcFromFormation(monster);
                     this.enemies.Remove(enemy);
                     this.disposableObjects.Remove(enemy.name);
                     enemy.SetActive(false);
