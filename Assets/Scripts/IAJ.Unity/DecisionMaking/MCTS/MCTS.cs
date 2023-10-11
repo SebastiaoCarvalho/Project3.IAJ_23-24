@@ -30,6 +30,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected CurrentStateWorldModel InitialState { get; set; }
         protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
+        protected int PlayoutDepthLimit { get; set; }
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
@@ -37,8 +38,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InitialState = currentStateWorldModel;
             this.MaxIterations = 1000;
             this.MaxIterationsPerFrame = 100;
-            this.MaxPlayoutIterations = 3;
+            this.MaxPlayoutIterations = 10;
             this.RandomGenerator = new System.Random();
+            this.PlayoutDepthLimit = 2;
         }
 
 
@@ -135,7 +137,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var currentState = initialStateForPlayout;
             Action[] executableActions = currentState.GetExecutableActions();
 
-            while (!currentState.IsTerminal())
+            while (!currentState.IsTerminal() && CurrentDepth < PlayoutDepthLimit)
             {
                 var index = RandomGenerator.Next(executableActions.Length);
                 executableActions[index].ApplyActionEffects(currentState);
