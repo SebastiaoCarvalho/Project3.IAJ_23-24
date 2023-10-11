@@ -51,6 +51,9 @@ public class GameManager : MonoBehaviour
     public bool gameEnded { get; set; } = false;
     public Vector3 initialPosition { get; set; }
 
+    public bool lineFormation = false;
+    public bool triangleFormation = false;
+
     void Awake()
     {
         Instance = this;
@@ -59,15 +62,21 @@ public class GameManager : MonoBehaviour
         this.Character = GameObject.FindGameObjectWithTag("Player").GetComponent<AutonomousCharacter>();
 
         List<Monster> monsters = new List<Monster>();
-        monsters.Add(GameObject.Find("TriangleFormationAnchor").GetComponent<OrcAnchorPoint>());
+        if (triangleFormation) {
+            monsters.Add(GameObject.Find("TriangleFormationAnchor").GetComponent<OrcAnchorPoint>());
+        }
         GameObject leader = GameObject.Find("Orc5");
         monsters.Add(leader.GetComponent<Orc>());
         monsters.Add(GameObject.Find("Orc4").GetComponent<Orc>());
         monsters.Add(GameObject.Find("Orc3").GetComponent<Orc>());
         
         Formations = new List<FormationManager>();
-        //Formations.Add(new FormationManager(monsters, new LineFormation(), leader.transform.position, leader.transform.forward));
-        Formations.Add(new FormationManager(monsters, new TriangleFormation(), GameObject.Find("TriangleFormationAnchor").transform.position, GameObject.Find("TriangleFormationAnchor").transform.forward));
+        if (lineFormation) {
+            Formations.Add(new FormationManager(monsters, new LineFormation(), leader.transform.position, leader.transform.forward));
+        }
+        else if (triangleFormation) {
+            Formations.Add(new FormationManager(monsters, new TriangleFormation(), GameObject.Find("TriangleFormationAnchor").transform.position, GameObject.Find("TriangleFormationAnchor").transform.forward));
+        }
 
         this.initialPosition = this.Character.gameObject.transform.position;
     }
