@@ -80,8 +80,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         private float getDistance(Vector3 currentPosition, Vector3 targetPosition)
         {        
-            var distance = this.Character.GetDistanceToTarget(currentPosition, targetPosition);
-            /* var distance = (currentPosition - targetPosition).magnitude; */
+            var distance = (currentPosition - targetPosition).magnitude * 2;
             return distance;
         }
 

@@ -38,9 +38,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InitialState = currentStateWorldModel;
             this.MaxIterations = 1000;
             this.MaxIterationsPerFrame = 500;
-            this.MaxPlayoutIterations = 3;
+            this.MaxPlayoutIterations = 10;
             this.RandomGenerator = new System.Random();
-            this.PlayoutDepthLimit = 2;
+            this.PlayoutDepthLimit = 10;
         }
 
 

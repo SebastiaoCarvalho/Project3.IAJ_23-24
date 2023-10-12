@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour
             monsters.Add(GameObject.Find("Orc4").GetComponent<Orc>());
             monsters.Add(GameObject.Find("Orc3").GetComponent<Orc>());
         }
-        
         Formations = new List<FormationManager>();
         if (lineFormation) {
             Formations.Add(new FormationManager(monsters, new LineFormation(), leader.transform.position, leader.transform.forward));

@@ -15,9 +15,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
     {
         public MCTSBiasedPlayout(CurrentStateWorldModel currentStateWorldModel) : base (currentStateWorldModel)
         {
-            this.MaxIterations = 1000;
-            this.MaxIterationsPerFrame = 100;
+            this.MaxIterations = 10000;
+            this.MaxIterationsPerFrame = 1000;
             this.MaxPlayoutIterations = 1;
+            this.PlayoutDepthLimit = 25;
         }
         
         protected override float Playout(WorldModel initialStateForPlayout)
