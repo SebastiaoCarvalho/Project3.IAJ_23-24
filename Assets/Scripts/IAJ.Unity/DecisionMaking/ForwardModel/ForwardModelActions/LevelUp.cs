@@ -41,10 +41,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         {
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
+            float time = (float)worldModel.GetProperty(Properties.TIME);
 
             worldModel.SetProperty(Properties.LEVEL, level + 1);
             worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
             worldModel.SetProperty(Properties.XP, (int)0);
+            worldModel.SetProperty(Properties.TIME, time + this.Duration);
             worldModel.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, 0);
             worldModel.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
         }

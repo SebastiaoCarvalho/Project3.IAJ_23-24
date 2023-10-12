@@ -98,7 +98,10 @@ namespace Assets.Scripts.Game
         {
             Vector3 position = (Vector3)this.GetProperty(Properties.POSITION);
             bool enemyEnabled;
-
+            if (GameManager.SleepingNPCs){
+                this.NextPlayer = 0;
+                return;
+            } 
             //basically if the character is close enough to an enemy, the next player will be the enemy.
             foreach (var enemy in this.GameManager.enemies)
             {
@@ -106,7 +109,7 @@ namespace Assets.Scripts.Game
                 if (enemyEnabled && (enemy.transform.position - position).sqrMagnitude <= 100)
                 {
                     this.NextPlayer = 1;
-                    this.NextEnemyAction = new SwordAttack(this.GameManager.Character, enemy);
+                    this.NextEnemyAction = new EnemyAttack(this.GameManager.Character, enemy);
                     this.NextEnemyActions = new Action[] { this.NextEnemyAction };
                     return; 
                 }

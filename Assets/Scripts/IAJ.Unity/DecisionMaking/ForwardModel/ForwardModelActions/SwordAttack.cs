@@ -31,7 +31,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             else if (target.tag.Equals("Orc"))
             {
                 this.dmgRoll = () => RandomHelper.RollD10() + 2;
-                this.enemySimpleDamage = 8;
+                this.enemySimpleDamage = 6;
                 this.expectedHPChange = 7.5f;
                 this.xpChange = 10;
                 this.expectedXPChange = 7.0f;
@@ -40,7 +40,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             else if (target.tag.Equals("Dragon"))
             {
                 this.dmgRoll = () => RandomHelper.RollD12() + RandomHelper.RollD12();
-                this.enemySimpleDamage = 15;
+                this.enemySimpleDamage = 12;
                 this.expectedHPChange = 13.0f;
                 this.xpChange = 20;
                 this.expectedXPChange = 10.0f;

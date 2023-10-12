@@ -37,7 +37,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.InitialState = currentStateWorldModel;
             this.MaxIterations = 1000;
-            this.MaxIterationsPerFrame = 100;
+            this.MaxIterationsPerFrame = 500;
             this.MaxPlayoutIterations = 3;
             this.RandomGenerator = new System.Random();
             this.PlayoutDepthLimit = 2;
@@ -73,7 +73,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var startTime = Time.realtimeSinceStartup;
             FrameCurrentIterations = 0;
             var CurrentPlayoutIterations = 0;
-
             while (CurrentIterations <= MaxIterations)
             {
                 if (FrameCurrentIterations > MaxIterationsPerFrame)
@@ -196,12 +195,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             // go for each child and check which value is best
             List<MCTSNode> childNodes = node.ChildNodes;
             MCTSNode bestChild = null;
-            double bestChildValue = double.MinValue;
+            double bestChildValue = - 1;
             double childValue;
 
             foreach (MCTSNode child in childNodes)
             {
-                childValue = child.N != 0 ? child.Q/child.N + C * Math.Sqrt(Math.Log(node.N)/child.N) : double.PositiveInfinity;
+                childValue = child.N != 0 ? child.Q/child.N + C * Math.Sqrt(Math.Log(node.N)/child.N) : 0;
 
                 if (childValue > bestChildValue)
                 {
@@ -219,12 +218,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             List<MCTSNode> childNodes = node.ChildNodes;
             MCTSNode bestChild = null;
-            float bestChildWinRate = float.MinValue;
+            float bestChildWinRate = -1;
             float childWinRate;
 
             foreach (MCTSNode child in childNodes)
             {
-                childWinRate = child.N != 0 ? child.Q/child.N : float.PositiveInfinity;
+                childWinRate = child.N != 0 ? child.Q/child.N : 0;
                 if (childWinRate > bestChildWinRate)
                 {
                     bestChild = child;
@@ -259,7 +258,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 node = bestChild;
                 this.BestActionSequenceEndState = node.State;
             }
-
+            Debug.Log(this.BestActionSequenceEndState.GetScore());
             return this.BestFirstChild.Action;
         }
 

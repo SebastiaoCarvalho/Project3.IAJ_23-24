@@ -59,11 +59,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             // else return a lower value that's still decent
             // count with distance
             var money = (int)worldModel.GetProperty(Properties.MONEY);
+            var baseValue = base.GetHValue(worldModel);
 
-            if (money == 20 || base.GetHValue(worldModel) < 0.1) {
-                return base.GetHValue(worldModel) * 0.1f;
+            if (money == 20 || baseValue < 0.3) {
+                return baseValue * 0.01f;
             }
-            return base.GetHValue(worldModel) * 0.6f;
+            return baseValue;
         }
     }
 }

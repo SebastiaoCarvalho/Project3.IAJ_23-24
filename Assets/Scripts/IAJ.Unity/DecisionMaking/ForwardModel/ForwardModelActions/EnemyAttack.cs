@@ -13,6 +13,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public EnemyAttack(AutonomousCharacter character, GameObject target) : base(character, target)
         {
             this.Name = "EnemyAttack(" + target.name + ")";
+            Debug.Log(this.Name);
         }
        
         public override void Execute()

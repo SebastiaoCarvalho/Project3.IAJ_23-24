@@ -177,7 +177,7 @@ public class AutonomousCharacter : NPC
         this.Actions.Add(new ShieldOfFaith(this));
         this.Actions.Add(new LevelUp(this));
         this.Actions.Add(new Teleport(this));
-        this.Actions.Add(new Rest(this));
+        /* this.Actions.Add(new Rest(this)); */
 
 
         // Initialization of Decision Making Algorithms
@@ -215,7 +215,7 @@ public class AutonomousCharacter : NPC
             GameObject enemy = CheckEnemies(ENEMY_DETECTION_RADIUS);
             if (enemy != null)
             {
-                GameManager.Instance.WorldChanged = true;
+                /* GameManager.Instance.WorldChanged = true; */
                 AddToDiary(" There is " + enemy.name + " in front of me!");
                 this.nearEnemy = enemy;
             }

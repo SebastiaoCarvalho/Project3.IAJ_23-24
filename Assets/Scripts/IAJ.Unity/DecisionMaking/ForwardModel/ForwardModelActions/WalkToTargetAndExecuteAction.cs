@@ -81,15 +81,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         private float getDistance(Vector3 currentPosition, Vector3 targetPosition)
         {        
             var distance = this.Character.GetDistanceToTarget(currentPosition, targetPosition);
+            /* var distance = (currentPosition - targetPosition).magnitude; */
             return distance;
         }
 
         public override float GetHValue(WorldModel worldModel)
         {
-            var duration = this.GetDuration();
+            /* Debug.Log("base " + worldModel.GetProperty(Properties.POSITION) + " " + Target.transform.position);
+            Debug.Log("distance " + getDistance((Vector3)worldModel.GetProperty(Properties.POSITION), Target.transform.position)); */
+            var duration = this.GetDuration(worldModel);
             var time = (float) worldModel.GetProperty(Properties.TIME);
-
-            return (float) Math.Exp(- duration / (150 - time));
+            /* Debug.Log("time remaining " + (150 - time) + " duration " + duration);
+            Debug.Log("value " + (float) (Math.Log(duration + 1)/Math.Log(150 - time + 1))); */
+            return (float) (Math.Log(duration + 1)/Math.Log(150 - time + 1));
         }
     }
 }
