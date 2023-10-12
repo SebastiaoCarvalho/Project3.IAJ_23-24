@@ -60,7 +60,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(Properties.HP, Math.Max(hp + this.expectedHPChange, maxHP));
+            worldModel.SetProperty(Properties.HP, (int) Math.Max(hp + this.expectedHPChange, maxHP));
         }
 
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS

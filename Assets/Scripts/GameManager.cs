@@ -452,7 +452,7 @@ public class GameManager : MonoBehaviour
 
     private bool CheckRange(GameObject obj, float maximumDistance)
     {
-        var distance = (obj.transform.position - this.Character.gameObject.transform.position).magnitude;
+        var distance = (obj.transform.position - this.Character.gameObject.transform.position).sqrMagnitude;
         return distance <= maximumDistance;
     }
 
