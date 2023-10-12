@@ -28,6 +28,8 @@ namespace Assets.Scripts.Game
         public void Initialize()
         {
             this.ActionEnumerator.Reset();
+            InitializePropertiesArray();
+            InitializeDisposableObjectsArray();
         }
 
         public override void InitializePropertiesArray()
@@ -48,20 +50,15 @@ namespace Assets.Scripts.Game
 
         public override void InitializeDisposableObjectsArray()
         {
-            int size = GameManager.Instance.InitialDisposableObjectsCount;
-            this.DisposableObjectsArray = new GameObject[size];
+            int size = this.GameManager.disposableObjects.Count;
+            this.ObjectsNames = new string[size];
             this.ObjectsExist = new bool[size];
             for(int i = 0; i < size; i++) {
-                this.DisposableObjectsArray[i] = this.GameManager.disposableObjects.Values.ToArray()[i][0];
-                this.ObjectsExist[i] = this.DisposableObjectsArray[i].activeSelf;
+                this.ObjectsNames[i] = this.GameManager.disposableObjects.Values.ToArray()[i][0].name;
+                this.ObjectsExist[i] =  this.GameManager.disposableObjects.Values.ToArray()[i][0].activeSelf;
             }
         }
-        public override object GetProperty(string propertyName)
-        {
-            InitializePropertiesArray();
-            return base.GetProperty(propertyName);
-        }
-
+        
         public override float GetGoalValue(string goalName)
         {
             return this.Goals[goalName].InsistenceValue;

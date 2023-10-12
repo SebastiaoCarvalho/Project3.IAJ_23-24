@@ -106,14 +106,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             MCTSNode bestChild;
 
             CurrentDepth = 0;
-
             while (!currentNode.State.IsTerminal()) {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null)
                 {
                     return this.Expand(currentNode, nextAction);
                 }
-
                 bestChild = BestUCTChild(currentNode);
                 currentNode = bestChild;
                 CurrentDepth++;
@@ -258,7 +256,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 node = bestChild;
                 this.BestActionSequenceEndState = node.State;
             }
-            Debug.Log(this.BestActionSequenceEndState.GetScore());
             return this.BestFirstChild.Action;
         }
 

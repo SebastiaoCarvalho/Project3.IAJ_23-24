@@ -11,7 +11,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
     {
         protected const int PROPERTIES_NUMBER = 11;
         protected object[] PropertiesArray { get; set; }
-        protected GameObject[] DisposableObjectsArray { get; set; }
+        protected string[] ObjectsNames { get; set; }
         protected bool[] ObjectsExist { get; set; }
         private List<Action> Actions { get; set; }
         protected IEnumerator<Action> ActionEnumerator { get; set; } 
@@ -49,10 +49,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
 
         public virtual void InitializeDisposableObjectsArray()
         {
-            int size = GameManager.Instance.InitialDisposableObjectsCount;
-            this.DisposableObjectsArray = new GameObject[GameManager.Instance.InitialDisposableObjectsCount];
+            int size = GameManager.Instance.disposableObjects.Count;
+            this.ObjectsNames = new string[GameManager.Instance.InitialDisposableObjectsCount];
+            this.ObjectsExist = new bool[GameManager.Instance.InitialDisposableObjectsCount];
             for(int i = 0; i < size; i++) {
-                this.DisposableObjectsArray[i] = this.Parent.DisposableObjectsArray[i];
+                this.ObjectsNames[i] = this.Parent.ObjectsNames[i];
+                this.ObjectsExist[i] = this.Parent.ObjectsExist[i];
             }
         }
 
@@ -88,12 +90,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
 
         private object SearchDisposableObjectExists(string objectName)
         {
-            for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
-                if(this.DisposableObjectsArray[i] != null && this.DisposableObjectsArray[i].name == objectName) {
+            for(int i = 0; i < GameManager.Instance.disposableObjects.Count; i++) {
+                if(this.ObjectsNames[i].Equals(objectName)) {
                     return this.ObjectsExist[i];
                 }
             }
-            return null;
+            return false;
         }
 
         public virtual void SetProperty(string propertyName, object value)
@@ -104,9 +106,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
                 this.PropertiesArray[index] = value;
                 return;
             }
-            for(int i = 0; i < GameManager.Instance.InitialDisposableObjectsCount; i++) {
-                if(this.DisposableObjectsArray[i].name == propertyName) {
+            for(int i = 0; i < GameManager.Instance.disposableObjects.Count; i++) {
+                if(this.ObjectsNames[i].Equals(propertyName)) {
                     this.ObjectsExist[i] = (bool) value;
+                    return;
                 }
             }
         }

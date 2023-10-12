@@ -177,7 +177,7 @@ public class AutonomousCharacter : NPC
         this.Actions.Add(new ShieldOfFaith(this));
         this.Actions.Add(new LevelUp(this));
         this.Actions.Add(new Teleport(this));
-        /* this.Actions.Add(new Rest(this)); */
+        this.Actions.Add(new Rest(this));
 
 
         // Initialization of Decision Making Algorithms

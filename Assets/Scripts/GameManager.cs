@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
                     //there was an hit, enemy is destroyed, gain xp
                     RemoveOrcFromFormation(monster);
                     this.enemies.Remove(enemy);
-                    this.disposableObjects[enemy.name].Remove(enemy);
+                    this.disposableObjects.Remove(enemy.name);
                     enemy.SetActive(false);
                     Object.Destroy(enemy);
                 }
@@ -222,7 +222,7 @@ public class GameManager : MonoBehaviour
                 damage = enemyData.SimpleDamage;
                 RemoveOrcFromFormation(monster);
                 this.enemies.Remove(enemy);
-                this.disposableObjects[enemy.name].Remove(enemy);
+                this.disposableObjects.Remove(enemy.name);
                 enemy.SetActive(false);
                 Object.Destroy(enemy);
             }
@@ -308,7 +308,7 @@ public class GameManager : MonoBehaviour
                 this.Character.baseStats.XP += 3;
                 this.Character.AddToDiary(" I Smited " + enemy.name);
                 this.enemies.Remove(enemy);
-                this.disposableObjects[enemy.name].Remove(enemy);
+                this.disposableObjects.Remove(enemy.name);
                 enemy.SetActive(false);
                 Object.Destroy(enemy);
             }
@@ -337,7 +337,7 @@ public class GameManager : MonoBehaviour
         {
             this.Character.AddToDiary(" I opened  " + chest.name);
             this.chests.Remove(chest);
-            this.disposableObjects[chest.name].Remove(chest);
+            this.disposableObjects.Remove(chest.name);
             Object.Destroy(chest);
             this.Character.baseStats.Money += 5;
             this.WorldChanged = true;
@@ -350,7 +350,7 @@ public class GameManager : MonoBehaviour
         if (manaPotion != null && manaPotion.activeSelf && InPotionRange(manaPotion))
         {
             this.Character.AddToDiary(" I drank " + manaPotion.name);
-            this.disposableObjects[manaPotion.name].Remove(manaPotion);
+            this.disposableObjects.Remove(manaPotion.name);
             Object.Destroy(manaPotion);
             this.Character.baseStats.Mana = 10;
             this.WorldChanged = true;
@@ -362,7 +362,7 @@ public class GameManager : MonoBehaviour
         if (potion != null && potion.activeSelf && InPotionRange(potion))
         {
             this.Character.AddToDiary(" I drank " + potion.name);
-            this.disposableObjects[potion.name].Remove(potion);
+            this.disposableObjects.Remove(potion.name);
             Object.Destroy(potion);
             this.Character.baseStats.HP = this.Character.baseStats.MaxHP;
             this.WorldChanged = true;
