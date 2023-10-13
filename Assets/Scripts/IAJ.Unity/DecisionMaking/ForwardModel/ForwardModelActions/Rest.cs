@@ -57,10 +57,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             int hp = (int)worldModel.GetProperty(Properties.HP);
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            float time = (float)worldModel.GetProperty(Properties.TIME);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(Properties.HP, (int) Math.Max(hp + this.expectedHPChange, maxHP));
+            worldModel.SetProperty(Properties.TIME, time + Duration);
         }
 
         public override float GetHValue(WorldModel worldModel) // TODO : MCTS

@@ -12,14 +12,6 @@ namespace Assets.Scripts.Game
         protected Action NextEnemyAction { get; set; }
         protected Action[] NextEnemyActions { get; set; }
 
-        private float timeWeight = 20f;
-        private float moneyWeight = 15;
-        private float levelWeight = 3f;
-        private float xpWeight = 3f;
-        private float manaWeight = 0.5f;
-        private float hpWeight = 2f;
-        private float shieldWeight = 1f;
-
         public FutureStateWorldModel(GameManager gameManager, List<Action> actions) : base(actions)
         {
             this.GameManager = gameManager;
@@ -56,42 +48,45 @@ namespace Assets.Scripts.Game
             else if (this.NextPlayer == 0 && money == 25 && HP > 0) //win
                 return 1.0f;
             else { // non-terminal state
-                float weightSum = timeWeight + moneyWeight + levelWeight + 
-                    xpWeight + manaWeight + hpWeight + shieldWeight;
-
-                // Weighted mean
-                return (timeScore() + moneyScore() + levelScore() + xpScore() +
-                         manaScore() + hpScore() + shieldScore()) / weightSum;
+                return timeAndMoneyScore(time, money) * levelScore() * hpScore(HP) * timeScore(time);          
             }
         }
 
-        private float timeScore() {
-            return timeWeight * (1 - (float)this.GetProperty(Properties.TIME) / GameManager.GameConstants.TIME_LIMIT);
+        private float timeAndMoneyScore(float time, int money) {
+            float relationTimeMoney = time - 6 * money;
+
+            if (relationTimeMoney > 30)
+                return 0;
+            else if (relationTimeMoney < 0)
+                return 0.6f;
+            else
+                return 0.3f;
         }
 
-        private float moneyScore() {
-            return moneyWeight * ((int)this.GetProperty(Properties.MONEY) / 25f);
+        private float timeScore(float time) {
+            return (1 - time / GameManager.GameConstants.TIME_LIMIT);
         }
 
         private float levelScore() {
-            return levelWeight * (int)this.GetProperty(Properties.LEVEL) == 2 ? 1 : 0;
+            int level = (int)this.GetProperty(Properties.LEVEL);
+            if (level == 2)
+                return 1f;
+            else if (level == 1)
+                return 0.4f;
+            else
+                return 0; 
         }
 
-        private float xpScore() {
-            return xpWeight * (int)this.GetProperty(Properties.LEVEL) < 2 ? 
-                (int)this.GetProperty(Properties.XP) / (float)(int)this.GetProperty(Properties.LEVEL) * 10 : 0;
-        }
+        private float hpScore(int hp) {
+            if (hp > 18) //survives orc and dragon
+                return 1f;
+            if (hp > 12) //survives dragon or two orcs
+                return 0.6f;
+            else if (hp > 6) //survives orc
+                return 0.1f;
+            else
+                return 0.01f;
 
-        private float manaScore() {
-            return manaWeight * (int)this.GetProperty(Properties.MANA) / (float)(int)this.GetProperty(Properties.MAXMANA);
-        }
-
-        private float hpScore() {
-            return hpWeight * (int)this.GetProperty(Properties.HP) / (float)(int)this.GetProperty(Properties.MAXHP);
-        }
-
-        private float shieldScore() {
-            return shieldWeight * (int)this.GetProperty(Properties.ShieldHP) / (float)(int)this.GetProperty(Properties.MaxShieldHP);
         }
 
         public override int GetNextPlayer()

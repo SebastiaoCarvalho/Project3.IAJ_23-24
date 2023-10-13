@@ -16,17 +16,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public MCTSBiasedPlayout(CurrentStateWorldModel currentStateWorldModel) : base (currentStateWorldModel)
         {
             this.MaxIterations = 1000;
-            this.MaxIterationsPerFrame = 10;
+            this.MaxIterationsPerFrame = 100;
             this.MaxPlayoutIterations = 1;
         }
-
+        
         protected override float Playout(WorldModel initialStateForPlayout)
         {
             CurrentDepth = 0;
             var currentState = initialStateForPlayout;
             Action[] executableActions = currentState.GetExecutableActions();
 
-            while (!currentState.IsTerminal())
+            while (!currentState.IsTerminal() && CurrentDepth < PlayoutDepthLimit)
             {
                 double[] weights = NormalizeWeights(executableActions, currentState);
                 Action executableAction = RandomChoose(executableActions, weights, currentState);

@@ -87,9 +87,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             else
             {
                 damage = this.enemySimpleDamage;
-                if (damage <= 0) {
-                    Debug.Log("wtf");
-                }
             }
             //calculate player's damage
             int remainingDamage = damage - shieldHp;

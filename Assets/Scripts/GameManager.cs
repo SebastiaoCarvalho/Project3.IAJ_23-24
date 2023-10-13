@@ -66,9 +66,11 @@ public class GameManager : MonoBehaviour
             monsters.Add(GameObject.Find("TriangleFormationAnchor").GetComponent<OrcAnchorPoint>());
         }
         GameObject leader = GameObject.Find("Orc5");
-        monsters.Add(leader.GetComponent<Orc>());
-        monsters.Add(GameObject.Find("Orc4").GetComponent<Orc>());
-        monsters.Add(GameObject.Find("Orc3").GetComponent<Orc>());
+        if (leader != null) {
+            monsters.Add(leader.GetComponent<Orc>());
+            monsters.Add(GameObject.Find("Orc4").GetComponent<Orc>());
+            monsters.Add(GameObject.Find("Orc3").GetComponent<Orc>());
+        }
         
         Formations = new List<FormationManager>();
         if (lineFormation) {
