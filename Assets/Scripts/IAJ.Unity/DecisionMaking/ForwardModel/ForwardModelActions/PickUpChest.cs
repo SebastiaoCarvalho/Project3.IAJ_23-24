@@ -61,7 +61,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             var money = (int)worldModel.GetProperty(Properties.MONEY);
             var baseValue = base.GetHValue(worldModel);
 
-            if (money == 20 || baseValue < 0.3) {
+            if (money == 20 || baseValue < 0.1) {
                 return baseValue * 0.01f;
             }
             return baseValue;

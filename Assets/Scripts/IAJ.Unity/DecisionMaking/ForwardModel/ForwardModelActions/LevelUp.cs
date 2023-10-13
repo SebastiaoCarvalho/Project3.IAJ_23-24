@@ -66,12 +66,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return change;
         }
 
-        public override float GetHValue(WorldModel worldModel) // FIXME : maybe factor in time and other stuff?
+        public override float GetHValue(WorldModel worldModel)
         {
             // if you are close to leveling up, choose this
             int xp = (int)worldModel.GetProperty(Properties.XP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
-            return xp > level * 10 ? 0.0f : 1.0f;
+            return xp > level * 10 - 5 ? -10 : 10;
             
         }
     }

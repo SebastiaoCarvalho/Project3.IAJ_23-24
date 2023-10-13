@@ -81,7 +81,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     return null;
                 }
                 selectedNode = Selection(InitialNode);
-
                 CurrentPlayoutIterations = 0;
                 while (CurrentPlayoutIterations++ < MaxPlayoutIterations) {
                     reward = Playout(selectedNode.State.GenerateChildWorldModel());
@@ -94,6 +93,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
             this.InProgress = false;
+
             return BestAction(InitialNode);
         }
 
@@ -206,7 +206,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     bestChildValue = childValue;
                 }
             }
-
             return bestChild;
         }
 
@@ -239,6 +238,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (bestChild == null) return null;
 
             this.BestFirstChild = bestChild;
+           /*  Debug.Log("-----------------------------------------------------------------------------------------------------------");
+            Debug.Log("Best child: " + bestChild.Action.Name + " with winrate: " + bestChild.Q / bestChild.N);
+            Debug.Log("Next bro : " + bestChild.State.GetNextPlayer());
+            PlayoutWithDebug(bestChild.State.GenerateChildWorldModel()); */
 
             //this is done for debugging proposes only
             this.BestActionSequence = new List<Action>();
@@ -257,6 +260,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 this.BestActionSequenceEndState = node.State;
             }
             return this.BestFirstChild.Action;
+        }
+
+        protected virtual float PlayoutWithDebug(WorldModel worldModel) {
+            return 0.0f;
         }
 
     }

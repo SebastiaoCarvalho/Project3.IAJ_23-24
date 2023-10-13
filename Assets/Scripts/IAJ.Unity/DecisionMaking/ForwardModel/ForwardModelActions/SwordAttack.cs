@@ -131,7 +131,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             {
                 return base.GetHValue(worldModel) * 0.5f + ((float) Math.Min(this.expectedHPChange/maxHp, 1)) * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f; // normalize from 0 to 1
             }
-            return 1000.0f;
+            return 10.0f;
         }
     }
 }
