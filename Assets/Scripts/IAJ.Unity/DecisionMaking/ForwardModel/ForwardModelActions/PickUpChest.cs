@@ -27,9 +27,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return true;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            return true;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
             return true;
         }
 
@@ -40,26 +46,53 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.PickUpChest(this.Target);
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            var goalValue = worldModel.GetGoalValue(AutonomousCharacter.GET_RICH_GOAL);
-            worldModel.SetGoalValue(AutonomousCharacter.GET_RICH_GOAL, goalValue - 5.0f);
-            var money = (int)worldModel.GetProperty(Properties.MONEY);
-            worldModel.SetProperty(Properties.MONEY, money + 5);
+            var goalValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.GET_RICH_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.GET_RICH_GOAL, goalValue - 5.0f);
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
+            WorldModelImproved.SetProperty(Properties.MONEY, money + 5);
 
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name, false);
+            WorldModelImproved.SetProperty(this.Target.name, false);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
+        {
+            base.ApplyActionEffects(WorldModelImproved);
+
+            var goalValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.GET_RICH_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.GET_RICH_GOAL, goalValue - 5.0f);
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
+            WorldModelImproved.SetProperty(Properties.MONEY, money + 5);
+
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(this.Target.name, false);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
         {
             // get money property if 20 go for it
             // else return a lower value that's still decent
             // count with distance
-            var money = (int)worldModel.GetProperty(Properties.MONEY);
-            var baseValue = base.GetHValue(worldModel);
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
+            var baseValue = base.GetHValue(WorldModelImproved);
+
+            if (money == 20 || baseValue < 0.1) {
+                return baseValue * 0.01f;
+            }
+            return baseValue;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            // get money property if 20 go for it
+            // else return a lower value that's still decent
+            // count with distance
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
+            var baseValue = base.GetHValue(WorldModelImproved);
 
             if (money == 20 || baseValue < 0.1) {
                 return baseValue * 0.01f;

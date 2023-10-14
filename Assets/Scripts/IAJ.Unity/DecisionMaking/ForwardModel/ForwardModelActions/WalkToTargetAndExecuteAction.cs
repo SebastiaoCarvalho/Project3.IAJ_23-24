@@ -23,9 +23,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return this.GetDuration(this.Character.transform.position);
         }
 
-        public override float GetDuration(WorldModel worldModel)
+        public override float GetDuration(WorldModelImproved WorldModelImproved)
         {
-            var position = (Vector3)worldModel.GetProperty(Properties.POSITION);
+            var position = (Vector3)WorldModelImproved.GetProperty(Properties.POSITION);
+            return this.GetDuration(position);
+        }
+
+        public override float GetDuration(WorldModel WorldModelImproved)
+        {
+            var position = (Vector3)WorldModelImproved.GetProperty(Properties.POSITION);
             return this.GetDuration(position);
         }
 
@@ -51,10 +57,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return this.Target != null;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
             if (this.Target == null) return false;
-            var targetEnabled = (bool)worldModel.GetProperty(this.Target.name);
+            var targetEnabled = (bool)WorldModelImproved.GetProperty(this.Target.name);
+            return targetEnabled;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (this.Target == null) return false;
+            var targetEnabled = (bool)WorldModelImproved.GetProperty(this.Target.name);
             return targetEnabled;
         }
 
@@ -67,27 +80,47 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         }
 
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            var duration = this.GetDuration(worldModel);
+            var duration = this.GetDuration(WorldModelImproved);
 
-            var quicknessValue = worldModel.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
-            worldModel.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, quicknessValue + duration);
-            var time = (float)worldModel.GetProperty(Properties.TIME);
-            worldModel.SetProperty(Properties.TIME, time + duration);
-            worldModel.SetProperty(Properties.POSITION, Target.transform.position);
+            var quicknessValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, quicknessValue + duration);
+            var time = (float)WorldModelImproved.GetProperty(Properties.TIME);
+            WorldModelImproved.SetProperty(Properties.TIME, time + duration);
+            WorldModelImproved.SetProperty(Properties.POSITION, Target.transform.position);
+        }
+
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
+        {
+            var duration = this.GetDuration(WorldModelImproved);
+
+            var quicknessValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, quicknessValue + duration);
+            var time = (float)WorldModelImproved.GetProperty(Properties.TIME);
+            WorldModelImproved.SetProperty(Properties.TIME, time + duration);
+            WorldModelImproved.SetProperty(Properties.POSITION, Target.transform.position);
         }
 
         private float getDistance(Vector3 currentPosition, Vector3 targetPosition)
         {        
-            var distance = (currentPosition - targetPosition).magnitude * 2;
+            var distance = this.Character.GetDistanceToTarget(currentPosition, targetPosition);
             return distance;
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
         {
-            var duration = this.GetDuration(worldModel);
-            var time = (float) worldModel.GetProperty(Properties.TIME);
+            var position = (Vector3)WorldModelImproved.GetProperty(Properties.POSITION);
+            var duration = (position - this.Target.transform.position).magnitude / this.Character.Speed; // avoid navmesh bug
+            var time = (float) WorldModelImproved.GetProperty(Properties.TIME);
+            return (float) (Math.Log(duration + 1)/Math.Log(150 - time + 1));
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var position = (Vector3)WorldModelImproved.GetProperty(Properties.POSITION);
+            var duration = (position - this.Target.transform.position).magnitude / this.Character.Speed; // avoid navmesh bug
+            var time = (float) WorldModelImproved.GetProperty(Properties.TIME);
             return (float) (Math.Log(duration + 1)/Math.Log(150 - time + 1));
         }
     }

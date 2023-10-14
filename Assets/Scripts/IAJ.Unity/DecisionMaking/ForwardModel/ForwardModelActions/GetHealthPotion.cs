@@ -16,12 +16,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return Character.baseStats.HP < Character.baseStats.MaxHP;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
+            if (!base.CanExecute(WorldModelImproved)) return false;
 
-            var currentHP = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            var currentHP = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            return currentHP < maxHP;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+
+            var currentHP = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
             return currentHP < maxHP;
         }
 
@@ -43,23 +52,42 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return change;
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            worldModel.SetProperty(Properties.HP, maxHP);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f);
+            base.ApplyActionEffects(WorldModelImproved);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            WorldModelImproved.SetProperty(Properties.HP, maxHP);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f);
 
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name, false);
+            WorldModelImproved.SetProperty(this.Target.name, false);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var currentHP = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            base.ApplyActionEffects(WorldModelImproved);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            WorldModelImproved.SetProperty(Properties.HP, maxHP);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, 0.0f);
 
-            return currentHP / maxHP * 0.5f + base.GetHValue(worldModel) * 0.5f;
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(this.Target.name, false);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var currentHP = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+
+            return currentHP / maxHP * 0.5f + base.GetHValue(WorldModelImproved) * 0.5f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var currentHP = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+
+            return currentHP / maxHP * 0.5f + base.GetHValue(WorldModelImproved) * 0.5f;
         }
     }
 }

@@ -16,12 +16,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return Character.baseStats.Mana < Character.baseStats.MaxMana;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
+            if (!base.CanExecute(WorldModelImproved)) return false;
 
-            var currentMana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
+            var currentMana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            return currentMana < maxMana;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+
+            var currentMana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
             return currentMana < maxMana;
         }
 
@@ -44,22 +53,40 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return change;
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
-            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
-            worldModel.SetProperty(Properties.MANA, maxMana);
+            base.ApplyActionEffects(WorldModelImproved);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            WorldModelImproved.SetProperty(Properties.MANA, maxMana);
 
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name, false);
+            WorldModelImproved.SetProperty(this.Target.name, false);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var currentMana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
+            base.ApplyActionEffects(WorldModelImproved);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            WorldModelImproved.SetProperty(Properties.MANA, maxMana);
 
-            return currentMana / (float) maxMana * 0.5f  + base.GetHValue(worldModel) * 0.5f;
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(this.Target.name, false);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var currentMana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+
+            return currentMana / (float) maxMana * 0.5f  + base.GetHValue(WorldModelImproved) * 0.5f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var currentMana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+
+            return currentMana / (float) maxMana * 0.5f  + base.GetHValue(WorldModelImproved) * 0.5f;
         }
     }
 }

@@ -70,13 +70,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.SwordAttack(this.Target);
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            int hp = (int)worldModel.GetProperty(Properties.HP);
-            int shieldHp = (int)worldModel.GetProperty(Properties.ShieldHP);
-            int xp = (int)worldModel.GetProperty(Properties.XP);
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int shieldHp = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
 
             int damage = 0;
             if (GameManager.Instance.StochasticWorld)
@@ -96,12 +96,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             if(remainingDamage > 0)
             {
                 remainingHP = hp - remainingDamage;
-                worldModel.SetProperty(Properties.HP, remainingHP);
+                WorldModelImproved.SetProperty(Properties.HP, remainingHP);
             }
 
-            worldModel.SetProperty(Properties.ShieldHP, remainingShield);
-            var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue + remainingDamage);
+            WorldModelImproved.SetProperty(Properties.ShieldHP, remainingShield);
+            var surviveValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue + remainingDamage);
 
             //calculate Hit
             //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
@@ -111,25 +111,89 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             {
                 //there was an hit, enemy is destroyed, gain xp
                 //disables the target object so that it can't be reused again
-                worldModel.SetProperty(this.Target.name, false);
-                worldModel.SetProperty(Properties.XP, xp + this.xpChange);
-                var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL);
-                worldModel.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, xpValue - this.xpChange);
+                WorldModelImproved.SetProperty(this.Target.name, false);
+                WorldModelImproved.SetProperty(Properties.XP, xp + this.xpChange);
+                var xpValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL);
+                WorldModelImproved.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, xpValue - this.xpChange);
             }
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            var maxHp = (int)worldModel.GetProperty(Properties.HP);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            int xp = (int)worldModel.GetProperty(Properties.XP);
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int shieldHp = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+
+            int damage = 0;
+            if (GameManager.Instance.StochasticWorld)
+            {
+                //execute the lambda function to calculate received damage based on the creature type
+                damage = this.dmgRoll.Invoke();
+            }
+            else
+            {
+                damage = this.enemySimpleDamage;
+            }
+            //calculate player's damage
+            int remainingDamage = damage - shieldHp;
+            int remainingShield = Mathf.Max(0, shieldHp - damage);
+            int remainingHP;
+
+            if(remainingDamage > 0)
+            {
+                remainingHP = hp - remainingDamage;
+                WorldModelImproved.SetProperty(Properties.HP, remainingHP);
+            }
+
+            WorldModelImproved.SetProperty(Properties.ShieldHP, remainingShield);
+            var surviveValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue + remainingDamage);
+
+            //calculate Hit
+            //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
+            int attackRoll = RandomHelper.RollD20() + 7;
+
+            if (attackRoll >= enemyAC || ! GameManager.Instance.StochasticWorld)
+            {
+                //there was an hit, enemy is destroyed, gain xp
+                //disables the target object so that it can't be reused again
+                WorldModelImproved.SetProperty(this.Target.name, false);
+                WorldModelImproved.SetProperty(Properties.XP, xp + this.xpChange);
+                var xpValue = WorldModelImproved.GetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL);
+                WorldModelImproved.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, xpValue - this.xpChange);
+            }
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.HP);
+
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
 
 
             if (hp > this.expectedHPChange) // you should survive
             {
-                return base.GetHValue(worldModel) * 0.5f + ((float) Math.Min(this.expectedHPChange/maxHp, 1)) * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f; // normalize from 0 to 1
+                return base.GetHValue(WorldModelImproved) * 0.5f + ((float) Math.Min(this.expectedHPChange/maxHp, 1)) * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f; // normalize from 0 to 1
+            }
+            return 10.0f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.HP);
+
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+
+
+            if (hp > this.expectedHPChange) // you should survive
+            {
+                return base.GetHValue(WorldModelImproved) * 0.5f + ((float) Math.Min(this.expectedHPChange/maxHp, 1)) * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f; // normalize from 0 to 1
             }
             return 10.0f;
         }

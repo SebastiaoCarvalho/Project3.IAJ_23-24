@@ -1,31 +1,31 @@
-using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
+﻿using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Game
 {
-    public class FutureStateWorldModel : WorldModel
+    public class FutureStateWorldModelImproved : WorldModelImproved
     {
         protected GameManager GameManager { get; set; }
         protected int NextPlayer { get; set; }
         protected Action NextEnemyAction { get; set; }
         protected Action[] NextEnemyActions { get; set; }
 
-        public FutureStateWorldModel(GameManager gameManager, List<Action> actions) : base(actions)
+        public FutureStateWorldModelImproved(GameManager gameManager, List<Action> actions) : base(actions)
         {
             this.GameManager = gameManager;
             this.NextPlayer = 0;
         }
 
-        public FutureStateWorldModel(FutureStateWorldModel parent) : base(parent)
+        public FutureStateWorldModelImproved(FutureStateWorldModelImproved parent) : base(parent)
         {
             this.GameManager = parent.GameManager;
         }
 
-        public override WorldModel GenerateChildWorldModel()
+        public override WorldModelImproved GenerateChildWorldModel()
         {
-            return new FutureStateWorldModel(this);
+            return new FutureStateWorldModelImproved(this);
         }
 
         public override bool IsTerminal()
@@ -98,7 +98,10 @@ namespace Assets.Scripts.Game
         {
             Vector3 position = (Vector3)this.GetProperty(Properties.POSITION);
             bool enemyEnabled;
-
+            if (GameManager.SleepingNPCs){
+                this.NextPlayer = 0;
+                return;
+            } 
             //basically if the character is close enough to an enemy, the next player will be the enemy.
             foreach (var enemy in this.GameManager.enemies)
             {
@@ -106,7 +109,7 @@ namespace Assets.Scripts.Game
                 if (enemyEnabled && (enemy.transform.position - position).sqrMagnitude <= 100)
                 {
                     this.NextPlayer = 1;
-                    this.NextEnemyAction = new SwordAttack(this.GameManager.Character, enemy);
+                    this.NextEnemyAction = new EnemyAttack(this.GameManager.Character, enemy);
                     this.NextEnemyActions = new Action[] { this.NextEnemyAction };
                     return; 
                 }

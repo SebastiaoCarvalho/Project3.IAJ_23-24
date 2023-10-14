@@ -31,10 +31,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return mana >= this.manaChange;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            return mana >= this.manaChange;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
             return mana >= this.manaChange;
         }
 
@@ -58,30 +65,56 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.DivineSmite(this.Target);
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            int xp = (int)worldModel.GetProperty(Properties.XP);
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name, false);
-            worldModel.SetProperty(Properties.XP, xp + this.xpChange);
-            worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
+            WorldModelImproved.SetProperty(this.Target.name, false);
+            WorldModelImproved.SetProperty(Properties.XP, xp + this.xpChange);
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            var maxHp = (int)worldModel.GetProperty(Properties.MAXHP);
-            var mana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
-            
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            return hp/(float)maxHp * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f + mana/(float)maxMana * 0.1f + base.GetHValue(worldModel) * 0.4f;
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+
+            //there was an hit, enemy is destroyed, gain xp, spend mana
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(this.Target.name, false);
+            WorldModelImproved.SetProperty(Properties.XP, xp + this.xpChange);
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+
+            return hp/(float)maxHp * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f + mana/(float)maxMana * 0.1f + base.GetHValue(WorldModelImproved) * 0.4f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+
+            return hp/(float)maxHp * 0.3f + ((float) Math.Min(level * 10/this.expectedXPChange, 1)) * 0.2f + mana/(float)maxMana * 0.1f + base.GetHValue(WorldModelImproved) * 0.4f;
         }
     }
 }

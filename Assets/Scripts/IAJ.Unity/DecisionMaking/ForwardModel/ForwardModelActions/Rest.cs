@@ -24,13 +24,22 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return Character.baseStats.HP < Character.baseStats.MaxHP;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
-            int hp = (int)worldModel.GetProperty(Properties.HP);
-            int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
             return hp < maxHP;
         }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            return hp < maxHP;
+        }
+
 
         public override float GetGoalChange(Goal goal)
         {
@@ -51,26 +60,50 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.Rest();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            int hp = (int)worldModel.GetProperty(Properties.HP);
-            int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            float time = (float)worldModel.GetProperty(Properties.TIME);
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            float time = (float)WorldModelImproved.GetProperty(Properties.TIME);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(Properties.HP, (int) Math.Max(hp + this.expectedHPChange, maxHP));
-            worldModel.SetProperty(Properties.TIME, time + Duration);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedHPChange));
-            worldModel.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
+            WorldModelImproved.SetProperty(Properties.HP, (int) Math.Max(hp + this.expectedHPChange, maxHP));
+            WorldModelImproved.SetProperty(Properties.TIME, time + Duration);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedHPChange));
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
         }
 
-        public override float GetHValue(WorldModel worldModel) // TODO : MCTS
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
+            base.ApplyActionEffects(WorldModelImproved);
+
+            int hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            float time = (float)WorldModelImproved.GetProperty(Properties.TIME);
+
+            //there was an hit, enemy is destroyed, gain xp, spend mana
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(Properties.HP, (int) Math.Max(hp + this.expectedHPChange, maxHP));
+            WorldModelImproved.SetProperty(Properties.TIME, time + Duration);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedHPChange));
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            
+            return 0.3f + hp / (float) maxHP * 0.7f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
             
             return 0.3f + hp / (float) maxHP * 0.7f;
         }

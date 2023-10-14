@@ -21,7 +21,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.EnemyAttack(this.Target);
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            return -10; // make sure this action is always chosen so that the player doesn't think he can avoid the attack
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
         {
             return -10; // make sure this action is always chosen so that the player doesn't think he can avoid the attack
         }

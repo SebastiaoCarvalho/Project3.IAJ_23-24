@@ -39,16 +39,25 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
             return this.Duration;
         }
 
-        public virtual float GetDuration(WorldModel worldModel)
+        public virtual float GetDuration(WorldModelImproved WorldModelImproved)
         {
             return this.Duration;
+        }
+
+         public virtual float GetDuration(WorldModel WorldModelImproved)
+        {
+            return this.Duration;
+        }
+
+        public virtual bool CanExecute(WorldModelImproved woldModel)
+        {
+            return true;
         }
 
         public virtual bool CanExecute(WorldModel woldModel)
         {
             return true;
         }
-
 
         public virtual bool CanExecute()
         {
@@ -60,12 +69,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
         }
 
         // Used for GOAP Decison Making
-        public virtual void ApplyActionEffects(WorldModel worldModel)
+        public virtual void ApplyActionEffects(WorldModelImproved WorldModelImproved)
+        {
+        }
+
+        public virtual void ApplyActionEffects(WorldModel WorldModelImproved)
         {
         }
 
         // Used for MCTS Biased
-        public virtual float GetHValue(WorldModel worldModel)
+        public virtual float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            return 0.0f;
+        }
+
+        public virtual float GetHValue(WorldModel WorldModelImproved)
         {
             return 0.0f;
         }

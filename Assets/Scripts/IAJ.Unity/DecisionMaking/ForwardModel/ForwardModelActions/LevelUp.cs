@@ -24,10 +24,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         }
         
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            int xp = (int)worldModel.GetProperty(Properties.XP);
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+
+            return xp >= level * 10;
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
 
             return xp >= level * 10;
         }
@@ -37,18 +45,32 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.LevelUp();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
-            float time = (float)worldModel.GetProperty(Properties.TIME);
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+            float time = (float)WorldModelImproved.GetProperty(Properties.TIME);
 
-            worldModel.SetProperty(Properties.LEVEL, level + 1);
-            worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
-            worldModel.SetProperty(Properties.XP, (int)0);
-            worldModel.SetProperty(Properties.TIME, time + this.Duration);
-            worldModel.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, 0);
-            worldModel.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
+            WorldModelImproved.SetProperty(Properties.LEVEL, level + 1);
+            WorldModelImproved.SetProperty(Properties.MAXHP, maxHP + 10);
+            WorldModelImproved.SetProperty(Properties.XP, (int)0);
+            WorldModelImproved.SetProperty(Properties.TIME, time + this.Duration);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, 0);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
+        }
+
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
+        {
+            int maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+            float time = (float)WorldModelImproved.GetProperty(Properties.TIME);
+
+            WorldModelImproved.SetProperty(Properties.LEVEL, level + 1);
+            WorldModelImproved.SetProperty(Properties.MAXHP, maxHP + 10);
+            WorldModelImproved.SetProperty(Properties.XP, (int)0);
+            WorldModelImproved.SetProperty(Properties.TIME, time + this.Duration);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, 0);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
         }
 
         public override float GetGoalChange(Goal goal)
@@ -66,11 +88,20 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return change;
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
         {
             // if you are close to leveling up, choose this
-            int xp = (int)worldModel.GetProperty(Properties.XP);
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+            return xp > level * 10 - 5 ? -10 : 10;
+            
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            // if you are close to leveling up, choose this
+            int xp = (int)WorldModelImproved.GetProperty(Properties.XP);
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
             return xp > level * 10 - 5 ? -10 : 10;
             
         }

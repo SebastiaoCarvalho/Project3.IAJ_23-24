@@ -23,19 +23,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public float TotalProcessingTime { get; set; }
         public MCTSNode BestFirstChild { get; set; }
         public List<Action> BestActionSequence { get; set; }
-        public WorldModel BestActionSequenceEndState { get; set; }
+        public WorldModelImproved BestActionSequenceEndState { get; set; }
         protected int CurrentIterations { get; set; }
         protected int CurrentDepth { get; set; }
         protected int FrameCurrentIterations { get; set; }
-        protected CurrentStateWorldModel InitialState { get; set; }
+        protected CurrentStateWorldModelImproved InitialState { get; set; }
         protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
         protected int PlayoutDepthLimit { get; set; }
 
-        public MCTS(CurrentStateWorldModel currentStateWorldModel)
+        public MCTS(CurrentStateWorldModelImproved CurrentStateWorldModelImproved)
         {
             this.InProgress = false;
-            this.InitialState = currentStateWorldModel;
+            this.InitialState = CurrentStateWorldModelImproved;
             this.MaxIterations = 1000;
             this.MaxIterationsPerFrame = 500;
             this.MaxPlayoutIterations = 10;
@@ -125,7 +125,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return currentNode;
         }
 
-        protected virtual float Playout(WorldModel initialStateForPlayout)
+        protected virtual float Playout(WorldModelImproved initialStateForPlayout)
         {
             // is terminal is always for player, getScore is always from player perspective
             // playout and return a result for initialStateForPlayout
@@ -172,7 +172,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected MCTSNode Expand(MCTSNode parent, Action action)
         {
             // here we create a new node from applying the action to the parent and do playout
-            WorldModel newState = parent.State.GenerateChildWorldModel();
+            WorldModelImproved newState = parent.State.GenerateChildWorldModel();
             action.ApplyActionEffects(newState);
             newState.CalculateNextPlayer();
             MCTSNode newNode = new MCTSNode(newState) {
@@ -262,7 +262,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return this.BestFirstChild.Action;
         }
 
-        protected virtual float PlayoutWithDebug(WorldModel worldModel) {
+        protected virtual float PlayoutWithDebug(WorldModelImproved WorldModelImproved) {
             return 0.0f;
         }
 

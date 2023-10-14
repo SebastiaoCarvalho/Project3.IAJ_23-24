@@ -24,11 +24,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return Character.baseStats.Level > 1 && mana >= this.manaChange ;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
-            int level = (int)worldModel.GetProperty(Properties.LEVEL);
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            return level > 1 && mana >= this.manaChange; 
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int level = (int)WorldModelImproved.GetProperty(Properties.LEVEL);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
             return level > 1 && mana >= this.manaChange; 
         }
 
@@ -45,24 +53,46 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.Teleport();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
             Vector3 position = GameManager.Instance.initialPosition;
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
 
-            worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
-            worldModel.SetProperty(Properties.POSITION, position);
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
+            WorldModelImproved.SetProperty(Properties.POSITION, position);
         }
 
-        public override float GetHValue(WorldModel worldModel) // TODO : MCTS
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
         {
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            var maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
-            var mana = (int)worldModel.GetProperty(Properties.MANA);
-            var maxMana = (int)worldModel.GetProperty(Properties.MAXMANA);
-            var money = (int)worldModel.GetProperty(Properties.MONEY);
+            base.ApplyActionEffects(WorldModelImproved);
+
+            Vector3 position = GameManager.Instance.initialPosition;
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
+            WorldModelImproved.SetProperty(Properties.POSITION, position);
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
+
+            return (hp/(float)maxHP) * 0.6f + (mana/(float)maxMana) * 0.1f + money/(float)25 * 0.3f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHP = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            var maxMana = (int)WorldModelImproved.GetProperty(Properties.MAXMANA);
+            var money = (int)WorldModelImproved.GetProperty(Properties.MONEY);
 
             return (hp/(float)maxHP) * 0.6f + (mana/(float)maxMana) * 0.1f + money/(float)25 * 0.3f;
         }

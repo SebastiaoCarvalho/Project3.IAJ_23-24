@@ -13,7 +13,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTSBiasedPlayout : MCTS
     {
-        public MCTSBiasedPlayout(CurrentStateWorldModel currentStateWorldModel) : base (currentStateWorldModel)
+        public MCTSBiasedPlayout(CurrentStateWorldModelImproved CurrentStateWorldModelImproved) : base (CurrentStateWorldModelImproved)
         {
             this.MaxIterations = 10000;
             this.MaxIterationsPerFrame = 1000;
@@ -21,7 +21,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.PlayoutDepthLimit = 5;
         }
         
-        protected override float Playout(WorldModel initialStateForPlayout)
+        protected override float Playout(WorldModelImproved initialStateForPlayout)
         {
             CurrentDepth = 0;
             var currentState = initialStateForPlayout;
@@ -46,16 +46,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return currentState.GetScore();
         }
 
-        private double[] NormalizeWeights(Action[] actions, WorldModel worldModel)
+        private double[] NormalizeWeights(Action[] actions, WorldModelImproved WorldModelImproved)
         {
             double[] normalizedWeights = new double[actions.Length];
 
-            double totalWeight = actions.Select(action => Math.Exp(-action.GetHValue(worldModel))).Sum();
+            double totalWeight = actions.Select(action => Math.Exp(-action.GetHValue(WorldModelImproved))).Sum();
 
             double lowerProbability = 0.0d;
             for (int i = 0; i < actions.Length; i++)
             {
-                double normalizedWeight = Math.Exp(-actions[i].GetHValue(worldModel))/totalWeight;
+                double normalizedWeight = Math.Exp(-actions[i].GetHValue(WorldModelImproved))/totalWeight;
                 normalizedWeights[i] = normalizedWeight;
                 lowerProbability += normalizedWeight;
             }
@@ -63,7 +63,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return normalizedWeights;
         }
 
-        private Action RandomChoose(Action[] actions, double[] weights, WorldModel worldModel)
+        private Action RandomChoose(Action[] actions, double[] weights, WorldModelImproved WorldModelImproved)
         {
             double eventProbability = RandomGenerator.NextDouble();
 
@@ -87,7 +87,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return candidate;
         }
 
-        private Action RandomChooseWithDebug(Action[] actions, double[] weights, WorldModel worldModel)
+        private Action RandomChooseWithDebug(Action[] actions, double[] weights, WorldModelImproved WorldModelImproved)
         {
             double eventProbability = RandomGenerator.NextDouble();
 
@@ -96,7 +96,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             foreach(Action action in actions)
             {
                 if (action.Name.Contains("EnemyAttack"))
-                    Debug.Log("Action: " + action.Name + " with probability: " + Math.Exp(-action.GetHValue(worldModel)));
+                    Debug.Log("Action: " + action.Name + " with probability: " + Math.Exp(-action.GetHValue(WorldModelImproved)));
             }
             for (int i = 0; i < actions.Length; i++)
             {
@@ -116,7 +116,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return candidate;
         }
 
-        protected override float PlayoutWithDebug(WorldModel initialStateForPlayout)
+        protected override float PlayoutWithDebug(WorldModelImproved initialStateForPlayout)
         {
             CurrentDepth = 0;
             var currentState = initialStateForPlayout;

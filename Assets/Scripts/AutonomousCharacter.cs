@@ -45,6 +45,7 @@ public class AutonomousCharacter : NPC
     public float Speed = 10.0f;
 
     [Header("Decision Algorithm Options")]
+    public bool EnemyChangesState;
     public bool GOBActive;
     public bool GOAPActive;
     public bool MCTSActive;
@@ -186,19 +187,19 @@ public class AutonomousCharacter : NPC
             if (this.GOBActive) this.GOBDecisionMaking = new GOBDecisionMaking(this.Actions, this.Goals);
             else if (this.GOAPActive)
             {
-                // the worldModel is necessary for the GOAP and MCTS algorithms that need to predict action effects on the world...
-                var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
-                this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
+                // the WorldModelImproved is necessary for the GOAP and MCTS algorithms that need to predict action effects on the world...
+                var WorldModelImproved = new CurrentStateWorldModelImproved(GameManager.Instance, this.Actions, this.Goals);
+                this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(WorldModelImproved, this.Actions, this.Goals);
             }
             else if (this.MCTSActive)
             {
-                var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
-                this.MCTSDecisionMaking = new MCTS(worldModel);
+                var WorldModelImproved = new CurrentStateWorldModelImproved(GameManager.Instance, this.Actions, this.Goals);
+                this.MCTSDecisionMaking = new MCTS(WorldModelImproved);
             }
             else if (this.MCTSBiasedPlayoutActive)
             {
-                var worldModel = new CurrentStateWorldModel(GameManager.Instance, this.Actions, this.Goals);
-                this.MCTSBiasedDecisionMaking = new MCTSBiasedPlayout(worldModel);
+                var WorldModelImproved = new CurrentStateWorldModelImproved(GameManager.Instance, this.Actions, this.Goals);
+                this.MCTSBiasedDecisionMaking = new MCTSBiasedPlayout(WorldModelImproved);
             }
         }
 
@@ -215,7 +216,7 @@ public class AutonomousCharacter : NPC
             GameObject enemy = CheckEnemies(ENEMY_DETECTION_RADIUS);
             if (enemy != null)
             {
-                GameManager.Instance.WorldChanged = true;
+                if (EnemyChangesState) GameManager.Instance.WorldChanged = true;
                 AddToDiary(" There is " + enemy.name + " in front of me!");
                 this.nearEnemy = enemy;
             }

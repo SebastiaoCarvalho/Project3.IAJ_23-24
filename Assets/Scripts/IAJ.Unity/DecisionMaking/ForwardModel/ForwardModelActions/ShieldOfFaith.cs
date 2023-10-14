@@ -26,12 +26,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             return Character.baseStats.ShieldHP < Character.baseStats.MaxShieldHp && mana >= this.manaChange ;
         }
 
-        public override bool CanExecute(WorldModel worldModel)
+        public override bool CanExecute(WorldModelImproved WorldModelImproved)
         {
-            if (!base.CanExecute(worldModel)) return false;
-            int shieldHP = (int)worldModel.GetProperty(Properties.ShieldHP);
-            int maxShieldHP = (int)worldModel.GetProperty(Properties.MaxShieldHP);
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int shieldHP = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            int maxShieldHP = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            return shieldHP < maxShieldHP && mana >= this.manaChange; 
+        }
+
+        public override bool CanExecute(WorldModel WorldModelImproved)
+        {
+            if (!base.CanExecute(WorldModelImproved)) return false;
+            int shieldHP = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            int maxShieldHP = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
             return shieldHP < maxShieldHP && mana >= this.manaChange; 
         }
 
@@ -50,28 +59,54 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             GameManager.Instance.ShieldOfFaith();
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModelImproved WorldModelImproved)
         {
-            base.ApplyActionEffects(worldModel);
+            base.ApplyActionEffects(WorldModelImproved);
 
-            int mana = (int)worldModel.GetProperty(Properties.MANA);
-            int maxShieldHP = (int)worldModel.GetProperty(Properties.MaxShieldHP);
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            int maxShieldHP = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
 
             //there was an hit, enemy is destroyed, gain xp, spend mana
             //disables the target object so that it can't be reused again
-            worldModel.SetProperty(Properties.ShieldHP, maxShieldHP);
-            worldModel.SetProperty(Properties.MANA, mana - this.manaChange);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedShieldChange));
+            WorldModelImproved.SetProperty(Properties.ShieldHP, maxShieldHP);
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedShieldChange));
         }
 
-        public override float GetHValue(WorldModel worldModel)
+        public override void ApplyActionEffects(WorldModel WorldModelImproved)
+        {
+            base.ApplyActionEffects(WorldModelImproved);
+
+            int mana = (int)WorldModelImproved.GetProperty(Properties.MANA);
+            int maxShieldHP = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
+
+            //there was an hit, enemy is destroyed, gain xp, spend mana
+            //disables the target object so that it can't be reused again
+            WorldModelImproved.SetProperty(Properties.ShieldHP, maxShieldHP);
+            WorldModelImproved.SetProperty(Properties.MANA, mana - this.manaChange);
+            WorldModelImproved.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, Math.Max(0, (int)WorldModelImproved.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) - this.expectedShieldChange));
+        }
+
+        public override float GetHValue(WorldModelImproved WorldModelImproved)
         {
             // if low hp and low shields
 
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            var maxHp = (int)worldModel.GetProperty(Properties.MAXHP);
-            var shieldHp = (int)worldModel.GetProperty(Properties.ShieldHP);
-            var maxShieldHp = (int)worldModel.GetProperty(Properties.MaxShieldHP);
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var shieldHp = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            var maxShieldHp = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
+
+            return  hp/(float)maxHp * 0.8f + shieldHp/(float)maxShieldHp * 0.2f;
+        }
+
+        public override float GetHValue(WorldModel WorldModelImproved)
+        {
+            // if low hp and low shields
+
+            var hp = (int)WorldModelImproved.GetProperty(Properties.HP);
+            var maxHp = (int)WorldModelImproved.GetProperty(Properties.MAXHP);
+            var shieldHp = (int)WorldModelImproved.GetProperty(Properties.ShieldHP);
+            var maxShieldHp = (int)WorldModelImproved.GetProperty(Properties.MaxShieldHP);
 
             return  hp/(float)maxHp * 0.8f + shieldHp/(float)maxShieldHp * 0.2f;
         }
