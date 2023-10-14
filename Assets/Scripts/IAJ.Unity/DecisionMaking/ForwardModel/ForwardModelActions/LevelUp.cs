@@ -45,11 +45,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
             worldModel.SetProperty(Properties.XP, (int)0);
             worldModel.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, 0);
+            worldModel.SetGoalValue(AutonomousCharacter.BE_QUICK_GOAL, (int)worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL) + Duration);
         }
 
         public override float GetGoalChange(Goal goal)
         {
-            float change = 0.0f;
+            float change = base.GetGoalChange(goal);
 
             if (goal.Name == AutonomousCharacter.GAIN_LEVEL_GOAL)
             {
@@ -69,11 +70,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
 
             return -100.0f;
-            //return ((level * 10) - xp)/(level * 10);
-
-
-            //you would be dumb not to level up if possible
-            //return -100.0f;
         }
     }
 }

@@ -113,6 +113,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
                 //disables the target object so that it can't be reused again
                 worldModel.SetProperty(this.Target.name, false);
                 worldModel.SetProperty(Properties.XP, xp + this.xpChange);
+                var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL);
+                worldModel.SetGoalValue(AutonomousCharacter.GAIN_LEVEL_GOAL, xpValue - this.xpChange);
             }
         }
 

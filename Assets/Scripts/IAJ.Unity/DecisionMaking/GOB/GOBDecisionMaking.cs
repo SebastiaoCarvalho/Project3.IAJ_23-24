@@ -28,28 +28,35 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         }
 
 
-        public static float CalculateDiscontentment(Action action, List<Goal> goals)
+        public static float CalculateDiscontentment(Action action, List<Goal> goals, AutonomousCharacter character)
         {
             // Keep a running total
             var discontentment = 0.0f;
             var duration = action.GetDuration();
+            float max = 10f;
 
             foreach (var goal in goals)
             {
+                if (goal.Name == "BeQuick")
+                    max = 150f;
+                else if (goal.Name == "GetRich")
+                    max = 40f;
+                else
+                    max = character.baseStats.Level * 10;
+                
                 // Calculate the new value after the action
-                var newValue = goal.InsistenceValue + action.GetGoalChange(goal);
-
+                float changeValue = action.GetGoalChange(goal) + duration * goal.ChangeRate;
+                
                 // The change rate is how much the goals changes per time
-                newValue += duration * goal.ChangeRate;
-
-                //Here is a bug: Insistence varies between 0-10, it should be normalized
-                discontentment += goal.GetDiscontentment(newValue);
+                changeValue = character.NormalizeGoalValues(goal.InsistenceValue + changeValue, 0, max);
+   
+                discontentment += goal.GetDiscontentment(changeValue);
             }
 
             return discontentment;
         }
 
-        public Action ChooseAction()
+        public Action ChooseAction(AutonomousCharacter character)
         {
             // Find the action leading to the lowest discontentment
             InProgress = true;
@@ -64,7 +71,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             {
                 if (action.CanExecute())
                 {
-                    value = CalculateDiscontentment(action, goals);
+                    value = CalculateDiscontentment(action, goals, character);
                     ActionDiscontentment.Add(action, value);
                     if (value < bestValue)
                     {

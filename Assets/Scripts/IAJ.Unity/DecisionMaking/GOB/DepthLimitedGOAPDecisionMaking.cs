@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
@@ -8,7 +8,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class DepthLimitedGOAPDecisionMaking
     {
-        public const int MAX_DEPTH = 3;
+        public const int MAX_DEPTH = 2;
         public int ActionCombinationsProcessedPerFrame { get; set; }
         public float TotalProcessingTime { get; set; }
         public int TotalActionCombinationsProcessed { get; set; }
@@ -77,6 +77,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                     nextAction.ApplyActionEffects(Models[CurrentDepth + 1]);
                     processedActions++;
                     if ((int) Models[CurrentDepth + 1].GetProperty(Properties.HP) <= 0) 
+                        continue;
+                    if ((float) Models[CurrentDepth + 1].GetProperty(Properties.TIME) >= 150) 
                         continue;
                     LevelAction[CurrentDepth] = nextAction;
                     CurrentDepth++;

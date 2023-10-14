@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
@@ -109,23 +109,23 @@ public class AutonomousCharacter : NPC
         //initialization of the GOB decision making
         //let's start by creating 4 main goals
 
-        this.SurviveGoal = new Goal(SURVIVE_GOAL, 0.8f);
+        this.SurviveGoal = new Goal(SURVIVE_GOAL, 0.7f);
 
-        this.GainLevelGoal = new Goal(GAIN_LEVEL_GOAL, 0.6f)
+        this.GainLevelGoal = new Goal(GAIN_LEVEL_GOAL, 0.8f)
         {
             InsistenceValue = 10.0f,
-            ChangeRate = 0.2f
+            ChangeRate = 0f
         };
 
-        this.GetRichGoal = new Goal(GET_RICH_GOAL, 0.5f)
+        this.GetRichGoal = new Goal(GET_RICH_GOAL, 0.8f)
         {
             InsistenceValue = 5.0f,
-            ChangeRate = 0.4f
+            ChangeRate = 0.3f
         };
 
-        this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 0.6f)
+        this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 0.5f)
         {
-            ChangeRate = 1f
+            ChangeRate = 0.0f
         };
 
         this.Goals = new List<Goal>
@@ -174,8 +174,8 @@ public class AutonomousCharacter : NPC
         }
 
         //Then we have a series of extra actions available to Sir Uthgard
-        this.Actions.Add(new LevelUp(this));
         this.Actions.Add(new ShieldOfFaith(this));
+        this.Actions.Add(new LevelUp(this));
         this.Actions.Add(new Teleport(this));
         this.Actions.Add(new Rest(this));
 
@@ -228,8 +228,6 @@ public class AutonomousCharacter : NPC
 
         if (Time.time > this.nextUpdateTime || GameManager.Instance.WorldChanged)
         {
-
-
             GameManager.Instance.WorldChanged = false;
             this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
             var duration = Time.time - this.lastUpdateTime;
@@ -253,8 +251,8 @@ public class AutonomousCharacter : NPC
             }
             this.GainLevelGoal.InsistenceValue = NormalizeGoalValues(this.GainLevelGoal.InsistenceValue, 0, baseStats.Level * 10);
 
-            this.GetRichGoal.InsistenceValue += this.GetRichGoal.ChangeRate * duration - (baseStats.Money-this.previousGold);
-            this.GetRichGoal.InsistenceValue = NormalizeGoalValues(this.GetRichGoal.InsistenceValue, 0, 25);
+            this.GetRichGoal.InsistenceValue = (25 - baseStats.Money) + this.GetRichGoal.ChangeRate * baseStats.Time;
+            this.GetRichGoal.InsistenceValue = NormalizeGoalValues(this.GetRichGoal.InsistenceValue, 0, 40);
             this.previousGold = baseStats.Money;
 
             this.SurviveGoalText.text = "Survive: " + this.SurviveGoal.InsistenceValue + " (" + this.SurviveGoal.Weight + ")";
@@ -272,7 +270,6 @@ public class AutonomousCharacter : NPC
                 this.GOBDecisionMaking.InProgress = true;
             }
             else if (GOAPActive)
-            //else if ()  //Add here other Algorithms...
             {
                 this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
             }
@@ -339,8 +336,6 @@ public class AutonomousCharacter : NPC
 
                 this.CurrentAction.Execute();
             }
-
-
         }
 
         if (navMeshAgent.hasPath)
@@ -385,7 +380,7 @@ public class AutonomousCharacter : NPC
         if (this.GOBDecisionMaking.InProgress)
         {
             //choose an action using the GOB Decision Making process
-            var action = this.GOBDecisionMaking.ChooseAction();
+            var action = this.GOBDecisionMaking.ChooseAction(this);
             if (action != null && action != this.CurrentAction)
             {
                 this.CurrentAction = action;
@@ -659,7 +654,7 @@ public class AutonomousCharacter : NPC
 
 
     // Normalize different goal values to 0-10 ranges according to their max
-    float NormalizeGoalValues(float value, float min, float max)
+    public float NormalizeGoalValues(float value, float min, float max)
     {
         if (value < 0) value = 0.0f;
         // Normalizing to 0-1

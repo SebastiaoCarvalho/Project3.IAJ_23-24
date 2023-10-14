@@ -14,11 +14,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override float GetGoalChange(Goal goal)
         {
             var change = base.GetGoalChange(goal);
-            if (goal.Name == AutonomousCharacter.GET_RICH_GOAL) change -= 5.0f;
+            if (goal.Name == AutonomousCharacter.GET_RICH_GOAL) {change -= 5.0f;}
 
-            //if(Character.baseStats.Money == 20)
-            //   if (goal.Name == AutonomousCharacter.BE_QUICK_GOAL)
-            //        change = -goal.InsistenceValue;
             return change;
         }
 

@@ -37,7 +37,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
             if (goal.Name == AutonomousCharacter.SURVIVE_GOAL)
             {
-                change -= goal.InsistenceValue;
+                change -= 5.0f;
             }
  
 
