@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{amsmath}
 \usepackage[a4paper, total={7.4in, 10in}]{geometry}
 
 \begin{titlepage}
@@ -21,13 +22,22 @@
   which we will describe better later.\\
   For the player character we compared 5 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
   MCTS with Biased Playground, and MCTS with Biased Playground and Limited Playout.
-  \section{Orc's Behaviour Trees}
+  \section{Orc's Behaviour Trees (Including Bonus Level)}
   \subsection{Basic Idea}
-
+  For the Orcs, we needed to implement a more complex Behaviour Tree that made the Orcs patrol around 2 points, and when one saw the player, they sould alert the other Orcs
+  using a shout and pursue the player. Also, it's needed for the Orcs to be listening to other Orcs' shouts. \\
+  To do this, we designed a Behaviour Tree using Parallel Tasks and Interruptors, that allowed the Orcs to stop the patrol movement whenever they heard a shout or 
+  saw the player. Also if an Orc is moving towards a shout position and sees the player, he should pursue the player and not keep moving to the shout position.\\
+  \subsection{Schema}
+  The schema of the Behaviour Tree is the following:
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth ]{Schema.jpg}
+  \end{figure}
   \section{GOB}
   \subsection{Algorithm}
   GOB with an overall utility function is an algorithm that uses Goals and a discontentment function, which he tries to minimize in other to fullfill the Goals. \\
-  The discontentment function used was \[discontentment = \sum_{i=1}^{k}w_i * insistence_i, for k Goals\]\\ 
+  The discontentment function used was \[discontentment = \sum_{i=1}^{k}w_i * insistence_i, \text{for k Goals}\]\\ 
   \subsection{Data}
   \begin{table}[h!]
     \centering
@@ -41,7 +51,8 @@
   \end{table}
   \subsection{Initial Analysis}
   Looking at the data, we can see GOB is a very basic algorithm but shows very good performance if the goal's weights, change rates and initial insistences are well tuned.\\
-  
+  This makes it dependent of the adjustment of the weigths according to the initial position, and only shows good win rate because there was an adjustment of the weights
+  until Sir Uthgard won. 
   \section{GOAP}
   \subsection{Algorithm}
   This algorithm tries to use the idea of GOB, but applying it to sequences of actions, instead of using only one action. For this, we use a WorldState representation 
@@ -51,8 +62,8 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{GOB performance}
-    \label{tab:tableGOB1}
+    \caption{GOAP performance}
+    \label{tab:tableGOAP1}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
@@ -60,19 +71,21 @@
     \end{tabular}
   \end{table}
   \subsection{Comparison}
-  Comparing GOB and GOAP, we can see that GOB shows better performance, both in win rate and processing time. Add more justification.
+  Comparing GOB and GOAP, we can see that GOB shows better performance, both in win rate and processing time. \\
+  Since GOAP computes sequences of actions and not only a single action, it's expected to take more processing time. The win rate being lower is less clear at first, but
+  ...
   
   \section{MCTS}
   \subsection{Algorithm}
   MCTS is an algorithm that was created as an alternative to the Minimax algorithm. It's basic implementation combines breadth-first tree search with local search using
   random sampling, in order to have data about if a state leads or not to a winning situation.\\
-   It uses 4 steps: Selection, Expansion, Playout and Backpropagation. Add more description.
+  It uses 4 steps: Selection, Expansion, Playout and Backpropagation. Add more description.
   
   \subsection{Data (Next Page)}
   \begin{table}[h!]
     \centering
-    \caption{GOB performance}
-    \label{tab:tableGOB1}
+    \caption{MCTS performance}
+    \label{tab:tableMCTS1}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
@@ -89,15 +102,15 @@
   \section{MCTS with Biased Playout}
   \subsection{Algorithm}
   By using an heurisitc to guide the Playout phase of MCTS, this algorithm achieves better results than the basic version.\\
-   Each action gets an H value assigned, based on their class, and then we use Gibbs distribution to sample the actions and get a probability to choose them. 
-   Since we use Gibbs distribution, lower H values mean bigger probabilities.\\
-   \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}}\]
+  Each action gets an H value assigned, based on their class, and then we use Gibbs distribution to sample the actions and get a probability to choose them. 
+  Since we use Gibbs distribution, lower H values mean bigger probabilities.\\
+  \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}}\]
   
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{GOB performance}
-    \label{tab:tableGOB1}
+    \caption{MCTS with Biased Playout performance}
+    \label{tab:tableBiasedMCTS1}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
@@ -106,8 +119,9 @@
   \end{table}
 
   \subsection{Comparison}
-  Comparing this data with the previous ones, we can see that this is by far the best optimization in terms of runtime. This is due to the use of bounding boxes,
-  that shorten the amounts of nodes we process, and thus the amount of calls to add, remove and search in the open and closed set.\\
+  Comparing this data with the previous ones, we can see it has better performance in time than the basic MCTS. This is due to having less Playout iterations,
+  since using a bias "guides" the playout, and there shouldn't be much change if we do multiple playouts.\\
+  Comparing win rates,
 
   \section{MCTS with Biased Playout and Limited Playout}
 
@@ -117,8 +131,8 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{GOB performance}
-    \label{tab:tableGOB1}
+    \caption{MCTS with Biased Playout and Limited Playout performance}
+    \label{tab:tableLimitedBiasedMCTS1}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
@@ -127,19 +141,23 @@
   \end{table}
 
   \subsection{Comparison}
-  We can see in the data that the Dead-End heuristic is a good heuristic, since it improves the time of the Search function, which is the most time consuming function 
-  in the A* algorithm, even though it has a big initialization cost calculating the DFS in the room graph. But it's still not a big optimization, since it shows 
-  results worse than NodeArray A*. It's also worth noting that the giant grid is not very fit for this algorithm as it creates many interconnecting clusters, which
-  causes finding all the paths very costly in some cases. With a clustering algorithm better fit for this map the results could be better.\\
+  We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the use of an heurisitc that allows us to have less
+  depth in the playouts, and evaluate better the state we're in. 
+  It still doesn't have a very good win rate but this is due to a tradeoff between the time it takes to make another decision and the commitment to the decision tje
+  character takes. Since we don't use the tree computed on previous searches, each time we do another decision the tree resets and this can lead to another decision,
+  thus wasting all the time spent in the commitment to the previous decision. Even though lowering the time to update the tree would help detecting enemies in our path,
+  if we do this too often, the character just wouldn't finish any action and would still lose to time, like in the basic MCTS.\\
 
   \section{Conclusions}
-  Analysing all algorithms we can acess that A* by itself is already a good algorithm, but it's optimizations can make it much faster, 
-  without compromising finding the best path.\\
-  Implementing better data structures that significantly reduce time spend on commonly used operations, like in the case of the Array Node A*, 
-  gave good results, but we still explored many nodes which were not part of the best path.\\
-  Then, we saw that adding preprocessing to the algorithm can improve it's runtime performance a lot, although it can take some time to perform it, 
-  especially on bigger maps, with many nodes. This is the case with goal bouding and the calculation of the Dead-End heurisitic.\\
-  The combination of the search efficiency of the Array Node A* with bouding boxes, which significantly reduced the nodes explored 
-  in directions other than the desired one, resolved both main issues with the basic A* algorithm. Due to this, goal bouding proved to be the best algorithm.
+  Analysing all algorithms we can acess that GOB is the one that shows better performance, both in win rate and processing time.\\
+  Even though MCTS with Limited and Biased playout should be better theoretically, since GOB uses goals, and their weights were well adjusted to fit the 
+  specific layout, it shows bigger win rate.\\
+  The biggest problem with MCTS and it's variants, is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
+  Even though we can recompute the tree when we are close to an enemy, this process makes Sir Uthgard waste all the time he already spent on the previous action if he switches
+  actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit. \\
+  One optimization that we think would help is to use the previous computed tree in new searches and keep expanding it, especially in cases where we are interrupted by enemies. 
+  This would make the process faster, since we wouldn't compute as much actions as before.\\
+  It would also be a good improvement if in the WorldState we took account for the movement of the enemies but this would be much harder to implement, since enemies can
+  change their behaviour when seeing the player, so the first optimization might be better.
 
 \end{document}
