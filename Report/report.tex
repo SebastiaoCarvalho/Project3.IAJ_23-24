@@ -21,7 +21,9 @@
   For the enemies we used Behaviour Trees, having a more basic one for the Mighty Dragon and the Skeletons, and a more advanced one for the Orcs, 
   which we will describe better later.\\
   For the player character, we compared 5 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
-  MCTS with Biased Playground, and MCTS with Biased Playground and Limited Playout.
+  MCTS with Biased Playground, and MCTS with Biased Playground and Limited Playout.\\
+  To improve performance of MCTS algorithms, we created a flag that allows us to decide if being near an enemy triggers a change in the world state. 
+  This flag can be toggled in Character -> Decision Algorithm Options -> Enemy Changes State. 
   \section{Orc's Behaviour Trees (Including Bonus Level)}
   \subsection{Basic Idea}
   For the Orcs, we needed to implement a more complex Behaviour Tree that made the Orcs patrol around 2 points, and when one saw the player, they should alert the other Orcs
@@ -44,9 +46,9 @@
     \caption{GOB performance}
     \label{tab:tableGOB1}
     \begin{tabular}{c|c|c}
-      \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
       \hline
-      1 & 1 & 1
+      0 & 27 & 100\%
     \end{tabular}
   \end{table}
   \subsection{Initial Analysis}
@@ -62,18 +64,40 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{GOAP performance}
+    \caption{GOAP performance with depth 2}
     \label{tab:tableGOAP1}
     \begin{tabular}{c|c|c}
-      \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
       \hline
-      1 & 1 & 1
+      0 & 356 & 10\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{GOAP performance with depth 3}
+    \label{tab:tableGOAP2}
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
+      \hline
+      0.08 & 6138 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{GOAP performance with depth 4}
+    \label{tab:tableGOAP3}
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
+      \hline
+      1.2 & 97351 & 0\%
     \end{tabular}
   \end{table}
   \subsection{Comparison}
   Comparing GOB and GOAP, we can see that GOB shows better performance, both in win rate and processing time. \\
   Since GOAP computes sequences of actions and not only a single action, it's expected to take more processing time. The win rate being lower is less clear at first, but
-  ...
+  by looking at the data, we can see that the GOAP algorithm works better for less depth. This is probably due to GOAP looking to far ahead, and plan actions 
+  that he won't be able to execute because there are enemies in the way that he doesn't detect. \\
+  Since GOB is basically GOAP with depth 1, we can understand why GOB works better than GOAP.
   
   \section{MCTS}
   \subsection{Algorithm}
@@ -84,15 +108,25 @@
   a Playout from this node. This consists in choosing random actions until we reach a terminal state, and then determine the result.
   In the end, all the nodes in the path are updated with this result, through Backpropagation.
   
-  \subsection{Data (Next Page)}
+  \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS performance}
+    \caption{MCTS performance with enemy detection}
     \label{tab:tableMCTS1}
-    \begin{tabular}{c|c|c}
-      \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      1 & 1 & 1
+      ? & 10000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout performance without enemy detection}
+    \label{tab:tableMCTS2}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      ? & 10000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
@@ -109,15 +143,27 @@
   Since we use Gibbs distribution, lower H values mean bigger probabilities.\\
   \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}}\]
   
+  \newpage
+
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout performance}
+    \caption{MCTS with Biased Playout performance with enemy detection}
     \label{tab:tableBiasedMCTS1}
-    \begin{tabular}{c|c|c}
-      \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      1 & 1 & 1
+      1.19 & 10000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout performance without enemy detection}
+    \label{tab:tableBiasedMCTS2}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      1.19 & 10000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
@@ -136,12 +182,22 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance}
+    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
     \label{tab:tableLimitedBiasedMCTS1}
-    \begin{tabular}{c|c|c}
-      \textbf{Processing time (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      1 & 1 & 1
+      0.59 & 10000 & 2 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \label{tab:tableLimitedBiasedMCTS2}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.58 & 10000 & 2 & 20\%
     \end{tabular}
   \end{table}
 
@@ -156,7 +212,7 @@
   \section{Conclusions}
   Analysing all algorithms we can acess that GOB is the one that shows better performance, both in win rate and processing time.\\
   Even though MCTS with Limited and Biased playout should be better theoretically, since GOB uses goals, and their weights were well adjusted to fit the 
-  specific layout, it shows bigger win rate.\\
+  specific layout of the level, it shows bigger win rate.\\
   The biggest problem with MCTS and it's variants, is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
   Even though we can recompute the tree when we are close to an enemy, this process makes Sir Uthgard waste all the time he already spent on the previous action if he switches
   actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit. \\
