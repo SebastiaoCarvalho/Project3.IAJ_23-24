@@ -215,7 +215,7 @@ public class AutonomousCharacter : NPC
             GameObject enemy = CheckEnemies(ENEMY_DETECTION_RADIUS);
             if (enemy != null)
             {
-                /* GameManager.Instance.WorldChanged = true; */
+                GameManager.Instance.WorldChanged = true;
                 AddToDiary(" There is " + enemy.name + " in front of me!");
                 this.nearEnemy = enemy;
             }

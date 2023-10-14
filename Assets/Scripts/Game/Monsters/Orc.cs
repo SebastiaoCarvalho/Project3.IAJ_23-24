@@ -71,6 +71,9 @@ namespace Assets.Scripts.Game.NPCs
             var animation = Instantiate(AlertSprite);
             Destroy(animation, 1.5f);
 
+            if (GameManager.Instance.lineFormation || GameManager.Instance.triangleFormation)
+                GameManager.Instance.BreakFormations();
+
             foreach(Orc target in targets)
                 target.hearShout(this);
          }
