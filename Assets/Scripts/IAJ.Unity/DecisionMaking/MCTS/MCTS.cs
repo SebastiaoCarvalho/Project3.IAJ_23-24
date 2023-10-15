@@ -238,10 +238,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (bestChild == null) return null;
 
             this.BestFirstChild = bestChild;
-           /*  Debug.Log("-----------------------------------------------------------------------------------------------------------");
-            Debug.Log("Best child: " + bestChild.Action.Name + " with winrate: " + bestChild.Q / bestChild.N);
-            Debug.Log("Next bro : " + bestChild.State.GetNextPlayer());
-            PlayoutWithDebug(bestChild.State.GenerateChildWorldModel()); */
 
             //this is done for debugging proposes only
             this.BestActionSequence = new List<Action>();
@@ -260,10 +256,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 this.BestActionSequenceEndState = node.State;
             }
             return this.BestFirstChild.Action;
-        }
-
-        protected virtual float PlayoutWithDebug(WorldModelImproved WorldModelImproved) {
-            return 0.0f;
         }
 
     }

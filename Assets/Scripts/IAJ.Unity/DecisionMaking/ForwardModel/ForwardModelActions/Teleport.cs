@@ -43,7 +43,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
         public override float GetGoalChange(Goal goal)
         {
             var change = base.GetGoalChange(goal);
-            // FIXME : add goals?
             return change;
         }
 
