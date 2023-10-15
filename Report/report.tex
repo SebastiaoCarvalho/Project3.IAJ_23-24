@@ -21,7 +21,7 @@
   For the enemies we used Behaviour Trees, having a more basic one for the Mighty Dragon and the Skeletons, and a more advanced one for the Orcs, 
   which we will describe better later.\\
   For the player character, we compared 5 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
-  MCTS with Biased Playground, and MCTS with Biased Playground and Limited Playout.\\
+  MCTS with Biased Playout, and MCTS with Biased Playout and Limited Playout.\\
   To improve performance of MCTS algorithms, we created a flag that allows us to decide if being near an enemy triggers a change in the world state. 
   This flag can be toggled in Character -> Decision Algorithm Options -> Enemy Changes State. \\
   The tests done for each algorithm were made on the standard grid, not the one with the Orc formation.
@@ -66,7 +66,7 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{GOAP performance with depth 2}
+    \caption{GOAP performance with depth 2 and using WorldModelImproved}
     \label{tab:tableGOAP1}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
@@ -76,8 +76,18 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{GOAP performance with depth 3}
+    \caption{GOAP performance with depth 2 and using WorldModel}
     \label{tab:tableGOAP2}
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
+      \hline
+      0 & 356 & 10\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{GOAP performance with depth 3 and using WorldModelImproved}
+    \label{tab:tableGOAP3}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
       \hline
@@ -86,12 +96,32 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{GOAP performance with depth 4}
-    \label{tab:tableGOAP3}
+    \caption{GOAP performance with depth 3 and using WorldModel}
+    \label{tab:tableGOAP4}
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
+      \hline
+      0.08 & 6138 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{GOAP performance with depth 4 and using WorldModelImproved}
+    \label{tab:tableGOAP5}
     \begin{tabular}{c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
       \hline
       1.2 & 97351 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{GOAP performance with depth 4 and using WorldModel}
+    \label{tab:tableGOAP6}
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of actions processed} & \textbf{Win Rate}\\
+      \hline
+      1.3 & 97351 & 0\%
     \end{tabular}
   \end{table}
   \subsection{Comparison}
@@ -113,7 +143,7 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS performance with enemy detection}
+    \caption{MCTS performance with enemy detection and using WorldModelImproved}
     \label{tab:tableMCTS1}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
@@ -123,12 +153,32 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout performance without enemy detection}
+    \caption{MCTS performance with enemy detection and using WorldModel}
     \label{tab:tableMCTS2}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
+      0.75 & 1000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS performance without enemy detection and using WorldModelImproved}
+    \label{tab:tableMCTS3}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
       0.68 & 1000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS performance without enemy detection and using WorldModel}
+    \label{tab:tableMCTS4}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.75 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
@@ -145,12 +195,10 @@
   Since we use Gibbs distribution, lower H values mean bigger probabilities.\\
   \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}}\]
   
-  \newpage
-
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout performance with enemy detection}
+    \caption{MCTS with Biased Playout performance with enemy detection and using WorldModelImproved}
     \label{tab:tableBiasedMCTS1}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
@@ -160,12 +208,32 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout performance without enemy detection}
+    \caption{MCTS with Biased Playout performance with enemy detection and using WorldModel}
     \label{tab:tableBiasedMCTS2}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
+      0.50 & 1000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout performance without enemy detection and using WorldModelImproved}
+    \label{tab:tableBiasedMCTS3}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
       0.41 & 1000 & 25 & 0\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout performance without enemy detection and using WorldModel}
+    \label{tab:tableBiasedMCTS4}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.50 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
@@ -186,7 +254,7 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
+    \caption{MCTS with Limited Playout performance with enemy detection and using WorldModelImproved}
     \label{tab:tableLimitedMCTS1}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
@@ -196,12 +264,32 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \caption{MCTS with Limited Playout performance with enemy detection and using WorldModel}
     \label{tab:tableLimitedMCTS2}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
+      0.14 & 1000 & 2 & 30\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Limited Playout performance without enemy detection and using WorldModelImproved}
+    \label{tab:tableLimitedMCTS3}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
       0.12 & 1000 & 2 & 30\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Limited Playout performance without enemy detection and using WorldModel}
+    \label{tab:tableLimitedMCTS4}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.14 & 1000 & 2 & 30\%
     \end{tabular}
   \end{table}
 
@@ -230,12 +318,32 @@
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
     \label{tab:tableLimitedBiasedMCTS2}
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
+      0.19 & 1000 & 2 & 40\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \label{tab:tableLimitedBiasedMCTS3}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
       0.15 & 1000 & 2 & 50\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \label{tab:tableLimitedBiasedMCTS4}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.18 & 1000 & 2 & 50\%
     \end{tabular}
   \end{table}
 
