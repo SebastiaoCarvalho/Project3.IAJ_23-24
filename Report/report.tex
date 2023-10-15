@@ -23,13 +23,15 @@
   For the player character, we compared 5 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
   MCTS with Biased Playground, and MCTS with Biased Playground and Limited Playout.\\
   To improve performance of MCTS algorithms, we created a flag that allows us to decide if being near an enemy triggers a change in the world state. 
-  This flag can be toggled in Character -> Decision Algorithm Options -> Enemy Changes State. 
+  This flag can be toggled in Character -> Decision Algorithm Options -> Enemy Changes State. \\
+  The tests done for each algorithm were made on the standard grid, not the one with the Orc formation.
   \section{Orc's Behaviour Trees (Including Bonus Level)}
   \subsection{Basic Idea}
   For the Orcs, we needed to implement a more complex Behaviour Tree that made the Orcs patrol around 2 points, and when one saw the player, they should alert the other Orcs
   using a shout and pursue the player. The Orcs, also, need to be listening for other Orcs' shouts, and when they hear one, they move to the position where that shout occured. \\
   To do this, we designed a Behaviour Tree using Parallel Tasks and Interruptors, that allowed the Orcs to stop the patrol movement whenever they heard a shout or 
   saw the player. Also if an Orc is moving towards a shout position and sees the player, he should pursue the player and not keep moving to the shout position.\\
+  Since the requirement for the Bonus Level was that Orcs would stop between patrol points to chase the player, we consider we have completed it.
   \subsection{Schema}
   The schema of the Behaviour Tree is the following:
   \begin{figure}[h]
@@ -116,7 +118,7 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      ? & 10000 & 25 & 0\%
+      0.7 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
@@ -126,7 +128,7 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      ? & 10000 & 25 & 0\%
+      0.68 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
@@ -153,7 +155,7 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      1.19 & 10000 & 25 & 0\%
+      0.41 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
@@ -163,21 +165,57 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      1.19 & 10000 & 25 & 0\%
+      0.41 & 1000 & 25 & 0\%
     \end{tabular}
   \end{table}
 
   \subsection{Comparison}
   Comparing this data with the previous ones, we can see it has better performance in time than the basic MCTS. This is due to having less Playout iterations,
-  since using a bias "guides" the playout, and there shouldn't be much change if we do multiple playouts.\\
-  Comparing win rates,
+  since using a bias "guides" the playout, and there shouldn't be much change if we do many playouts like in the random MCTS.\\
+  We can see that the win rate continues at 0, thus proving that just an heurisitc doesn't help much. 
+
+  \section{MCTS with Limited Playout}
+
+  \subsection{Algorithm}
+  This algorithm is a version of the basic MCTS,  but limits the maximum depth of a Playout. This is so the algorithm spends less time performing playouts. However,
+  a drawback is that we may not reach a terminal branch, and in that case, we can't determine the result. To address this issue, we create an heuristic function,
+  which gives a score, between 0 and 1, to a world state, that represents how good that state is, or in other words, how likely it is to lead to victory. \\
+  Even though this comparison was not necessary, we thought it would be good to include it since it shows progression relative to the Biased version and will be useful
+  to compare with the next algorithm as well;
+  
+  \subsection{Data}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
+    \label{tab:tableLimitedMCTS1}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.12 & 1000 & 2 & 30\%
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \label{tab:tableLimitedMCTS2}
+    \begin{tabular}{c|c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+      \hline
+      0.12 & 1000 & 2 & 30\%
+    \end{tabular}
+  \end{table}
+
+  \subsection{Comparison}
+  We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the use of an heurisitc that allows us to have less
+  depth in the playouts, and evaluate better the state we're in. \\
+  This algorithm shows the same win rate with enemy detect and without it. This is probably because we don't take much time to decide, since the playout is random
+  and we have a short playout depth.\\
 
   \section{MCTS with Biased Playout and Limited Playout}
 
   \subsection{Algorithm}
-  This algorithm uses the previous as a base, but limits the maximum depth of a Playout. This is so the algorithm spends less time performing playouts. However,
-  a drawback is that we may not reach a terminal branch, and in that case, we can't determine the result. To address this issue, we create an heuristic function,
-  which gives a score, between 0 and 1, to a world state, that represents how good that state is, or in other words, how likely it is to lead to victory.
+  This algorithm uses Biased MCTS as a base, but combines it with small Playout depth and the heuristic from the previous algorithm, 
+  thus aiming to achieve even better results.
   
   \subsection{Data}
   \begin{table}[h!]
@@ -187,7 +225,7 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      0.59 & 10000 & 2 & 0\%
+      0.15 & 1000 & 2 & 40\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
@@ -197,17 +235,18 @@
     \begin{tabular}{c|c|c|c}
       \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
       \hline
-      0.58 & 10000 & 2 & 20\%
+      0.15 & 1000 & 2 & 50\%
     \end{tabular}
   \end{table}
 
   \subsection{Comparison}
-  We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the use of an heurisitc that allows us to have less
-  depth in the playouts, and evaluate better the state we're in. 
-  It still doesn't have a very good win rate but this is due to a tradeoff between the time it takes to make another decision and the commitment to the decision tje
+  We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the combination of the bias with the limit heuristic.
+  Even though it has worse time performace than the random MCTS with Limited Playout, it shows better win rate. \\
+  It still doesn't have a very good win rate but this is due to a tradeoff between the time it takes to make another decision and the commitment to the decision the
   character takes. Since we don't use the tree computed on previous searches, each time we do another decision the tree resets and this can lead to another decision,
-  thus wasting all the time spent in the commitment to the previous decision. Even though lowering the time to update the tree would help detecting enemies in our path,
-  if we do this too often, the character just wouldn't finish any action and would still lose to time, like in the basic MCTS.\\
+  thus wasting all the time spent in the commitment to the previous decision.\\ 
+  Even though lowering the time to update the tree would help detecting enemies in our path, if we do this too often, the character just wouldn't finish any action 
+  and would still lose to time, like in the basic MCTS.\\
 
   \section{Conclusions}
   Analysing all algorithms we can acess that GOB is the one that shows better performance, both in win rate and processing time.\\
@@ -215,7 +254,8 @@
   specific layout of the level, it shows bigger win rate.\\
   The biggest problem with MCTS and it's variants, is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
   Even though we can recompute the tree when we are close to an enemy, this process makes Sir Uthgard waste all the time he already spent on the previous action if he switches
-  actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit. \\
+  actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit. As we can see by looking at the data,
+  we haver better win rates when detecting an enemy doesn't change our world state. \\
   One optimization that we think would help is to use the previous computed tree in new searches and keep expanding it, especially in cases where we are interrupted by enemies. 
   This would make the process faster, since we wouldn't compute as much actions as before.\\
   It would also be a good improvement if in the WorldState we took account for the movement of the enemies but this would be much harder to implement, since enemies can
