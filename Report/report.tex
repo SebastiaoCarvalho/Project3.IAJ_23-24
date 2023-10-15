@@ -28,9 +28,9 @@
   \section{Orc's Behaviour Trees (Including Bonus Level)}
   \subsection{Basic Idea}
   For the Orcs, we needed to implement a more complex Behaviour Tree that made the Orcs patrol around 2 points, and when one saw the player, they should alert the other Orcs
-  using a shout and pursue the player. The Orcs, also, need to be listening for other Orcs' shouts, and when they hear one, they move to the position where that shout occured. \\
-  To do this, we designed a Behaviour Tree using Parallel Tasks and Interruptors, that allowed the Orcs to stop the patrol movement whenever they heard a shout or 
-  saw the player. Also if an Orc is moving towards a shout position and sees the player, he should pursue the player and not keep moving to the shout position.\\
+  by shouting and pursue the player. The Orcs, also, need to be listening for other Orcs' shouts, and when they hear one, they move to the position where that shout occured. \\
+  To do this, we designed a Behaviour Tree using Parallel Tasks and Interruptors, that allows the Orcs to stop the patrol movement whenever they hear a shout or 
+  see the player. Also if an Orc is moving towards a shout position and sees the player, he should pursue the player and not keep moving to the shout position.\\
   Since the requirement for the Bonus Level was that Orcs would stop between patrol points to chase the player, we consider we have completed it.
   \subsection{Schema}
   The schema of the Behaviour Tree is the following:
@@ -62,7 +62,7 @@
   This algorithm tries to use the idea of GOB, but applying it to sequences of actions, instead of using only one action. For this, we use a WorldState representation 
   and Depth-Limited search to find the best sequence.\\
   For our specific case, we had to use some modifications, like pruning the actions' tree of branches that had actions leading to death. The algorithm chose actions like killing
-  an enemy and recovering health later, which isn't allowed on the game, so this pruning was needed.
+  an enemy and recovering health later, which isn't allowed in the game, so this pruning was needed.
   \subsection{Data}
   \begin{table}[h!]
     \centering
@@ -127,14 +127,14 @@
   \subsection{Comparison}
   Comparing GOB and GOAP, we can see that GOB shows better performance, both in win rate and processing time. \\
   Since GOAP computes sequences of actions and not only a single action, it's expected to take more processing time. The win rate being lower is less clear at first, but
-  by looking at the data, we can see that the GOAP algorithm works better for less depth. This is probably due to GOAP looking to far ahead, and plan actions 
+  by looking at the data, we can see that the GOAP algorithm works better for less depth. This is probably due to GOAP looking too far ahead, and planning actions 
   that he won't be able to execute because there are enemies in the way that he doesn't detect. \\
   Since GOB is basically GOAP with depth 1, we can understand why GOB works better than GOAP.
   
   \section{MCTS}
   \subsection{Algorithm}
-  MCTS is an algorithm that was created as an alternative to the Minimax algorithm. It's basic implementation combines breadth-first tree search with local search using
-  random sampling, in order to have data about if a state leads or not to a winning situation.\\
+  MCTS is an algorithm that was created as an alternative to the Minimax algorithm. Its basic implementation combines breadth-first tree search with local search using
+  random sampling, in order to reason whether a state leads to a winning situation.\\
   It uses 4 steps: Selection, Expansion, Playout and Backpropagation. Selection serves to traverse the tree, selecting the optimal nodes, until a terminal node or a node that 
   still has child nodes to expand is reached. Expand, will then create that child node. In our implementation, we expand only one child node per iteration. Then, we perform 
   a Playout from this node. This consists in choosing random actions until we reach a terminal state, and then determine the result.
@@ -184,7 +184,7 @@
 
   \subsection{Comparison}
   By looking at the data, we can see that the basic implementation of MCTS doesn't get us very far. This is mostly due to the randomness of the algorithm, 
-  since every time we see an enemy or get close enough to a chest or potion, the algorithm runs again, giving a new decision and wasting all 
+  since every time we see an enemy or get close enough to a chest or potion, the algorithm runs again, which can give a new decision and waste all 
   the time spent to reach the previous target.
   Add more conclusions.\\
 
@@ -238,7 +238,7 @@
   \end{table}
 
   \subsection{Comparison}
-  Comparing this data with the previous ones, we can see it has better performance in time than the basic MCTS. This is due to having less Playout iterations,
+  Comparing this data with the previous ones, we can see it has better performance time-wise than the basic MCTS. This is due to having less Playout iterations,
   since using a bias "guides" the playout, and there shouldn't be much change if we do many playouts like in the random MCTS.\\
   We can see that the win rate continues at 0, thus proving that just an heurisitc doesn't help much. 
 
@@ -247,7 +247,7 @@
   \subsection{Algorithm}
   This algorithm is a version of the basic MCTS,  but limits the maximum depth of a Playout. This is so the algorithm spends less time performing playouts. However,
   a drawback is that we may not reach a terminal branch, and in that case, we can't determine the result. To address this issue, we create an heuristic function,
-  which gives a score, between 0 and 1, to a world state, that represents how good that state is, or in other words, how likely it is to lead to victory. \\
+  which gives a score between 0 and 1 to a world state, that represents how good that state is or, in other words, how likely it is to lead to victory. \\
   Even though this comparison was not necessary, we thought it would be good to include it since it shows progression relative to the Biased version and will be useful
   to compare with the next algorithm as well;
   
@@ -296,8 +296,7 @@
   \subsection{Comparison}
   We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the use of an heurisitc that allows us to have less
   depth in the playouts, and evaluate better the state we're in. \\
-  This algorithm shows the same win rate with enemy detect and without it. This is probably because we don't take much time to decide, since the playout is random
-  and we have a short playout depth.\\
+  This is similar to what happened with GOB and GOAP, where planning too far ahead proves to be detrimental because Sir Uthgard gets intercepted by orcs and therefore needs to react in a more short-term manner.\\
 
   \section{MCTS with Biased Playout and Limited Playout}
 
@@ -350,20 +349,20 @@
   \subsection{Comparison}
   We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the combination of the bias with the limit heuristic.
   Even though it has worse time performace than the random MCTS with Limited Playout, it shows better win rate. \\
-  It still doesn't have a very good win rate but this is due to a tradeoff between the time it takes to make another decision and the commitment to the decision the
+  It still doesn't have a very good win rate. This might be due to a tradeoff between the time it takes to make another decision and the commitment to the decision the
   character takes. Since we don't use the tree computed on previous searches, each time we do another decision the tree resets and this can lead to another decision,
   thus wasting all the time spent in the commitment to the previous decision.\\ 
   Even though lowering the time to update the tree would help detecting enemies in our path, if we do this too often, the character just wouldn't finish any action 
   and would still lose to time, like in the basic MCTS.\\
+  Also, the bias heuristic and the scoring for non-terminal world states could be better tuned to work in tandum. \\
 
   \section{Conclusions}
   Analysing all algorithms we can acess that GOB is the one that shows better performance, both in win rate and processing time.\\
   Even though MCTS with Limited and Biased playout should be better theoretically, since GOB uses goals, and their weights were well adjusted to fit the 
-  specific layout of the level, it shows bigger win rate.\\
-  The biggest problem with MCTS and it's variants, is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
+  specific layout of the level, it shows a better win rate.\\
+  The biggest problem with MCTS and its variants is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
   Even though we can recompute the tree when we are close to an enemy, this process makes Sir Uthgard waste all the time he already spent on the previous action if he switches
-  actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit. As we can see by looking at the data,
-  we haver better win rates when detecting an enemy doesn't change our world state. \\
+  actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit.\\
   One optimization that we think would help is to use the previous computed tree in new searches and keep expanding it, especially in cases where we are interrupted by enemies. 
   This would make the process faster, since we wouldn't compute as much actions as before.\\
   It would also be a good improvement if in the WorldState we took account for the movement of the enemies but this would be much harder to implement, since enemies can
