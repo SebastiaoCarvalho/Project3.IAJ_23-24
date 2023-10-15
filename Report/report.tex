@@ -370,9 +370,8 @@
   and would still lose to time, like in the basic MCTS.\\
   We can also look at the data and see that using enemy detection lowers the win rate. This is due to the problem spoken above, the player resets the tree and loses
   to time.\\
-  Note, however, that while in the basic MCTS the character would change decision every time the algorithm executed,
-in this version he sticks with the same decision more often, since the best action being determined is more likely to be the same between executions due to
-both heuristics.\\
+  Note, however, that while in the basic MCTS the character would change decision every time the algorithm executed, in this version he sticks with the same 
+  decision more often, since the best action being determined is more likely to be the same between executions due to both heuristics.\\
   Also, the bias heuristic and the scoring for non-terminal world states could be better tuned to work in tandum. \\
 
   \section{Conclusions}
@@ -387,6 +386,8 @@ both heuristics.\\
   This would make the process faster, since we wouldn't compute as much actions as before.\\
   It would also be a good improvement if in the WorldModel we took account for the movement of the enemies but this would be much harder to implement, since enemies can
   change their behaviour when seeing the player, so the first optimization might be better.
-  Relatively to the world state representation, which we didn't meantion before, but the data relative to it is in each section, we can see that the array implementation does out perform the dictonary implementation more as the depth increases. In GOAP, this is hardly noticible but in the playouts for MCTS it becomes more relevant. So, it does offer a slight improvement in computational times.
+  Relatively to the world state representation, which we didn't mention before, but the data relative to it is in each section, we can see that the array implementation 
+  does outperform the dictionary implementation more as the depth increases. In GOAP, this is hardly noticeable but in the playouts for MCTS it becomes more relevant. 
+  So, it does offer a slight improvement in computational times.
 
 \end{document}
