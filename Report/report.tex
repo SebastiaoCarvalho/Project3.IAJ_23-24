@@ -20,10 +20,10 @@
   The goal of the project was to test different decison making algortihms, and compare their performace and efficiency in terms of win rate. \\
   For the enemies we used Behaviour Trees, having a more basic one for the Mighty Dragon and the Skeletons, and a more advanced one for the Orcs, 
   which we will describe better later.\\
-  For the player character, we compared 5 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
-  MCTS with Biased Playout, and MCTS with Biased Playout and Limited Playout.\\
+  For the player character, we compared 6 different algorithms: Goal Oriented Behaviour (GOB), Goal Oriented Action Planning (GOAP), Monte Carlo Search Tree (MCTS),
+  MCTS with Biased Playout, MCTS with Limited Playout, and MCTS with Biased Playout and Limited Playout.\\
   To improve performance of MCTS algorithms, we created a flag that allows us to decide if being near an enemy triggers a change in the world state. 
-  This flag can be toggled in Character -> Decision Algorithm Options -> Enemy Changes State. \\
+  This flag can be toggled in Character $\rightarrow$ Decision Algorithm Options $\rightarrow$ Enemy Changes State. \\
   The tests done for each algorithm were made on the standard grid, not the one with the Orc formation.
   \section{Orc's Behaviour Trees (Including Bonus Level)}
   \subsection{Basic Idea}
@@ -32,6 +32,9 @@
   To do this, we designed a Behaviour Tree using Parallel Tasks and Interruptors, that allows the Orcs to stop the patrol movement whenever they hear a shout or 
   see the player. Also if an Orc is moving towards a shout position and sees the player, he should pursue the player and not keep moving to the shout position.\\
   Since the requirement for the Bonus Level was that Orcs would stop between patrol points to chase the player, we consider we have completed it.
+
+  \newpage
+
   \subsection{Schema}
   The schema of the Behaviour Tree is the following:
   \begin{figure}[h]
@@ -59,7 +62,7 @@
   until Sir Uthgard won. 
   \section{GOAP}
   \subsection{Algorithm}
-  This algorithm tries to use the idea of GOB, but applying it to sequences of actions, instead of using only one action. For this, we use a WorldState representation 
+  This algorithm tries to use the idea of GOB, but applying it to sequences of actions, instead of using only one action. For this, we use a WorldModel representation 
   and Depth-Limited search to find the best sequence.\\
   For our specific case, we had to use some modifications, like pruning the actions' tree of branches that had actions leading to death. The algorithm chose actions like killing
   an enemy and recovering health later, which isn't allowed in the game, so this pruning was needed.
@@ -129,7 +132,8 @@
   Since GOAP computes sequences of actions and not only a single action, it's expected to take more processing time. The win rate being lower is less clear at first, but
   by looking at the data, we can see that the GOAP algorithm works better for less depth. This is probably due to GOAP looking too far ahead, and planning actions 
   that he won't be able to execute because there are enemies in the way that he doesn't detect. \\
-  Since GOB is basically GOAP with depth 1, we can understand why GOB works better than GOAP.
+  Since GOB is basically GOAP with depth 1, we can understand why GOB works better than GOAP. Also, GOAP tends to always put the LevelUp action as the last, probably due to
+  bad use of the Goals in the WorldModel implementation. This results in the player facing the dragon still at level 1, and dying.
   
   \section{MCTS}
   \subsection{Algorithm}
@@ -138,109 +142,113 @@
   It uses 4 steps: Selection, Expansion, Playout and Backpropagation. Selection serves to traverse the tree, selecting the optimal nodes, until a terminal node or a node that 
   still has child nodes to expand is reached. Expand, will then create that child node. In our implementation, we expand only one child node per iteration. Then, we perform 
   a Playout from this node. This consists in choosing random actions until we reach a terminal state, and then determine the result.
-  In the end, all the nodes in the path are updated with this result, through Backpropagation.
+  In the end, all the nodes in the path are updated with this result, through Backpropagation. \\
+  For the testing we used the following configurations : this.MaxIterations = 1000, this.MaxIterationsPerFrame = 500, this.MaxPlayoutIterations = 10,
+  this.PlayoutDepthLimit = 25.
   
   \subsection{Data}
   \begin{table}[h!]
     \centering
     \caption{MCTS performance with enemy detection and using WorldModelImproved}
     \label{tab:tableMCTS1}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.7 & 1000 & 25 & 0\%
+      0.7 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS performance with enemy detection and using WorldModel}
     \label{tab:tableMCTS2}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.75 & 1000 & 25 & 0\%
+      0.75 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS performance without enemy detection and using WorldModelImproved}
     \label{tab:tableMCTS3}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.68 & 1000 & 25 & 0\%
+      0.68 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS performance without enemy detection and using WorldModel}
     \label{tab:tableMCTS4}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.75 & 1000 & 25 & 0\%
+      0.75 & 1000 & 0\%
     \end{tabular}
   \end{table}
 
   \subsection{Comparison}
   By looking at the data, we can see that the basic implementation of MCTS doesn't get us very far. This is mostly due to the randomness of the algorithm, 
   since every time we see an enemy or get close enough to a chest or potion, the algorithm runs again, which can give a new decision and waste all 
-  the time spent to reach the previous target.
-  Add more conclusions.\\
+  the time spent to reach the previous target.\\
+  Also, since the playout is random, every time it shows a different gameplay, but the chance of winning rappidly decreases.
 
   \section{MCTS with Biased Playout}
   \subsection{Algorithm}
   By using an heurisitc to guide the Playout phase of MCTS, this algorithm achieves better results than the basic version.\\
   Each action gets an H value assigned, based on their class and the current world state, and then we use Gibbs distribution to sample the actions and get a probability to choose them. 
   Since we use Gibbs distribution, lower H values mean bigger probabilities.\\
-  \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}}\]
+  \[P(s,a_i) = \frac{e^{-h(s, a_i)}}{\sum_{j=1}^{A}e^{-h(s, a_i)}} \text{     (Gibbs distribution)} \] \\
+  For the testing we used the following configurations : this.MaxIterations = 1000, this.MaxIterationsPerFrame = 500, this.MaxPlayoutIterations = 3,
+  this.PlayoutDepthLimit = 25.
   
   \subsection{Data}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Biased Playout performance with enemy detection and using WorldModelImproved}
     \label{tab:tableBiasedMCTS1}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.41 & 1000 & 25 & 0\%
+      0.41 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Biased Playout performance with enemy detection and using WorldModel}
     \label{tab:tableBiasedMCTS2}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.50 & 1000 & 25 & 0\%
+      0.50 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Biased Playout performance without enemy detection and using WorldModelImproved}
     \label{tab:tableBiasedMCTS3}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.41 & 1000 & 25 & 0\%
+      0.41 & 1000 & 0\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Biased Playout performance without enemy detection and using WorldModel}
     \label{tab:tableBiasedMCTS4}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.50 & 1000 & 25 & 0\%
+      0.50 & 1000 & 0\%
     \end{tabular}
   \end{table}
 
   \subsection{Comparison}
   Comparing this data with the previous ones, we can see it has better performance time-wise than the basic MCTS. This is due to having less Playout iterations,
   since using a bias "guides" the playout, and there shouldn't be much change if we do many playouts like in the random MCTS.\\
-  We can see that the win rate continues at 0, thus proving that just an heurisitc doesn't help much. 
+  We can see that the win rate continues at 0, thus proving that just an heuristic doesn't help much. 
 
   \section{MCTS with Limited Playout}
 
@@ -248,55 +256,61 @@
   This algorithm is a version of the basic MCTS,  but limits the maximum depth of a Playout. This is so the algorithm spends less time performing playouts. However,
   a drawback is that we may not reach a terminal branch, and in that case, we can't determine the result. To address this issue, we create an heuristic function,
   which gives a score between 0 and 1 to a world state, that represents how good that state is or, in other words, how likely it is to lead to victory. \\
-  Even though this comparison was not necessary, we thought it would be good to include it since it shows progression relative to the Biased version and will be useful
-  to compare with the next algorithm as well;
+  Even though this comparison was not necessary, we thought it would be good to include it since it shows progression relatively to the Biased version and will be useful
+  to compare with the next algorithm as well.\\
+  For the testing we used the following configurations : this.MaxIterations = 1000, this.MaxIterationsPerFrame = 500, this.MaxPlayoutIterations = 3,
+  this.PlayoutDepthLimit = 2.
   
+  \newpage
   \subsection{Data}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Limited Playout performance with enemy detection and using WorldModelImproved}
     \label{tab:tableLimitedMCTS1}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.12 & 1000 & 2 & 30\%
+      0.12 & 1000 & 30\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Limited Playout performance with enemy detection and using WorldModel}
     \label{tab:tableLimitedMCTS2}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.14 & 1000 & 2 & 30\%
+      0.14 & 1000 & 30\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Limited Playout performance without enemy detection and using WorldModelImproved}
     \label{tab:tableLimitedMCTS3}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.12 & 1000 & 2 & 30\%
+      0.12 & 1000 & 30\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
     \caption{MCTS with Limited Playout performance without enemy detection and using WorldModel}
     \label{tab:tableLimitedMCTS4}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.14 & 1000 & 2 & 30\%
+      0.14 & 1000 & 30\%
     \end{tabular}
   \end{table}
 
   \subsection{Comparison}
   We can see in the data that this algorithm has better performance then the previous versions of MCTS. This is due to the use of an heurisitc that allows us to have less
   depth in the playouts, and evaluate better the state we're in. \\
-  This is similar to what happened with GOB and GOAP, where planning too far ahead proves to be detrimental because Sir Uthgard gets intercepted by orcs and therefore needs to react in a more short-term manner.\\
+  This is similar to what happened with GOB and GOAP, where planning too far ahead proves to be detrimental because Sir Uthgard gets intercepted by orcs and 
+  therefore needs to react in a more short-term manner.\\
+  For the testing we used the following configurations : this.MaxIterations = 1000, this.MaxIterationsPerFrame = 500, this.MaxPlayoutIterations = 3,
+  this.PlayoutDepthLimit = 2.
 
   \section{MCTS with Biased Playout and Limited Playout}
 
@@ -307,42 +321,42 @@
   \subsection{Data}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
+    \caption{MCTS with Biased and Limited Playout performance with enemy detection and using WorldModelImproved}
     \label{tab:tableLimitedBiasedMCTS1}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.15 & 1000 & 2 & 40\%
+      0.15 & 1000 & 40\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance with enemy detection}
+    \caption{MCTS with Biased and Limited Playout performance with enemy detection and using WorldModel}
     \label{tab:tableLimitedBiasedMCTS2}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.19 & 1000 & 2 & 40\%
+      0.19 & 1000 & 40\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \caption{MCTS with Biased and Limited Playout performance without enemy detection and using WorldModelImproved}
     \label{tab:tableLimitedBiasedMCTS3}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.15 & 1000 & 2 & 50\%
+      0.15 & 1000 & 50\%
     \end{tabular}
   \end{table}
   \begin{table}[h!]
     \centering
-    \caption{MCTS with Biased Playout and Limited Playout performance without enemy detection}
+    \caption{MCTS with Biased and Limited Playout performance without enemy detection and using WorldModel}
     \label{tab:tableLimitedBiasedMCTS4}
-    \begin{tabular}{c|c|c|c}
-      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Playout Depth} & \textbf{Win Rate}\\
+    \begin{tabular}{c|c|c}
+      \textbf{Processing time (ms) (of 1st decision)} & \textbf{Number of iterations} & \textbf{Win Rate}\\
       \hline
-      0.18 & 1000 & 2 & 50\%
+      0.18 & 1000 & 50\%
     \end{tabular}
   \end{table}
 
@@ -354,6 +368,8 @@
   thus wasting all the time spent in the commitment to the previous decision.\\ 
   Even though lowering the time to update the tree would help detecting enemies in our path, if we do this too often, the character just wouldn't finish any action 
   and would still lose to time, like in the basic MCTS.\\
+  We can also look at the data and see that using enemy detection lowers the win rate. This is due to the problem spoken above, the player resets the tree and loses
+  to time.\\ 
   Also, the bias heuristic and the scoring for non-terminal world states could be better tuned to work in tandum. \\
 
   \section{Conclusions}
@@ -363,9 +379,10 @@
   The biggest problem with MCTS and its variants is that sometimes we can't detect enemies in our path, and can only detect them close to the target of our action.
   Even though we can recompute the tree when we are close to an enemy, this process makes Sir Uthgard waste all the time he already spent on the previous action if he switches
   actions. This is also not optimal, since we die not by fighting enemies, but by reaching the time limit.\\
-  One optimization that we think would help is to use the previous computed tree in new searches and keep expanding it, especially in cases where we are interrupted by enemies. 
+  One optimization that we think would help is to use the previous computed tree in new searches and keep expanding it, but account for changes in enemy positions. This would be 
+  helpful especially in cases where we are interrupted by enemies. 
   This would make the process faster, since we wouldn't compute as much actions as before.\\
-  It would also be a good improvement if in the WorldState we took account for the movement of the enemies but this would be much harder to implement, since enemies can
+  It would also be a good improvement if in the WorldModel we took account for the movement of the enemies but this would be much harder to implement, since enemies can
   change their behaviour when seeing the player, so the first optimization might be better.
 
 \end{document}
