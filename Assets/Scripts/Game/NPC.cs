@@ -34,6 +34,8 @@ namespace Assets.Scripts.Game
         private Vector3 previousTarget;
 
         public Stats baseStats;
+        private Stats initialStats;
+        private Vector3 initialPosition;
 
 
         void Awake()
@@ -41,6 +43,8 @@ namespace Assets.Scripts.Game
             previousTarget = new Vector3(0.0f, 0.0f, 0.0f);
             this.character = this.gameObject;
             navMeshAgent = this.GetComponent<NavMeshAgent>();
+            initialStats = baseStats;
+            initialPosition = this.transform.position;
         }
 
 
@@ -87,6 +91,12 @@ namespace Assets.Scripts.Game
 
             //Default value
             return 100;
+        }
+
+        public void Restart() {
+            baseStats = initialStats;
+            previousTarget = new Vector3(0.0f, 0.0f, 0.0f);
+            navMeshAgent.Warp(initialPosition);
         }
 
         #endregion
