@@ -5,8 +5,9 @@ using Assets.Scripts.Game;
 using System;
 using UnityEngine;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
+using UnityEngine.Rendering;
 
-namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL.RLState
+namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 {
     public class RLState
     {
@@ -37,8 +38,30 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL.RLState
 
         public RLState(List<ForwardModel.Action> actions)
         {
+            GameManager = GameManager.Instance;
             this.Actions = new List<ForwardModel.Action>(actions);
             this.ActionEnumerator = this.Actions.GetEnumerator();
+            InitializePropertiesArray();
+            InitializeDisposableObjectsArray();
+        }
+
+        public RLState(RLState parent)
+        {
+            GameManager = parent.GameManager;
+            PropertiesArray = new object[parent.PropertiesArray.Length];
+            parent.PropertiesArray.CopyTo(PropertiesArray, 0);
+            ObjectsNames = new string[parent.ObjectsNames.Length];
+            parent.ObjectsNames.CopyTo(ObjectsNames, 0);
+            ObjectsExist = new bool[parent.ObjectsExist.Length];
+            parent.ObjectsExist.CopyTo(ObjectsExist, 0);
+            Actions = new List<ForwardModel.Action>(parent.Actions);
+            Actions.Shuffle();
+            ActionEnumerator = parent.Actions.GetEnumerator();
+        }
+
+        public void Initialize()
+        {
+            this.ActionEnumerator.Reset();
             InitializePropertiesArray();
             InitializeDisposableObjectsArray();
         }
@@ -229,6 +252,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL.RLState
                 return -100;
             return 0;
 
+        }
+
+        public ForwardModel.Action GetRandomAction() {
+            var actions = GetExecutableActions();
+            actions.Shuffle();
+            return actions[0];
+        }
+
+        public RLState Copy() {
+            return new RLState(this);
         }
     }
 }

@@ -47,24 +47,25 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public Action GetBestAction(RLState state) {
             if (!QValues.ContainsKey(state)) {
-                // we have a problem
-                return null;
-            }
-            else {
-                var subTable = QValues[state];
-                Action bestAction = null;
-                float bestValue = float.MinValue;
-                foreach (KeyValuePair<Action, float> kvp in subTable) {
-                    if (kvp.Value > bestValue) {
-                        bestAction = kvp.Key;
-                        bestValue = kvp.Value;
-                    }
+                Dictionary<Action, float> newSubTable = new Dictionary<Action, float>();
+                var actions = state.GetExecutableActions();
+                foreach (var action in actions) {
+                    newSubTable.Add(action, 0.0f);
                 }
-
-                return bestAction;
+                QValues.Add(state, newSubTable);
             }
 
+            var subTable = QValues[state];
+            Action bestAction = null;
+            float bestValue = float.MinValue;
+            foreach (KeyValuePair<Action, float> kvp in subTable) {
+                if (kvp.Value > bestValue) {
+                    bestAction = kvp.Key;
+                    bestValue = kvp.Value;
+                }
+            }
 
+            return bestAction;
         }
     }
 }
