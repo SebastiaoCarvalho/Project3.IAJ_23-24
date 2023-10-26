@@ -1,0 +1,124 @@
+using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.Action;
+
+namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
+{
+    public class QLearning
+    {
+        public const float C = 1.4f;
+        public bool InProgress { get; private set; }
+        public int MaxIterations { get; set; }
+        public int MaxIterationsPerFrame { get; set; }
+        public float TotalProcessingTime { get; set; }
+        protected int CurrentIterations { get; set; }
+        protected int FrameCurrentIterations { get; set; }
+        protected RLState PreviousState { get; set; }
+        protected RLState CurrentState { get; set; }
+        protected QTable Store { get; set; }
+        protected Action ExecutedAction { get; set; }
+        //protected MCTSNode InitialNode { get; set; }
+        protected System.Random RandomGenerator { get; set; }
+        protected float Nu { get; set; }
+        protected float Epsilon { get; set; }
+        protected float Alpha { get; set; }
+        protected float Gamma { get; set; }
+
+        public QLearning(RLState initialState)
+        {
+            this.InProgress = false;
+            this.CurrentState = initialState;
+            this.MaxIterations = 1000;
+            this.MaxIterationsPerFrame = 500;
+            this.RandomGenerator = new System.Random();
+        }
+
+
+        public void InitializeQLearning()
+        {
+            this.CurrentState.Initialize();
+            this.CurrentIterations = 0;
+            this.FrameCurrentIterations = 0;
+            this.TotalProcessingTime = 0.0f;
+ 
+            this.InProgress = true;
+        }
+
+        /*
+        public Action ChooseAction()
+        {
+            def QLearning(problem, iterations, alpha, gamma,rho, nu)
+            state = problem.getRandomState()
+            for i in 0 ... iterations
+                if random() < nu //pick a new random state every once in a while
+                    state = problem.getRandomState()
+                
+                actions = problem.getAvailableActions(state)
+                
+                if random() < epsilon //pick a random action every once in a while
+                    action = actions.getRandomAction()
+                else
+                    action = store.getBestAction(state)
+                
+                reward, newState = problem.performAction(state,action)
+                
+                Q = store.getQValue(state,action)
+                
+                maxQ = store.getQValue(newState,store.getBestAction(newState))
+                
+                Q = (1 – alpha) * Q + alpha * (reward + gamma * maxQ)
+                
+                store.storeQValue(state,action,Q)
+                
+                state = newState
+        }
+        */
+
+        public Action ChooseAction()
+        {
+            double randomRestartChance = RandomGenerator.NextDouble();
+            /*
+            if (randomRestartChance < Nu) //pick a new random state every once in a while
+            {
+                CurrentState = problem.getRandomState();
+            }
+            */
+            
+            Action[] executableActions = CurrentState.GetExecutableActions();
+            //actions = problem.getAvailableActions(state)
+
+            InProgress = false;
+            double randomActionChance = RandomGenerator.NextDouble();
+            if (randomActionChance < Epsilon) //pick a random action every once in a while
+            {
+                //action = actions.getRandomAction()
+                PreviousState = CurrentState.Copy();
+                ExecutedAction = CurrentState.GetRandomAction();
+                return ExecutedAction;
+            }
+            else
+            {
+                PreviousState = CurrentState.Copy();
+                ExecutedAction = Store.GetBestAction(CurrentState);
+                return ExecutedAction;
+            }
+        }
+
+        public void UpdateQTable()
+        {
+            float reward = CurrentState.reward();
+
+            //reward, newState = problem.performAction(state,action)
+                
+            //Q = store.getQValue(state,action)
+            float Q = Store.GetQValue(PreviousState, ExecutedAction);
+
+            float newStateBestQ = Store.GetQValue(CurrentState, Store.GetBestAction(CurrentState));
+            //maxQ = store.getQValue(newState,store.getBestAction(newState))
+
+            float newQ = (1 - Alpha) * Q + Alpha * (reward + Gamma * newStateBestQ);
+            Store.SetQValue(PreviousState, ExecutedAction, newQ);
+                
+            //store.storeQValue(state,action,Q)
+        }
+
+    }
+}

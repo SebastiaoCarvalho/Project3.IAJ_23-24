@@ -9,6 +9,8 @@ using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActions;
 using Assets.Scripts.Game;
 using Assets.Scripts.Game.NPCs;
 using Assets.Scripts.IAJ.Unity.Utils;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.RL;
+using System.Runtime.InteropServices;
 //using System;
 
 public class AutonomousCharacter : NPC
@@ -50,6 +52,7 @@ public class AutonomousCharacter : NPC
     public bool GOAPActive;
     public bool MCTSActive;
     public bool MCTSBiasedPlayoutActive;
+    public bool QLearningActive;
  
     [Header("Character Info")]
     public bool Resting = false;
@@ -67,6 +70,7 @@ public class AutonomousCharacter : NPC
     public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
     public MCTS MCTSDecisionMaking { get; set; }
     public MCTSBiasedPlayout MCTSBiasedDecisionMaking { get; set; }
+    public QLearning QLearning { get; set; }
 
     public GameObject nearEnemy { get; private set; }
 
@@ -201,6 +205,11 @@ public class AutonomousCharacter : NPC
                 var WorldModelImproved = new CurrentStateWorldModelImproved(GameManager.Instance, this.Actions, this.Goals);
                 this.MCTSBiasedDecisionMaking = new MCTSBiasedPlayout(WorldModelImproved);
             }
+            else if (this.QLearningActive)
+            {
+                var SimplifiedWorldModel = new RLState(GameManager.Instance, this.Actions);
+                this.QLearning = new QLearning(SimplifiedWorldModel);
+            }
         }
 
         DiaryText.text += "My Diary \n I awoke. What a wonderful day to kill Monsters! \n";
@@ -282,6 +291,12 @@ public class AutonomousCharacter : NPC
             {
                 this.MCTSBiasedDecisionMaking.InitializeMCTSearch();
             }
+            else if (QLearningActive)
+            {
+                // TODO: does the final state reach this?
+                this.QLearning.InitializeQLearning();
+                this.QLearning.UpdateQTable();
+            }
         }
 
         if (this.controlledByPlayer)
@@ -328,6 +343,10 @@ public class AutonomousCharacter : NPC
         else if (this.MCTSBiasedPlayoutActive)
         {
             this.UpdateMCTSBiased();
+        }
+        else if (this.QLearningActive)
+        {
+            this.UpdateQLearning();
         }
 
         if (this.CurrentAction != null)
@@ -537,6 +556,19 @@ public class AutonomousCharacter : NPC
         {
             this.BestActionSequence.text = "Best Action Sequence:\nNone";
             this.BestActionText.text = "";
+        }
+    }
+
+    private void UpdateQLearning()
+    {
+        if (this.QLearning.InProgress)
+        {
+            var action = this.QLearning.ChooseAction();
+            if (action != null)
+            {
+                this.CurrentAction = action;
+                AddToDiary(" I decided to " + action.Name);
+            }
         }
     }
 
