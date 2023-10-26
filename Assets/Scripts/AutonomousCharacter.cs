@@ -217,7 +217,15 @@ public class AutonomousCharacter : NPC
 
     void FixedUpdate()
     {
-        if (GameManager.Instance.gameEnded) return;
+        if (GameManager.Instance.gameEnded) {
+            if (QLearningActive && GameManager.Instance.WorldChanged)
+            {
+                Debug.Log("Ended " + GameManager.Instance.gameEnded);
+                this.QLearning.InitializeQLearning();
+                this.QLearning.UpdateQTable();
+            }
+            return;
+        }
 
         //Agent Perception 
         if (Time.time > this.lastEnemyCheckTime + ENEMY_NEAR_CHECK_INTERVAL) 
@@ -296,6 +304,7 @@ public class AutonomousCharacter : NPC
                 // TODO: does the final state reach this?
                 // TODO: Change initialize and update table location
                 this.QLearning.InitializeQLearning();
+                Debug.Log("Ended " + GameManager.Instance.gameEnded);
                 this.QLearning.UpdateQTable();
             }
         }

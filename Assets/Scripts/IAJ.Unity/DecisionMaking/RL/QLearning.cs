@@ -31,6 +31,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.MaxIterationsPerFrame = 500;
             this.RandomGenerator = new System.Random();
             Store = new QTable();
+            Alpha = 0.5f;
+            Gamma = 0.1f;
+            Epsilon = 0.05f;
         }
 
 
@@ -43,36 +46,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
  
             this.InProgress = true;
         }
-
-        /*
-        public Action ChooseAction()
-        {
-            def QLearning(problem, iterations, alpha, gamma,rho, nu)
-            state = problem.getRandomState()
-            for i in 0 ... iterations
-                if random() < nu //pick a new random state every once in a while
-                    state = problem.getRandomState()
-                
-                actions = problem.getAvailableActions(state)
-                
-                if random() < epsilon //pick a random action every once in a while
-                    action = actions.getRandomAction()
-                else
-                    action = store.getBestAction(state)
-                
-                reward, newState = problem.performAction(state,action)
-                
-                Q = store.getQValue(state,action)
-                
-                maxQ = store.getQValue(newState,store.getBestAction(newState))
-                
-                Q = (1 – alpha) * Q + alpha * (reward + gamma * maxQ)
-                
-                store.storeQValue(state,action,Q)
-                
-                state = newState
-        }
-        */
 
         public Action ChooseAction()
         {
@@ -109,7 +82,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             if (PreviousState == null) {
                 return;
             }
-            
+
             float reward = CurrentState.GetReward();
 
             //reward, newState = problem.performAction(state,action)

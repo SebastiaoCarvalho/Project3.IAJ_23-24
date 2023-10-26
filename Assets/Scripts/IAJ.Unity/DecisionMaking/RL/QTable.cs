@@ -1,22 +1,24 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.Action;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 {
     public class QTable
     {
-        private Dictionary<RLState, Dictionary<Action, float>> QValues { get; set; } 
+        private Dictionary<string, Dictionary<Action, float>> QValues { get; set; } 
 
         public QTable()
         {
-            this.QValues = new Dictionary<RLState, Dictionary<Action, float>>();
+            this.QValues = new Dictionary<string, Dictionary<Action, float>>();
         }
 
         // TODO: Initialize QTable
 
         public float GetQValue(RLState state, Action action) {
-            if (QValues.ContainsKey(state)) {
-                var subTable = QValues[state];
+            if (QValues.ContainsKey(state.ToString())) {
+                var subTable = QValues[state.ToString()];
                 if (subTable.ContainsKey(action)) {
                     var QValue = subTable[action];
                     return QValue;
@@ -31,8 +33,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         public void SetQValue(RLState state, Action action, float newValue) {
-            if (QValues.ContainsKey(state)) {
-                var subTable = QValues[state];
+            if (QValues.ContainsKey(state.ToString())) {
+                var subTable = QValues[state.ToString()];
                 if (subTable.ContainsKey(action)) {
                     subTable[action] = newValue;
                 }
@@ -41,25 +43,27 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 }
             }
             else {
-                QValues.Add(state, new Dictionary<Action, float>() { { action, newValue } });
+                Debug.Log("Create state " + state.ToString());
+                QValues.Add(state.ToString(), new Dictionary<Action, float>() { { action, newValue } });
             }
         }
 
         public Action GetBestAction(RLState state) {
-            if (!QValues.ContainsKey(state)) {
+            if (!QValues.ContainsKey(state.ToString())) {
                 Dictionary<Action, float> newSubTable = new Dictionary<Action, float>();
                 var actions = state.GetExecutableActions();
                 foreach (var action in actions) {
                     newSubTable.Add(action, 0.0f);
                 }
-                QValues.Add(state, newSubTable);
+
+                QValues.Add(state.ToString(), newSubTable);
             }
 
-            var subTable = QValues[state];
+            var subTable = QValues[state.ToString()];
             Action bestAction = null;
             float bestValue = float.MinValue;
             foreach (KeyValuePair<Action, float> kvp in subTable) {
-                if (kvp.Value > bestValue) {
+                if (kvp.Value > bestValue && kvp.Key.CanExecute()) {
                     bestAction = kvp.Key;
                     bestValue = kvp.Value;
                 }

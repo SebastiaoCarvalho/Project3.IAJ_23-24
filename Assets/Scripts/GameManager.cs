@@ -170,10 +170,12 @@ public class GameManager : MonoBehaviour
             if (this.Character.baseStats.HP <= 0 || this.Character.baseStats.Time >= GameConstants.TIME_LIMIT)
             {
                 this.gameEnded = true;
+                WorldChanged = true;
             }
             else if (this.Character.baseStats.Money >= 25)
             {
                 this.gameEnded = true;
+                WorldChanged = true;
             }
         }
         else {
