@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.Game.NPCs;
 using Assets.Scripts.IAJ.Unity.Formations;
+using Assets.Scripts.Game;
 
 public class GameManager : MonoBehaviour
 {
@@ -38,6 +39,8 @@ public class GameManager : MonoBehaviour
 
     //fields
     public List<GameObject> chests { get; set; }
+    public List<GameObject> healthPotions { get; set; }
+    public List<GameObject> manaPotions { get; set; }
     public List<GameObject> skeletons { get; set; }
     public List<GameObject> orcs { get; set; }
     public List<GameObject> dragons { get; set; }
@@ -57,6 +60,10 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        InitializeGame();
+    }
+
+    private void InitializeGame() {
         Instance = this;
         UpdateDisposableObjects();
         this.InitialDisposableObjectsCount = this.disposableObjects.Count;
@@ -82,6 +89,7 @@ public class GameManager : MonoBehaviour
         }
 
         this.initialPosition = this.Character.gameObject.transform.position;
+        gameEnded = false;
     }
 
     public void UpdateDisposableObjects()
@@ -89,6 +97,8 @@ public class GameManager : MonoBehaviour
         this.enemies = new List<GameObject>();
         this.disposableObjects = new Dictionary<string, List<GameObject>>();
         this.chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
+        this.healthPotions = GameObject.FindGameObjectsWithTag("HealthPotion").ToList();
+        this.manaPotions = GameObject.FindGameObjectsWithTag("ManaPotion").ToList();
         this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").ToList();
         this.orcs = GameObject.FindGameObjectsWithTag("Orc").ToList();
         this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
@@ -100,7 +110,6 @@ public class GameManager : MonoBehaviour
         //adds all enemies to the disposable objects collection
         foreach (var enemy in this.enemies)
         {
-
             if (disposableObjects.ContainsKey(enemy.name))
             {
                 this.disposableObjects[enemy.name].Add(enemy);
@@ -117,7 +126,7 @@ public class GameManager : MonoBehaviour
             else this.disposableObjects.Add(chest.name, new List<GameObject>() { chest });
         }
         //adds all health potions to the disposable objects collection
-        foreach (var potion in GameObject.FindGameObjectsWithTag("HealthPotion"))
+        foreach (var potion in healthPotions)
         {
             if (disposableObjects.ContainsKey(potion.name))
             {
@@ -126,7 +135,7 @@ public class GameManager : MonoBehaviour
             else this.disposableObjects.Add(potion.name, new List<GameObject>() { potion });
         }
         //adds all mana potions to the disposable objects collection
-        foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
+        foreach (var potion in manaPotions)
         {
             if (disposableObjects.ContainsKey(potion.name))
             {
@@ -160,17 +169,35 @@ public class GameManager : MonoBehaviour
 
             if (this.Character.baseStats.HP <= 0 || this.Character.baseStats.Time >= GameConstants.TIME_LIMIT)
             {
-                this.GameEnd.SetActive(true);
                 this.gameEnded = true;
-                this.GameEnd.GetComponentInChildren<Text>().text = "You Died";
             }
             else if (this.Character.baseStats.Money >= 25)
             {
-                this.GameEnd.SetActive(true);
                 this.gameEnded = true;
-                this.GameEnd.GetComponentInChildren<Text>().text = "Victory \n GG EZ";
             }
         }
+        else {
+            RestartGame();
+            gameEnded = false;
+        }
+    }
+
+    private void RestartGame()  {
+        foreach (GameObject enemy in this.enemies) {
+            enemy.SetActive(true);
+            enemy.GetComponent<NPC>().Restart();
+        }
+        foreach (GameObject chest in this.chests) {
+            chest.SetActive(true);
+        }
+        foreach (GameObject potion in healthPotions) {
+            potion.SetActive(true);
+        }
+        foreach (GameObject potion in manaPotions) {
+            potion.SetActive(true);
+        }
+        this.Character.Restart();
+
     }
 
     public void RemoveOrcFromFormation(Monster enemy)
@@ -211,20 +238,14 @@ public class GameManager : MonoBehaviour
                 {
                     //there was an hit, enemy is destroyed, gain xp
                     RemoveOrcFromFormation(monster);
-                    this.enemies.Remove(enemy);
-                    this.disposableObjects.Remove(enemy.name);
                     enemy.SetActive(false);
-                    Object.Destroy(enemy);
                 }
             }
             else
             {
                 damage = enemyData.SimpleDamage;
                 RemoveOrcFromFormation(monster);
-                this.enemies.Remove(enemy);
-                this.disposableObjects.Remove(enemy.name);
                 enemy.SetActive(false);
-                Object.Destroy(enemy);
             }
 
             this.Character.baseStats.XP += enemyData.XPvalue;
@@ -267,20 +288,14 @@ public class GameManager : MonoBehaviour
                     {
                         //there was an hit, enemy is destroyed, gain xp
                         RemoveOrcFromFormation(monster);
-                        this.enemies.Remove(enemy);
-                        this.disposableObjects.Remove(enemy.name);
                         enemy.SetActive(false);
-                        Object.Destroy(enemy);
                     }
                 }
                 else
                 {
                     damage = monster.enemyStats.SimpleDamage;
                     RemoveOrcFromFormation(monster);
-                    this.enemies.Remove(enemy);
-                    this.disposableObjects.Remove(enemy.name);
                     enemy.SetActive(false);
-                    Object.Destroy(enemy);
                 }
 
                 this.Character.baseStats.XP += monster.enemyStats.XPvalue;
@@ -307,10 +322,7 @@ public class GameManager : MonoBehaviour
             {
                 this.Character.baseStats.XP += 3;
                 this.Character.AddToDiary(" I Smited " + enemy.name);
-                this.enemies.Remove(enemy);
-                this.disposableObjects.Remove(enemy.name);
                 enemy.SetActive(false);
-                Object.Destroy(enemy);
             }
             this.Character.baseStats.Mana -= 2;
 
@@ -336,9 +348,7 @@ public class GameManager : MonoBehaviour
         if (chest != null && chest.activeSelf && InChestRange(chest))
         {
             this.Character.AddToDiary(" I opened  " + chest.name);
-            this.chests.Remove(chest);
-            this.disposableObjects.Remove(chest.name);
-            Object.Destroy(chest);
+            chest.SetActive(false);
             this.Character.baseStats.Money += 5;
             this.WorldChanged = true;
         }
@@ -350,8 +360,7 @@ public class GameManager : MonoBehaviour
         if (manaPotion != null && manaPotion.activeSelf && InPotionRange(manaPotion))
         {
             this.Character.AddToDiary(" I drank " + manaPotion.name);
-            this.disposableObjects.Remove(manaPotion.name);
-            Object.Destroy(manaPotion);
+            manaPotion.SetActive(false);
             this.Character.baseStats.Mana = 10;
             this.WorldChanged = true;
         }
@@ -362,8 +371,7 @@ public class GameManager : MonoBehaviour
         if (potion != null && potion.activeSelf && InPotionRange(potion))
         {
             this.Character.AddToDiary(" I drank " + potion.name);
-            this.disposableObjects.Remove(potion.name);
-            Object.Destroy(potion);
+            potion.SetActive(false);
             this.Character.baseStats.HP = this.Character.baseStats.MaxHP;
             this.WorldChanged = true;
         }
@@ -415,7 +423,6 @@ public class GameManager : MonoBehaviour
                 this.Character.AddToDiary(" I used the Divine Wrath and all monsters were killed! \nSo ends a day's work...");
                 enemy.SetActive(false);
                 this.disposableObjects.Remove(enemy.name);
-                Object.Destroy(enemy);
             }
 
             enemies.Clear();
