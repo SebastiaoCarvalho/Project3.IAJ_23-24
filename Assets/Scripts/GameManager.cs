@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
 
     //fields
     public List<GameObject> chests { get; set; }
+    public List<GameObject> healthPotions { get; set; }
+    public List<GameObject> manaPotions { get; set; }
     public List<GameObject> skeletons { get; set; }
     public List<GameObject> orcs { get; set; }
     public List<GameObject> dragons { get; set; }
@@ -95,6 +97,8 @@ public class GameManager : MonoBehaviour
         this.enemies = new List<GameObject>();
         this.disposableObjects = new Dictionary<string, List<GameObject>>();
         this.chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
+        this.healthPotions = GameObject.FindGameObjectsWithTag("HealthPotion").ToList();
+        this.manaPotions = GameObject.FindGameObjectsWithTag("ManaPotion").ToList();
         this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").ToList();
         this.orcs = GameObject.FindGameObjectsWithTag("Orc").ToList();
         this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
@@ -122,7 +126,7 @@ public class GameManager : MonoBehaviour
             else this.disposableObjects.Add(chest.name, new List<GameObject>() { chest });
         }
         //adds all health potions to the disposable objects collection
-        foreach (var potion in GameObject.FindGameObjectsWithTag("HealthPotion"))
+        foreach (var potion in healthPotions)
         {
             if (disposableObjects.ContainsKey(potion.name))
             {
@@ -131,7 +135,7 @@ public class GameManager : MonoBehaviour
             else this.disposableObjects.Add(potion.name, new List<GameObject>() { potion });
         }
         //adds all mana potions to the disposable objects collection
-        foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
+        foreach (var potion in manaPotions)
         {
             if (disposableObjects.ContainsKey(potion.name))
             {
@@ -186,10 +190,10 @@ public class GameManager : MonoBehaviour
         foreach (GameObject chest in this.chests) {
             chest.SetActive(true);
         }
-        foreach (GameObject potion in GameObject.FindGameObjectsWithTag("HealthPotion")) {
+        foreach (GameObject potion in healthPotions) {
             potion.SetActive(true);
         }
-        foreach (GameObject potion in GameObject.FindGameObjectsWithTag("ManaPotion")) {
+        foreach (GameObject potion in manaPotions) {
             potion.SetActive(true);
         }
         this.Character.Restart();
