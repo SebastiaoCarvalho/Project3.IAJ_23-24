@@ -1,4 +1,5 @@
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.Action;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 {
@@ -29,6 +30,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.MaxIterations = 1000;
             this.MaxIterationsPerFrame = 500;
             this.RandomGenerator = new System.Random();
+            Store = new QTable();
         }
 
 
@@ -104,7 +106,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void UpdateQTable()
         {
-            float reward = CurrentState.reward();
+            if (PreviousState == null) {
+                return;
+            }
+            
+            float reward = CurrentState.GetReward();
 
             //reward, newState = problem.performAction(state,action)
                 

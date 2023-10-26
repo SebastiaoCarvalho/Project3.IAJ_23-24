@@ -207,7 +207,7 @@ public class AutonomousCharacter : NPC
             }
             else if (this.QLearningActive)
             {
-                var SimplifiedWorldModel = new RLState(GameManager.Instance, this.Actions);
+                var SimplifiedWorldModel = new RLState(this.Actions);
                 this.QLearning = new QLearning(SimplifiedWorldModel);
             }
         }
@@ -294,6 +294,7 @@ public class AutonomousCharacter : NPC
             else if (QLearningActive)
             {
                 // TODO: does the final state reach this?
+                // TODO: Change initialize and update table location
                 this.QLearning.InitializeQLearning();
                 this.QLearning.UpdateQTable();
             }
