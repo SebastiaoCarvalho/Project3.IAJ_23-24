@@ -54,7 +54,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.ForwardModelActio
 
         public override bool CanExecute()
         {
-            return this.Target != null;
+            if (Target.name.Contains("Skel")) {
+                Debug.Log(Target.name);
+                Debug.Log(GameManager.Instance.disposableObjects[Target.name][0].activeSelf);
+            }
+            return this.Target != null && GameManager.Instance.disposableObjects[Target.name][0].activeSelf;
         }
 
         public override bool CanExecute(WorldModelImproved WorldModelImproved)

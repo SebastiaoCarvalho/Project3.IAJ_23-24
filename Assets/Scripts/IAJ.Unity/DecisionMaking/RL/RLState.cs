@@ -227,6 +227,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public virtual float GetReward()
         {
+            Debug.Log("Reward " + (MoneyReward() + LevelReward() + HpReward()));
             return MoneyReward() + LevelReward() + HpReward();
         }
 
@@ -262,6 +263,25 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public RLState Copy() {
             return new RLState(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            RLState state = (RLState) obj;
+            return (MacroStateHP)PropertiesArray[0] == (MacroStateHP)state.PropertiesArray[0] &&
+                   (MacroStateMoney)PropertiesArray[1] == (MacroStateMoney)state.PropertiesArray[1] &&
+                   (MacroStateLevel)PropertiesArray[2] == (MacroStateLevel)state.PropertiesArray[2] &&
+                   (MacroStatePosition)PropertiesArray[3] == (MacroStatePosition)state.PropertiesArray[3] &&
+                   (MacroStateTime)PropertiesArray[4] == (MacroStateTime)state.PropertiesArray[4];
+        }
+
+        public override string ToString()
+        {
+            return "HP: " + (MacroStateHP)PropertiesArray[0] + 
+                   "\nMoney: " + (MacroStateMoney)PropertiesArray[1] + 
+                   "\nLevel: " + (MacroStateLevel)PropertiesArray[2] +
+                   "\nPosition: " + (MacroStatePosition)PropertiesArray[3] +
+                   "\nTime: " + (MacroStateTime)PropertiesArray[4];
         }
     }
 }
