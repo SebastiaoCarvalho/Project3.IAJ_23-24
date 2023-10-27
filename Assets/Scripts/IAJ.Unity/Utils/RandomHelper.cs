@@ -46,7 +46,7 @@ namespace Assets.Scripts.IAJ.Unity.Utils
             while (n > 1)
             {
                 n--;
-                int k = Random.Range(1, n + 1);
+                int k = Random.Range(0, n + 1);
                 T value = list[k];
                 list[k] = list[n];
                 list[n] = value;
