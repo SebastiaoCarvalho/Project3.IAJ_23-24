@@ -43,7 +43,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 }
             }
             else {
-                Debug.Log("Create state " + state.ToString());
+                //Debug.Log("Create state " + state.ToString());
                 QValues.Add(state.ToString(), new Dictionary<Action, float>() { { action, newValue } });
             }
         }

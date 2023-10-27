@@ -58,6 +58,11 @@ public class GameManager : MonoBehaviour
     public bool lineFormation = false;
     public bool triangleFormation = false;
 
+    public int runCounter = 0;
+    public int deathCounter = 0;
+    public int timeoutCounter = 0;
+    public int winCounter = 0;
+
     void Awake()
     {
         InitializeGame();
@@ -185,6 +190,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void RestartGame()  {
+        runCounter++;
+
         foreach (GameObject enemy in this.enemies) {
             enemy.SetActive(true);
             enemy.GetComponent<NPC>().Restart();

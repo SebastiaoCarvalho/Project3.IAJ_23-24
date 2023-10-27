@@ -220,7 +220,7 @@ public class AutonomousCharacter : NPC
         if (GameManager.Instance.gameEnded) {
             if (QLearningActive && GameManager.Instance.WorldChanged)
             {
-                Debug.Log("Ended " + GameManager.Instance.gameEnded);
+                //Debug.Log("Ended " + GameManager.Instance.gameEnded);
                 this.QLearning.InitializeQLearning();
                 this.QLearning.UpdateQTable();
             }
@@ -272,13 +272,21 @@ public class AutonomousCharacter : NPC
             this.GetRichGoal.InsistenceValue = (25 - baseStats.Money) + this.GetRichGoal.ChangeRate * baseStats.Time;
             this.GetRichGoal.InsistenceValue = NormalizeGoalValues(this.GetRichGoal.InsistenceValue, 0, 40);
             this.previousGold = baseStats.Money;
-
-            this.SurviveGoalText.text = "Survive: " + this.SurviveGoal.InsistenceValue + " (" + this.SurviveGoal.Weight + ")";
-            this.GainXPGoalText.text = "Gain Level: " + this.GainLevelGoal.InsistenceValue.ToString("F1") + " (" + this.GainLevelGoal.Weight + ")"; ;
-            this.BeQuickGoalText.text = "Be Quick: " + this.BeQuickGoal.InsistenceValue.ToString("F1") + " (" + this.BeQuickGoal.Weight + ")"; ;
-            this.GetRichGoalText.text = "GetRich: " + this.GetRichGoal.InsistenceValue.ToString("F1") + " (" + this.GetRichGoal.Weight + ")"; ;
-            this.DiscontentmentText.text = "Discontentment: " + this.CalculateDiscontentment().ToString("F1");
-
+            
+            if (QLearningActive) {
+                this.GainXPGoalText.text = "Runs: " + GameManager.Instance.runCounter;
+                this.SurviveGoalText.text = "Deaths: " + GameManager.Instance.deathCounter;
+                this.BeQuickGoalText.text = "Timeouts: " + GameManager.Instance.timeoutCounter;
+                this.GetRichGoalText.text = "Wins: " + GameManager.Instance.winCounter;
+                this.DiscontentmentText.text = "";
+            }
+            else {
+                this.SurviveGoalText.text = "Survive: " + this.SurviveGoal.InsistenceValue + " (" + this.SurviveGoal.Weight + ")";
+                this.GainXPGoalText.text = "Gain Level: " + this.GainLevelGoal.InsistenceValue.ToString("F1") + " (" + this.GainLevelGoal.Weight + ")"; ;
+                this.BeQuickGoalText.text = "Be Quick: " + this.BeQuickGoal.InsistenceValue.ToString("F1") + " (" + this.BeQuickGoal.Weight + ")"; ;
+                this.GetRichGoalText.text = "GetRich: " + this.GetRichGoal.InsistenceValue.ToString("F1") + " (" + this.GetRichGoal.Weight + ")"; ;
+                this.DiscontentmentText.text = "Discontentment: " + this.CalculateDiscontentment().ToString("F1");
+            }
             this.lastUpdateTime = Time.time;
             
             //To have a new decision lets initialize Decision Making Proccess
@@ -304,7 +312,7 @@ public class AutonomousCharacter : NPC
                 // TODO: does the final state reach this?
                 // TODO: Change initialize and update table location
                 this.QLearning.InitializeQLearning();
-                Debug.Log("Ended " + GameManager.Instance.gameEnded);
+                //Debug.Log("Ended " + GameManager.Instance.gameEnded);
                 this.QLearning.UpdateQTable();
             }
         }

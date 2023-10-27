@@ -20,13 +20,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         protected IEnumerator<ForwardModel.Action> ActionEnumerator { get; set; } 
 
         enum MacroStateHP {
-            Lose, VeryLow, Low, OK
+            VeryLow, Low, OK, Good
         }
         enum MacroStateTime {
-            Early, Late, Lose
+            Early, Mid, Late
         }
         enum MacroStateMoney {
-            Poor, Mid, Win
+            Poor, Mid, Rich
         }
         enum MacroStateLevel {
             NotLevel2, Level2
@@ -69,7 +69,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         public void InitializePropertiesArray()
         {
             this.PropertiesArray = new object[PROPERTIES_NUMBER];
-            this.PropertiesArray[0] = CalculateMacroStateHP((int) this.GameManager.Character.baseStats.HP);
+            this.PropertiesArray[0] = CalculateMacroStateHP((int) this.GameManager.Character.baseStats.HP + (int) GameManager.Character.baseStats.ShieldHP);
             this.PropertiesArray[1] = CalculateMacroStateMoney((int) this.GameManager.Character.baseStats.Money);
             this.PropertiesArray[2] = CalculateMacroStateLevel((int) this.GameManager.Character.baseStats.Level);
             this.PropertiesArray[3] = CalculateMacroStatePosition((Vector3) this.GameManager.Character.gameObject.transform.position);
@@ -88,19 +88,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private MacroStateHP CalculateMacroStateHP(int hp) {
-            if (hp > 12)
+            if (hp > 18)
+                return MacroStateHP.Good;
+            else if (hp > 12)
                 return MacroStateHP.OK;
             else if (hp > 6)
                 return MacroStateHP.Low;
-            else if (hp > 0)
-                return MacroStateHP.VeryLow;
             else
-                return MacroStateHP.Lose;
+                return MacroStateHP.VeryLow;
         }
 
         private MacroStateMoney CalculateMacroStateMoney(int money) {
-            if (money > 20)
-                return MacroStateMoney.Win;
+            if (money > 15)
+                return MacroStateMoney.Rich;
             else if (money > 10)
                 return MacroStateMoney.Mid;
             else
@@ -108,10 +108,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private MacroStateTime CalculateMacroStateTime(float time) {
-            if (time >= 150)
-                return MacroStateTime.Lose;
-            else if (time > 75)
+            if (time >= 100)
                 return MacroStateTime.Late;
+            else if (time >= 50)
+                return MacroStateTime.Mid;
             else
                 return MacroStateTime.Early;
         }
@@ -227,30 +227,41 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public virtual float GetReward()
         {
-            Debug.Log("Reward " + (MoneyReward() + LevelReward() + HpReward()));
-            return MoneyReward() + LevelReward() + HpReward();
+            //Debug.Log("Reward " + (MoneyReward() + LevelReward() + HpReward()));
+            return MoneyReward() + LevelReward() + HpReward() + TimeReward();
         }
 
         private float MoneyReward() {
-            MacroStateMoney money = (MacroStateMoney)this.GetProperty(Properties.MONEY);
-            if (money == MacroStateMoney.Win)
+            int money = (int)GameManager.Character.baseStats.Money;
+            if (money == 25) {
+                GameManager.Instance.winCounter++;
                 return 100;
-            else
-                return 0;
+            }
+            return 0;
+        }
+
+        private float TimeReward() {
+            float time = (float)GameManager.Character.baseStats.Time;
+            if (time >= 150f) {
+                GameManager.Instance.timeoutCounter++;
+                return -100;
+            }
+            return 0;
         }
 
         private float LevelReward() {
-            MacroStateLevel level = (MacroStateLevel)this.GetProperty(Properties.LEVEL);
-            if (level == MacroStateLevel.Level2)
-                return 0.5f;
-            else
-                return 0; 
+            int level = (int)GameManager.Character.baseStats.Level;
+            if (level == 2)
+                return 2f;
+            return 0; 
         }
 
         private float HpReward() {
-            MacroStateHP hp = (MacroStateHP)this.GetProperty(Properties.HP);
-            if (hp == MacroStateHP.Lose)
+            int hp = (int)GameManager.Character.baseStats.HP + (int)GameManager.Character.baseStats.ShieldHP;
+            if (hp <= 0) {
+                GameManager.Instance.deathCounter++;
                 return -100;
+            }
             return 0;
 
         }
