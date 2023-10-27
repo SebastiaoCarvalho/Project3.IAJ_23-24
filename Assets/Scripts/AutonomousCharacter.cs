@@ -53,7 +53,11 @@ public class AutonomousCharacter : NPC
     public bool MCTSActive;
     public bool MCTSBiasedPlayoutActive;
     public bool QLearningActive;
- 
+    
+    [Header("QLearningOptions")]
+    public bool QLearningSave;
+    public bool QLearningLoad;
+
     [Header("Character Info")]
     public bool Resting = false;
     public bool LevelingUp = false;
@@ -209,6 +213,8 @@ public class AutonomousCharacter : NPC
             {
                 var SimplifiedWorldModel = new RLState(this.Actions);
                 this.QLearning = new QLearning(SimplifiedWorldModel);
+                if (QLearningLoad)
+                   this.QLearning.LoadQTable();
             }
         }
 
@@ -220,7 +226,6 @@ public class AutonomousCharacter : NPC
         if (GameManager.Instance.gameEnded) {
             if (QLearningActive && GameManager.Instance.WorldChanged)
             {
-                //Debug.Log("Ended " + GameManager.Instance.gameEnded);
                 this.QLearning.InitializeQLearning();
                 this.QLearning.UpdateQTable();
             }
@@ -312,7 +317,6 @@ public class AutonomousCharacter : NPC
                 // TODO: does the final state reach this?
                 // TODO: Change initialize and update table location
                 this.QLearning.InitializeQLearning();
-                //Debug.Log("Ended " + GameManager.Instance.gameEnded);
                 this.QLearning.UpdateQTable();
             }
         }
@@ -715,6 +719,11 @@ public class AutonomousCharacter : NPC
         x *= 10;
 
         return x;
+    }
+
+    private void OnDestroy() {
+        if (QLearningActive && QLearningSave)
+            QLearning.SaveQTable();
     }
 
 }
