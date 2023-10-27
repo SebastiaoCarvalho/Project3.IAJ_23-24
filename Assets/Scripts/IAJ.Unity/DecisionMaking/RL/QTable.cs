@@ -66,15 +66,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 if (!subTable.ContainsKey(action.Name))
                     subTable.Add(action.Name, 0.0f);
             }
-            for (int i = subTable.Count - 1; i >= 0; i--) {
-                string key = subTable.ElementAt(i).Key;
-                if (!actions.ToList().Exists(a => a.Name == key)) {
-                    subTable.Remove(key);
-                }
-            }
             string bestAction = null;
             float bestValue = float.MinValue;
             foreach (KeyValuePair<string, float> kvp in subTable) {
+                if (!actions.ToList().Find(a => a.Name == kvp.Key).CanExecute()) continue;
                 if (kvp.Value > bestValue) {
                     bestAction = kvp.Key;
                     bestValue = kvp.Value;
