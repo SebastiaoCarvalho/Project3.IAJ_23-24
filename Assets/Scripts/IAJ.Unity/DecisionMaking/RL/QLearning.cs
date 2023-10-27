@@ -98,6 +98,24 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 
             //store.storeQValue(state,action,Q)
         }
+        public void SaveQTable()
+        {
+            Debug.LogWarning("Saving QTable");
+            QTableSerializer serializer = new QTableSerializer()
+            {
+                qTable = Store
+            };
+            serializer.Save();
+        }
+
+        public void LoadQTable()
+        {
+            Debug.LogWarning("Loading QTable");
+            QTableSerializer serializer = new QTableSerializer();
+            serializer.Load();
+            Store = serializer.qTable;
+        }
 
     }
+
 }

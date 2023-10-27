@@ -289,10 +289,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         public override string ToString()
         {
             return "HP: " + (MacroStateHP)PropertiesArray[0] + 
-                   "\nMoney: " + (MacroStateMoney)PropertiesArray[1] + 
-                   "\nLevel: " + (MacroStateLevel)PropertiesArray[2] +
-                   "\nPosition: " + (MacroStatePosition)PropertiesArray[3] +
-                   "\nTime: " + (MacroStateTime)PropertiesArray[4];
+                   " Money: " + (MacroStateMoney)PropertiesArray[1] + 
+                   " Level: " + (MacroStateLevel)PropertiesArray[2] +
+                   " Position: " + (MacroStatePosition)PropertiesArray[3] +
+                   " Time: " + (MacroStateTime)PropertiesArray[4];
         }
     }
 }
