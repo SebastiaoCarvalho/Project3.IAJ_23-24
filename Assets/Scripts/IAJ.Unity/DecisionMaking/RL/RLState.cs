@@ -237,7 +237,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 GameManager.Instance.winCounter++;
                 return 100;
             }
-            return 0;
+            return money * 0.5f;
         }
 
         private float TimeReward() {
