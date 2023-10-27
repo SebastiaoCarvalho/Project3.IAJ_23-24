@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.IAJ.Unity.Utils;
 using UnityEngine;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.Action;
 
@@ -61,26 +62,29 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             }
             
             var subTable = QValues[state.ToString()];
-            var actions = state.GetExecutableActions();
+            var actions = state.GetExecutableActions().ToList();
             foreach (var action in actions) {
                 if (!subTable.ContainsKey(action.Name))
                     subTable.Add(action.Name, 0.0f);
             }
-            for (int i = subTable.Count - 1; i >= 0; i--) {
-                string key = subTable.ElementAt(i).Key;
-                if (!actions.ToList().Exists(a => a.Name == key)) {
-                    subTable.Remove(key);
-                }
-            }
             string bestAction = null;
             float bestValue = float.MinValue;
-            foreach (KeyValuePair<string, float> kvp in subTable) {
+            List<KeyValuePair<string, float>> pairs = subTable.AsEnumerable().ToList();
+            pairs.Shuffle();
+            Debug.Log("-----------------------------------------------------------");
+            foreach(KeyValuePair<string, float> kvp in pairs) {
+                Debug.Log("Action: " + kvp.Key + " Value: " + kvp.Value);
+            }
+            Debug.Log("-----------------------------------------------------------");
+            foreach (KeyValuePair<string, float> kvp in pairs) {
+                if (actions.Find(a => a.Name == kvp.Key) == null)
+                    continue;
                 if (kvp.Value > bestValue) {
                     bestAction = kvp.Key;
                     bestValue = kvp.Value;
                 }
             }
-
+            Debug.Log("Best action: " + bestAction + " with value " + bestValue);
             return actions.ToList().Find(a => a.Name == bestAction);
         }
     }
