@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.RL;
 using UnityEngine;
+using System.Globalization;
+
 public class QTableSerializer
 {
     public QTable qTable;
@@ -69,8 +71,7 @@ public class QTableSerializer
                         string key = keyValue[0].Trim().Trim('"');
                         if (tabCount == 2) {
                             string action = key;
-                            Debug.Log(keyValue[1].Trim().Trim(','));
-                            float value = float.Parse(keyValue[1].Trim().Trim(',').Replace(".", ","));
+                            float value = float.Parse(keyValue[1].Trim().Trim(','), CultureInfo.InvariantCulture);
                             qValues[state].Add(action, value);
                         }
                     }
