@@ -63,6 +63,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void Reset() {
             this.PreviousState = null;
+            this.GameManager.Character.Restart();
+            InitializePropertiesArray();
         }
 
         public void Initialize()
