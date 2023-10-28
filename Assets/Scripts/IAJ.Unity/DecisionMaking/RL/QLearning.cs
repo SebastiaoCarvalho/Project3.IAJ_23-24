@@ -34,7 +34,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Store = new QTable();
             Alpha = 0.5f;
             Gamma = 0.1f;
-            Epsilon = 0f;
+            Epsilon = 0.05f;
             NewAction = false;
         }
 
