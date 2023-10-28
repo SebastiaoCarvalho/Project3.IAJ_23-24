@@ -33,7 +33,7 @@ public class QTableSerializer
             json += new string('\t', tabCount) + "\"" + state.Key + "\":{\n";
             tabCount++;
             foreach (KeyValuePair<string, float> action in state.Value) {
-                json += new string('\t', tabCount) + "\"" + action.Key + "\":" + action.Value + ",\n";
+                json += new string('\t', tabCount) + "\"" + action.Key + "\":" + action.Value.ToString().Replace(",", ".") + ",\n";
             }
             tabCount--;
             json = json[..^2] + "\n";
@@ -69,7 +69,8 @@ public class QTableSerializer
                         string key = keyValue[0].Trim().Trim('"');
                         if (tabCount == 2) {
                             string action = key;
-                            float value = float.Parse(keyValue[1].Trim().Trim(','));
+                            Debug.Log(keyValue[1].Trim().Trim(','));
+                            float value = float.Parse(keyValue[1].Trim().Trim(',').Replace(".", ","));
                             qValues[state].Add(action, value);
                         }
                     }
