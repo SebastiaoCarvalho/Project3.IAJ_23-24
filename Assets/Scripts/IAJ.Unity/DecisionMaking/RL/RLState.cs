@@ -231,6 +231,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             return MoneyReward() + LevelReward() + HpReward() + TimeReward();
         }
 
+        public virtual bool IsTerminal()
+        {
+            return (int)GameManager.Character.baseStats.HP <= 0 ||
+                   (float)GameManager.Character.baseStats.Time >= GameManager.GameConstants.TIME_LIMIT ||
+                   (int)GameManager.Character.baseStats.Money == 25;
+        }
+
         private float MoneyReward() {
             int money = (int)GameManager.Character.baseStats.Money;
             if (money == 25) {
