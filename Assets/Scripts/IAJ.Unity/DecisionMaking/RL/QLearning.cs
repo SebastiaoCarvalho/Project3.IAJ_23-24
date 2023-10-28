@@ -22,6 +22,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         protected float Epsilon { get; set; }
         protected float Alpha { get; set; }
         protected float Gamma { get; set; }
+        protected bool NewAction { get; set; }
 
         public QLearning(RLState initialState)
         {
@@ -34,6 +35,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Alpha = 0.5f;
             Gamma = 0.1f;
             Epsilon = 0.05f;
+            NewAction = false;
         }
 
 
@@ -49,6 +51,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public Action ChooseAction()
         {
+            if (CurrentState.IsTerminal())
+            {
+                return null;
+            }
+
             double randomRestartChance = RandomGenerator.NextDouble();
             /*
             if (randomRestartChance < Nu) //pick a new random state every once in a while
@@ -61,6 +68,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             //actions = problem.getAvailableActions(state)
 
             InProgress = false;
+            NewAction = true;
             double randomActionChance = RandomGenerator.NextDouble();
             if (randomActionChance < Epsilon) //pick a random action every once in a while
             {
@@ -79,9 +87,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void UpdateQTable()
         {
-            if (PreviousState == null) {
+            if (!NewAction || PreviousState == null) {
                 return;
             }
+
+            NewAction = false;
 
             float reward = CurrentState.GetReward();
 
