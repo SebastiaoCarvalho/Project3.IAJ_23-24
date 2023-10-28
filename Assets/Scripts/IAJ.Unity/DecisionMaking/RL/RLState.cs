@@ -18,6 +18,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         protected bool[] ObjectsExist { get; set; }
         private List<ForwardModel.Action> Actions { get; set; }
         protected IEnumerator<ForwardModel.Action> ActionEnumerator { get; set; } 
+        public RLState PreviousState { get; protected set; }
 
         enum MacroStateHP {
             VeryLow, Low, OK, Good
@@ -38,6 +39,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public RLState(List<ForwardModel.Action> actions)
         {
+            this.PreviousState = null;
             GameManager = GameManager.Instance;
             this.Actions = new List<ForwardModel.Action>(actions);
             this.ActionEnumerator = this.Actions.GetEnumerator();
@@ -59,8 +61,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             ActionEnumerator = parent.Actions.GetEnumerator();
         }
 
+        public void Reset() {
+            this.PreviousState = null;
+        }
+
         public void Initialize()
         {
+            PreviousState = this.Copy();
             this.ActionEnumerator.Reset();
             InitializePropertiesArray();
             InitializeDisposableObjectsArray();
@@ -72,7 +79,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.PropertiesArray[0] = CalculateMacroStateHP((int) this.GameManager.Character.baseStats.HP + (int) GameManager.Character.baseStats.ShieldHP);
             this.PropertiesArray[1] = CalculateMacroStateMoney((int) this.GameManager.Character.baseStats.Money);
             this.PropertiesArray[2] = CalculateMacroStateLevel((int) this.GameManager.Character.baseStats.Level);
-            this.PropertiesArray[3] = CalculateMacroStatePosition((Vector3) this.GameManager.Character.gameObject.transform.position);
+            this.PropertiesArray[3] = CalculateMacroStatePosition((Vector3) this.GameManager.Character.transform.position);
             this.PropertiesArray[4] = CalculateMacroStateTime((float) this.GameManager.Character.baseStats.Time);
         }
 
@@ -117,11 +124,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private MacroStatePosition CalculateMacroStatePosition(Vector3 position) {
-            if (position.x <= 66 && position.y <= 1) //y decreases as you go up
+            if (position.x <= 66 && position.z >= 48.27)
                 return MacroStatePosition.TopLeft;
-            else if (position.x > 66 && position.y <= 1)
+            else if (position.x > 66 && position.z >= 48.27)
                 return MacroStatePosition.TopRight;
-            else if (position.x <= 66 && position.y > 1)
+            else if (position.x <= 66 && position.z < 48.27)
                 return MacroStatePosition.BottomLeft;
             else
                 return MacroStatePosition.BottomRight;
@@ -196,30 +203,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             };
         }
 
-        public virtual ForwardModel.Action GetNextAction()
-        {
-            ForwardModel.Action action = null;
-            //returns the next action that can be executed or null if no more executable actions exist
-            if (this.ActionEnumerator.MoveNext())
-            {
-                action = this.ActionEnumerator.Current;
-            }
-
-            while (action != null && !action.CanExecute())
-            {
-                if (this.ActionEnumerator.MoveNext())
-                {
-                    action = this.ActionEnumerator.Current;    
-                }
-                else
-                {
-                    action = null;
-                }
-            }
-
-            return action;
-        }
-
         public virtual ForwardModel.Action[] GetExecutableActions()
         {
             return this.Actions.Where(a => a.CanExecute()).ToArray();
@@ -242,9 +225,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             int money = (int)GameManager.Character.baseStats.Money;
             if (money == 25) {
                 GameManager.Instance.winCounter++;
-                return 100;
+                return 100f;
             }
-            return money * 0.5f;
+            else if ((MacroStateMoney)PreviousState.PropertiesArray[1] != 
+                     (MacroStateMoney)this.PropertiesArray[1])
+                return 10f;
+            return 0f;
         }
 
         private float TimeReward() {
@@ -257,19 +243,22 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private float LevelReward() {
-            int level = (int)GameManager.Character.baseStats.Level;
-            if (level == 2)
-                return 2f;
-            return 0; 
+            if ((MacroStateLevel)PreviousState.PropertiesArray[2] == MacroStateLevel.NotLevel2
+                  && (MacroStateLevel)this.PropertiesArray[2] == MacroStateLevel.Level2)
+                return 20f;
+            return 0f; 
         }
 
         private float HpReward() {
             int hp = (int)GameManager.Character.baseStats.HP + (int)GameManager.Character.baseStats.ShieldHP;
             if (hp <= 0) {
                 GameManager.Instance.deathCounter++;
-                return -100;
+                return -100f;
             }
-            return 0;
+            else if ((MacroStateHP)PreviousState.PropertiesArray[0] == MacroStateHP.VeryLow 
+                  && (MacroStateHP)this.PropertiesArray[0] == MacroStateHP.Good)
+                return 10f;
+            return 0f;
 
         }
 

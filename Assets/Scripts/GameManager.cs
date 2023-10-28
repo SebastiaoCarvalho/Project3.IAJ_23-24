@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        Debug.LogWarning("Update Manager");
+        //Debug.LogWarning("Update Manager");
         if (!this.gameEnded)
         {
             if (Time.time > this.nextUpdateTime)

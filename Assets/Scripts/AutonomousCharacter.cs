@@ -224,7 +224,7 @@ public class AutonomousCharacter : NPC
 
     void FixedUpdate()
     {
-        Debug.LogWarning("Update character");
+        //Debug.LogWarning("Update character");
         if (GameManager.Instance.gameEnded) {
             if (QLearningActive && GameManager.Instance.WorldChanged)
             {
@@ -593,10 +593,10 @@ public class AutonomousCharacter : NPC
             {
                 this.CurrentAction = action;
                 AddToDiary(" I decided to " + action.Name);
-                this.BestActionSequence.text = "Best action: " + action.Name + " with value " + QLearning.Store.GetQValues()[QLearning.CurrentState.ToString()][action.Name].ToString("F05");
+                this.BestActionSequence.text = "Best action: " + action.Name + " with value " + QLearning.Store.GetQValues()[QLearning.State.ToString()][action.Name].ToString("F05");
 
             }
-            this.BestActionText.text = QLearning.CurrentState.ToString();
+            this.BestActionText.text = QLearning.State.ToString();
         }
     }
 
