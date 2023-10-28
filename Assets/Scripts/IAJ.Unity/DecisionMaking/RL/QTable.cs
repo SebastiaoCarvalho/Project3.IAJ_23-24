@@ -71,11 +71,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             float bestValue = float.MinValue;
             List<KeyValuePair<string, float>> pairs = subTable.AsEnumerable().ToList();
             pairs.Shuffle();
-            Debug.Log("-----------------------------------------------------------");
+            /* Debug.Log("-----------------------------------------------------------");
             foreach(KeyValuePair<string, float> kvp in pairs) {
                 Debug.Log("Action: " + kvp.Key + " Value: " + kvp.Value);
             }
-            Debug.Log("-----------------------------------------------------------");
+            Debug.Log("-----------------------------------------------------------"); */
             foreach (KeyValuePair<string, float> kvp in pairs) {
                 if (actions.Find(a => a.Name == kvp.Key) == null)
                     continue;

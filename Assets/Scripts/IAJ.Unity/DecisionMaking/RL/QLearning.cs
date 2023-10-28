@@ -41,12 +41,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void InitializeQLearning()
         {
-            this.CurrentState.Initialize();
             this.CurrentIterations = 0;
             this.FrameCurrentIterations = 0;
             this.TotalProcessingTime = 0.0f;
- 
-            this.InProgress = true;
+            this.PreviousState = null;
+        }
+
+        public void Reset() {
+            this.PreviousState = null;
         }
 
         public Action ChooseAction()
@@ -87,6 +89,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void UpdateQTable()
         {
+            this.CurrentState.Initialize();
+            this.InProgress = true;
             if (!NewAction || PreviousState == null) {
                 return;
             }
@@ -102,8 +106,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
             float newStateBestQ = Store.GetQValue(CurrentState, Store.GetBestAction(CurrentState));
             //maxQ = store.getQValue(newState,store.getBestAction(newState))
-
             float newQ = (1 - Alpha) * Q + Alpha * (reward + Gamma * newStateBestQ);
+            Debug.Log("Q : " + Q + " reward : " + reward + " newStateBestQ : " + newStateBestQ + " newQ : " + newQ);
             Store.SetQValue(PreviousState, ExecutedAction, newQ);
                 
             //store.storeQValue(state,action,Q)

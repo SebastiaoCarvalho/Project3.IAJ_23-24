@@ -152,6 +152,7 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        Debug.LogWarning("Update Manager");
         if (!this.gameEnded)
         {
             if (Time.time > this.nextUpdateTime)
@@ -175,6 +176,7 @@ public class GameManager : MonoBehaviour
             if (this.Character.baseStats.HP <= 0 || this.Character.baseStats.Time >= GameConstants.TIME_LIMIT)
             {
                 this.gameEnded = true;
+                Debug.Log("------------------------------You died--------------------------------");
                 WorldChanged = true;
             }
             else if (this.Character.baseStats.Money >= 25)
