@@ -22,7 +22,7 @@ public class AutonomousCharacter : NPC
     public const string BE_QUICK_GOAL = "BeQuick";
     public const string GET_RICH_GOAL = "GetRich";
 
-    public const float DECISION_MAKING_INTERVAL = 20.0f;
+    public const float DECISION_MAKING_INTERVAL = 150.0f;
     public const float RESTING_INTERVAL = 5.0f;
     public const float LEVELING_INTERVAL = 10.0f;
     public const float ENEMY_NEAR_CHECK_INTERVAL = 0.5f;
@@ -224,11 +224,14 @@ public class AutonomousCharacter : NPC
 
     void FixedUpdate()
     {
+        Debug.LogWarning("Update character");
         if (GameManager.Instance.gameEnded) {
             if (QLearningActive && GameManager.Instance.WorldChanged)
             {
-                this.QLearning.InitializeQLearning();
                 this.QLearning.UpdateQTable();
+                this.QLearning.InitializeQLearning();
+                GameManager.Instance.WorldChanged = false;
+                Debug.Log("---------------------Updating For Death Action---------------------");
             }
             return;
         }
@@ -317,7 +320,6 @@ public class AutonomousCharacter : NPC
             {
                 // TODO: does the final state reach this?
                 // TODO: Change initialize and update table location
-                this.QLearning.InitializeQLearning();
                 this.QLearning.UpdateQTable();
             }
         }
