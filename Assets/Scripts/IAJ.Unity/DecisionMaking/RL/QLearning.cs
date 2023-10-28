@@ -120,6 +120,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             {
                 qTable = Store
             };
+            RunSerializer runSerializer = new RunSerializer();
+            runSerializer.Save();
             serializer.Save();
         }
 
@@ -128,6 +130,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Debug.LogWarning("Loading QTable");
             QTableSerializer serializer = new QTableSerializer();
             serializer.Load();
+            RunSerializer runSerializer = new RunSerializer();
+            runSerializer.Load();
             Store = serializer.qTable;
         }
 
