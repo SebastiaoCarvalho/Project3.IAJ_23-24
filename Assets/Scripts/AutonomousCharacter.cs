@@ -11,6 +11,7 @@ using Assets.Scripts.Game.NPCs;
 using Assets.Scripts.IAJ.Unity.Utils;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.RL;
 using System.Runtime.InteropServices;
+using System.Linq;
 //using System;
 
 public class AutonomousCharacter : NPC
@@ -249,7 +250,7 @@ public class AutonomousCharacter : NPC
             this.lastEnemyCheckTime = Time.time;
         }
 
-        if (Time.time > this.nextUpdateTime || GameManager.Instance.WorldChanged)
+        if ((!QLearningActive && Time.time > this.nextUpdateTime) || this.nextUpdateTime == 0f || GameManager.Instance.WorldChanged)
         {
             GameManager.Instance.WorldChanged = false;
             this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
@@ -590,7 +591,10 @@ public class AutonomousCharacter : NPC
             {
                 this.CurrentAction = action;
                 AddToDiary(" I decided to " + action.Name);
+                this.BestActionSequence.text = "Best action: " + action.Name + " with value " + QLearning.Store.GetQValues()[QLearning.CurrentState.ToString()][action.Name].ToString("F05");
+
             }
+            this.BestActionText.text = QLearning.CurrentState.ToString();
         }
     }
 

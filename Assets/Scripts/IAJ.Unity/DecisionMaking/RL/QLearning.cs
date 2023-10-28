@@ -1,5 +1,6 @@
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel.Action;
 using UnityEngine;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 {
@@ -13,8 +14,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         protected int CurrentIterations { get; set; }
         protected int FrameCurrentIterations { get; set; }
         protected RLState PreviousState { get; set; }
-        protected RLState CurrentState { get; set; }
-        protected QTable Store { get; set; }
+        public RLState CurrentState {  get; protected set; }
+        public QTable Store { get; protected set; }
         protected Action ExecutedAction { get; set; }
         //protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
