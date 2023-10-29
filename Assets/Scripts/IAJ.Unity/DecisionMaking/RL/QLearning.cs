@@ -34,7 +34,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Store = new QTable();
             Alpha = 0.5f;
             Gamma = 0.1f;
-            Epsilon = 0.05f;
+            Epsilon = 0f;
             NewAction = false;
         }
 
@@ -70,7 +70,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             double randomActionChance = RandomGenerator.NextDouble();
             if (randomActionChance < Epsilon) //pick a random action every once in a while
             {
-                //action = actions.getRandomAction()
                 ExecutedAction = State.GetRandomAction();
                 return ExecutedAction;
             }

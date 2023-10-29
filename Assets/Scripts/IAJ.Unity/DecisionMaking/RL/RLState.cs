@@ -12,7 +12,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
     public class RLState
     {
         protected GameManager GameManager { get; set; }
-        protected const int PROPERTIES_NUMBER = 5;
+        protected const int PROPERTIES_NUMBER = 6;
         protected object[] PropertiesArray { get; set; }
         protected string[] ObjectsNames { get; set; }
         protected bool[] ObjectsExist { get; set; }
@@ -27,13 +27,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Early, Mid, Late
         }
         enum MacroStateMoney {
-            Poor, Mid, Rich
+            VeryPoor, Poor, Mid, Rich, VeryRich
         }
         enum MacroStateLevel {
             NotLevel2, Level2
         }
         enum MacroStatePosition {
             TopLeft, TopRight, BottomRight, BottomLeft
+        }
+        enum MacroStateDragonAndOrc {
+            EitherAlive, BothDead
         }
 
 
@@ -65,6 +68,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.PreviousState = null;
             this.GameManager.Character.Restart();
             InitializePropertiesArray();
+             this.PropertiesArray[5] = MacroStateDragonAndOrc.EitherAlive;
         }
 
         public void Initialize()
@@ -83,6 +87,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.PropertiesArray[2] = CalculateMacroStateLevel((int) this.GameManager.Character.baseStats.Level);
             this.PropertiesArray[3] = CalculateMacroStatePosition((Vector3) this.GameManager.Character.transform.position);
             this.PropertiesArray[4] = CalculateMacroStateTime((float) this.GameManager.Character.baseStats.Time);
+            this.PropertiesArray[5] = CalculateMacroStateDragon();
         }
 
         public void InitializeDisposableObjectsArray()
@@ -94,6 +99,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 this.ObjectsNames[i] = this.GameManager.disposableObjects.Values.ToArray()[i][0].name;
                 this.ObjectsExist[i] =  this.GameManager.disposableObjects.Values.ToArray()[i][0].activeSelf;
             }
+        }
+
+        private MacroStateDragonAndOrc CalculateMacroStateDragon() {
+            if (GameObject.FindGameObjectWithTag("Dragon") == null && GameObject.Find("Orc2") == null)
+                return MacroStateDragonAndOrc.BothDead;
+            return MacroStateDragonAndOrc.EitherAlive;
         }
 
         private MacroStateHP CalculateMacroStateHP(int hp) {
@@ -108,12 +119,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private MacroStateMoney CalculateMacroStateMoney(int money) {
-            if (money > 15)
+            if (money == 20)
+                return MacroStateMoney.VeryRich;
+            else if (money == 15)
                 return MacroStateMoney.Rich;
-            else if (money > 10)
+            else if (money == 10)
                 return MacroStateMoney.Mid;
-            else
+            else if (money == 5)
                 return MacroStateMoney.Poor;
+            else
+                return MacroStateMoney.VeryPoor;
         }
 
         private MacroStateTime CalculateMacroStateTime(float time) {
@@ -213,7 +228,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         public virtual float GetReward()
         {
             //Debug.Log("Reward " + (MoneyReward() + LevelReward() + HpReward()));
-            return MoneyReward() + LevelReward() + HpReward() + TimeReward();
+            return MoneyReward() + LevelReward() + HpReward() + TimeReward() + PositionReward() + DragonAndOrcReward();
         }
 
         public virtual bool IsTerminal()
@@ -221,6 +236,20 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             return (int)GameManager.Character.baseStats.HP <= 0 ||
                    (float)GameManager.Character.baseStats.Time >= GameManager.GameConstants.TIME_LIMIT ||
                    (int)GameManager.Character.baseStats.Money == 25;
+        }
+
+        private float PositionReward() {
+            if ((MacroStatePosition)PreviousState.PropertiesArray[3] != (MacroStatePosition)this.PropertiesArray[3])
+                return -1f;
+            return 0f;
+        }
+
+        private float DragonAndOrcReward() {
+            if ((MacroStateDragonAndOrc)PreviousState.PropertiesArray[5] == MacroStateDragonAndOrc.EitherAlive &&
+                (MacroStateDragonAndOrc)this.PropertiesArray[5] == MacroStateDragonAndOrc.BothDead &&
+                (MacroStateTime)this.PropertiesArray[4] == MacroStateTime.Late)
+                return 10f;
+            return 0f;
         }
 
         private float MoneyReward() {
@@ -232,17 +261,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             else if ((MacroStateMoney)PreviousState.PropertiesArray[1] != 
                      (MacroStateMoney)this.PropertiesArray[1])
                 return 10f;
+            else if ((MacroStateTime)this.PropertiesArray[4] == MacroStateTime.Late)
+                return -5f;
             return 0f;
         }
 
-        private float TimeReward() {
+         private float TimeReward() {
             float time = (float)GameManager.Character.baseStats.Time;
             if (time >= 150f) {
                 GameManager.Instance.timeoutCounter++;
-                return -100;
             }
             return 0;
-        }
+        } 
 
         private float LevelReward() {
             if ((MacroStateLevel)PreviousState.PropertiesArray[2] == MacroStateLevel.NotLevel2
@@ -281,7 +311,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                    (MacroStateMoney)PropertiesArray[1] == (MacroStateMoney)state.PropertiesArray[1] &&
                    (MacroStateLevel)PropertiesArray[2] == (MacroStateLevel)state.PropertiesArray[2] &&
                    (MacroStatePosition)PropertiesArray[3] == (MacroStatePosition)state.PropertiesArray[3] &&
-                   (MacroStateTime)PropertiesArray[4] == (MacroStateTime)state.PropertiesArray[4];
+                   (MacroStateTime)PropertiesArray[4] == (MacroStateTime)state.PropertiesArray[4] &&
+                   (MacroStateDragonAndOrc)PropertiesArray[5] == (MacroStateDragonAndOrc)state.PropertiesArray[5];
         }
 
         public override string ToString()
@@ -290,7 +321,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                    " Money: " + (MacroStateMoney)PropertiesArray[1] + 
                    " Level: " + (MacroStateLevel)PropertiesArray[2] +
                    " Position: " + (MacroStatePosition)PropertiesArray[3] +
-                   " Time: " + (MacroStateTime)PropertiesArray[4];
+                   " Time: " + (MacroStateTime)PropertiesArray[4] +
+                   " DragonAndOrc: " + (MacroStateDragonAndOrc)PropertiesArray[5];
         }
     }
 }
