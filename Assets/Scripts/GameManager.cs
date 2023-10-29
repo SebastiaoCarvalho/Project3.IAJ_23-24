@@ -200,12 +200,15 @@ public class GameManager : MonoBehaviour
         }
         foreach (GameObject chest in this.chests) {
             chest.SetActive(true);
+            chest.GetComponent<Consumable>().Reset();
         }
         foreach (GameObject potion in healthPotions) {
             potion.SetActive(true);
+            potion.GetComponent<Consumable>().Reset();
         }
         foreach (GameObject potion in manaPotions) {
             potion.SetActive(true);
+            potion.GetComponent<Consumable>().Reset();
         }
         this.Character.Restart();
 

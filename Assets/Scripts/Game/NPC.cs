@@ -93,7 +93,7 @@ namespace Assets.Scripts.Game
             return 100;
         }
 
-        public void Restart() {
+        public virtual void Restart() {
             baseStats = initialStats;
             previousTarget = new Vector3(0.0f, 0.0f, 0.0f);
             navMeshAgent.Warp(initialPosition);
