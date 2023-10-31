@@ -324,5 +324,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                    " Time: " + (MacroStateTime)PropertiesArray[4] +
                    " DragonAndOrc: " + (MacroStateDragonAndOrc)PropertiesArray[5];
         }
+
+        public float[] ToArray() {
+            return new float[] {
+                (int)PropertiesArray[0],
+                (int)PropertiesArray[1],
+                (int)PropertiesArray[2],
+                (int)PropertiesArray[3],
+                (int)PropertiesArray[4],
+                (int)PropertiesArray[5]
+            };
+        }
     }
 }
