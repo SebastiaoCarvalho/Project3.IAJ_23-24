@@ -730,4 +730,10 @@ public class AutonomousCharacter : NPC
             QLearning.SaveQTable();
     }
 
+    public override void Restart() {
+        base.Restart();
+        LevelingUp = false;
+        Resting = false;
+    }
+
 }
