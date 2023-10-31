@@ -224,14 +224,12 @@ public class AutonomousCharacter : NPC
 
     void FixedUpdate()
     {
-        //Debug.LogWarning("Update character");
         if (GameManager.Instance.gameEnded) {
             if (QLearningActive && GameManager.Instance.WorldChanged)
             {
                 this.QLearning.UpdateQTable();
                 this.QLearning.InitializeQLearning();
                 GameManager.Instance.WorldChanged = false;
-                Debug.Log("---------------------Updating For Death Action---------------------");
             }
             return;
         }

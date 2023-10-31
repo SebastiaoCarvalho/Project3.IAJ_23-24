@@ -22,8 +22,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.QValues = qValues;
         }
 
-        // TODO: Initialize QTable
-
         public float GetQValue(RLState state, Action action) {
             if (QValues.ContainsKey(state.ToString())) {
                 var subTable = QValues[state.ToString()];
@@ -51,7 +49,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 }
             }
             else {
-                Debug.Log("Create state " + state.ToString());
                 QValues.Add(state.ToString(), new Dictionary<string, float>() { { action.Name, newValue } });
             }
         }
@@ -71,11 +68,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             float bestValue = float.MinValue;
             List<KeyValuePair<string, float>> pairs = subTable.AsEnumerable().ToList();
             pairs.Shuffle();
-            /* Debug.Log("-----------------------------------------------------------");
-            foreach(KeyValuePair<string, float> kvp in pairs) {
-                Debug.Log("Action: " + kvp.Key + " Value: " + kvp.Value);
-            }
-            Debug.Log("-----------------------------------------------------------"); */
+
             foreach (KeyValuePair<string, float> kvp in pairs) {
                 if (actions.Find(a => a.Name == kvp.Key) == null)
                     continue;
@@ -84,7 +77,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                     bestValue = kvp.Value;
                 }
             }
-            Debug.Log("Best action: " + bestAction + " with value " + bestValue);
+
             return actions.ToList().Find(a => a.Name == bestAction);
         }
     }

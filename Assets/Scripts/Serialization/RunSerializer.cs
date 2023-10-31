@@ -15,7 +15,6 @@ public class RunSerializer {
         try {
             string json = File.ReadAllText(Application.dataPath + "/" + fileName);
             LoadGame(json);
-            Debug.Log(GameManager.Instance.runCounter);
         }
         catch (FileNotFoundException e)
         {

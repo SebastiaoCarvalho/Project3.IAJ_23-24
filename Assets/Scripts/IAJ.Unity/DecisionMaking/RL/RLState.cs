@@ -132,7 +132,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         }
 
         private MacroStateTime CalculateMacroStateTime(float time) {
-            if (time >= 100)
+            if (time >= 90)
                 return MacroStateTime.Late;
             else if (time >= 50)
                 return MacroStateTime.Mid;
@@ -160,7 +160,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public virtual object GetProperty(string propertyName)
         {
-            //recursive implementation of WorldModelImproved
             var index = this.GetPropertyIndex(propertyName);
             if (index != -1)
             {
@@ -225,10 +224,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             return this.Actions.Where(a => a.CanExecute()).ToArray();
         }
 
-        public virtual float GetReward()
+        public virtual float GetReward(ForwardModel.Action excutedAction)
         {
-            //Debug.Log("Reward " + (MoneyReward() + LevelReward() + HpReward()));
-            return MoneyReward() + LevelReward() + HpReward() + TimeReward() + PositionReward() + DragonAndOrcReward();
+            return MoneyReward(excutedAction) + LevelReward() + HpReward() + TimeReward() + PositionReward() + DragonAndOrcReward();
         }
 
         public virtual bool IsTerminal()
@@ -252,17 +250,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             return 0f;
         }
 
-        private float MoneyReward() {
+        private float MoneyReward(ForwardModel.Action excutedAction) {
             int money = (int)GameManager.Character.baseStats.Money;
             if (money == 25) {
                 GameManager.Instance.winCounter++;
-                return 100f;
+                return 100f + (150 - (float) this.GameManager.Character.baseStats.Time);
             }
             else if ((MacroStateMoney)PreviousState.PropertiesArray[1] != 
                      (MacroStateMoney)this.PropertiesArray[1])
-                return 10f;
-            else if ((MacroStateTime)this.PropertiesArray[4] == MacroStateTime.Late)
-                return -5f;
+                return 15f;
+            else if ((MacroStateTime)this.PropertiesArray[4] == MacroStateTime.Late && !excutedAction.Name.Contains("PickUpChest"))
+                return -4f;
             return 0f;
         }
 
@@ -287,7 +285,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
                 GameManager.Instance.deathCounter++;
                 return -100f;
             }
-            else if ((MacroStateHP)PreviousState.PropertiesArray[0] == MacroStateHP.VeryLow 
+            else if (((MacroStateHP)PreviousState.PropertiesArray[0] == MacroStateHP.VeryLow || (MacroStateHP)PreviousState.PropertiesArray[0] == MacroStateHP.Low)
                   && (MacroStateHP)this.PropertiesArray[0] == MacroStateHP.Good)
                 return 10f;
             return 0f;
