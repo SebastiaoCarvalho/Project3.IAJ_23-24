@@ -22,8 +22,154 @@
   without having to restart the simulation each time.\\
   We implemented 2 Reinforcement Learning algorithms: Q-Learning and a Neural Network.\\
   \section{Q-Learning}
-  
   \subsection{Algorithm}
+  Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments in result of
+  performing actions.\\
+  For this algorithm we use macro states, these represent the current game state in a more simplified way, reducing the total
+  amount of possible states for the game. Anything that is not encoded in these states cannot be learned, so these changed as
+  we improved the algorithm. For each state, the algorithm must also know what actions are available to it. This is because the
+  algorithm will keep a Q Table that stores the quality of an action giving a certain state, this is called the Q value.
+
+  \[Q(s,a) = (1-alpha)Q(s, a) + alpha(r + gamma * max(Q(s', a'))),\]
+  \[\text{s - current state \\a - action performed\\ r - direct reward for the performed action\\ s' - new state\\ a' - best action in the new state.}\]
+
+  Alpha and Gamma are the learning parameters.
+  Alpha, is the learning rate, takes a value between 0 and 1, so how much the new Q value will change because of the new reward.
+  Gamma, is how much the indirect reward will propagate backwards, takes a value between 0 and 1 as well.\\
+  
+  After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
+  For our exploration strategy, we choose ε-greedy, this means that for learning we get the action with the highest Q value for
+  the state, most of the time, but we have a low chance of using a random action.\\
+  
+  \subsection{Training process}
+  For the training process, we let the algorithm first run for about 1000 iterations.
+  We would then see the amount of victories and perform 20 runs to see the win rate.
+  We would also note what the agent did in the run, to see if there was any any information
+  in the state that he was missing.\\
+  After this we would change what we though was necessary and train the agent again.
+
+  \subsection{1st iteration}
+  // states
+  // 
+  // learning parameters
+  // results
+  // conclusions/o que melhorar
+
+  For our states, we started by capturing what we felt was most important while still keeping the total amount of states as low as possible.
+  We captured the characters' health, money, level, position and the time of the game.\\
+  These stats were simplified in the following way.\\
+
+  \subsection{States}
+  \begin{table}[h!]
+      \parbox{.3\linewidth}{
+        \centering
+        \caption{Simplified states of Health}
+        \label{tab:tableA*1}
+        \begin{tabular}{c|c|c}
+          \textbf{Status} & \textbf{Interval (health + shield values)}\\
+          \hline
+          VeryLow & [0,6]\\
+          Low & [6,12]\\
+          OK & [12,18]\\
+          Good & [18,30]\\
+        \end{tabular}
+      }
+      \hfil
+      \parbox{.3\linewidth}{
+        \centering
+        \caption{Simplified states of Time}
+        \label{tab:tableA*2}
+        \begin{tabular}{c|c|c}
+          \textbf{Status} & \textbf{Interval (time values)}\\
+          \hline
+          Early  & [0,49]\\
+          Mid & [50,99]\\
+          Late & [100,150]\\
+        \end{tabular}
+      }
+      \hfil
+      \parbox{.3\linewidth}{
+        \centering
+        \caption{Simplified states of Money}
+        \label{tab:tableA*2}
+        \begin{tabular}{c|c|c}
+          \textbf{Status} & \textbf{Values}\\
+          \hline
+          Poor & 0 and 5\\
+          Mid & 10 and 15\\
+          Rich & 15, 20 and 25\\
+        \end{tabular}
+      }
+  \end{table}
+  \begin{table}[h!]
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Level}
+      \label{tab:tableA*1}
+      \begin{tabular}{c|c|c}
+        \textbf{Status} & \textbf{Level}\\
+        \hline
+        Level2 & 2\\
+        NotLevel2 & 1 and 3\\
+      \end{tabular}
+    }
+    \hfil
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Position}
+      \label{tab:tableA*2}
+      \begin{tabular}{c|c|c}
+        \textbf{Status} & \textbf{Interval (x coordinates)} & \textbf{Interval (z coordinates)}\\
+        \hline
+        TopLeft  & <=66 && >=48.27\\
+        TopRight & >66 && >=48.27\\
+        BottomLeft & <=66 && <48.27\\
+        BottomRight & >66 && <48.27\\
+      \end{tabular}
+    }
+  \end{table}
+
+  This gave us a total amount of 288 possible states.\\
+  The reason as to why we choose these divisions was due to our previous experiences with the game.\\
+  Health is divided into intervals of 6 because that's the attack damage of the orcs, VeryLow will result in death if the
+  character is attacked by an orc independently of his effective health for example, we found these values to be descriptive enough that we
+  didn't need to do in intervals of the skeletons health.\\
+  In terms of Time we considered 3 intervals, (I don't really remember the logic behing these 3 intervals)\\
+  For money, we gave it 3 states, we represent each 2 values in a state essencially, 
+  we did this in the hopes that the agent wouldn't need these intermediate values to learn that he should pick up the chests.\\
+  Level, only has 2 states, this is because out of observation we can see that it is possible to win only by being in level 2, and we don't want
+  to waste any more time than we need leveling up or killing enemies.\\
+  The last statistic is position, in here we divided the level into rectangles, this was done by analyzing the map and seeing what areas where more
+  connected so that the character would prefer actions in one area.\\
+
+  \subsection{Reward Function}
+
+  Our initial reward function only rewarded the agent for reaching the win condition, in which case the reward was 100, or any of the loss conditions,
+  where the reward was -100.\\
+
+  \subsection{Learning Parameters}
+
+  At this point we didn't have a clear idea of what values where better for the learning parameters for this situation, so we chose an alpha of 0.5 and a gamma of 0.1.
+  The random action chance was 5percent.\\
+
+  \subsection{Results}
+
+  Not very good, the guy did not win a single time :/\\
+
+  \subsection{Conclusions}
+
+  We must really improve.
+
+
+
+  \subsection{2nd iteration}
+
+  \subsection{3rd iteration}
+
+  \subsection{4th iteration}
+
+  \subsection{5th iteration}
+
 
   \section{Conclusions}
   
