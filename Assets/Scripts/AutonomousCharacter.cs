@@ -54,6 +54,7 @@ public class AutonomousCharacter : NPC
     public bool MCTSActive;
     public bool MCTSBiasedPlayoutActive;
     public bool QLearningActive;
+    public bool NeuralNetworkQLearningActive;
     
     [Header("QLearningOptions")]
     public bool QLearningSave;
@@ -76,6 +77,7 @@ public class AutonomousCharacter : NPC
     public MCTS MCTSDecisionMaking { get; set; }
     public MCTSBiasedPlayout MCTSBiasedDecisionMaking { get; set; }
     public QLearning QLearning { get; set; }
+    public NeuralNetworkQLearning NNQLearning { get; set; }
 
     public GameObject nearEnemy { get; private set; }
 
@@ -217,6 +219,13 @@ public class AutonomousCharacter : NPC
                 if (QLearningLoad)
                    this.QLearning.LoadQTable();
             }
+            else if (this.NeuralNetworkQLearningActive)
+            {
+                var SimplifiedWorldModel = new RLState(this.Actions);
+                this.NNQLearning = new NeuralNetworkQLearning(SimplifiedWorldModel, this.Actions);
+                /* if (QLearningLoad)
+                    this.NNQLearning.LoadNeuralNetwork(); */ // TODO : serialization for NN
+            }
         }
 
         DiaryText.text += "My Diary \n I awoke. What a wonderful day to kill Monsters! \n";
@@ -230,6 +239,13 @@ public class AutonomousCharacter : NPC
             {
                 this.QLearning.UpdateQTable();
                 this.QLearning.InitializeQLearning();
+                GameManager.Instance.WorldChanged = false;
+                Debug.Log("---------------------Updating For Death Action---------------------");
+            }
+            else if (NeuralNetworkQLearningActive && GameManager.Instance.WorldChanged)
+            {
+                this.NNQLearning.UpdateNeuralNetwork();
+                this.NNQLearning.InitializeQLearning();
                 GameManager.Instance.WorldChanged = false;
                 Debug.Log("---------------------Updating For Death Action---------------------");
             }
@@ -253,7 +269,7 @@ public class AutonomousCharacter : NPC
             this.lastEnemyCheckTime = Time.time;
         }
 
-        if ((!QLearningActive && Time.time > this.nextUpdateTime) || this.nextUpdateTime == 0f || GameManager.Instance.WorldChanged)
+        if ((!(QLearningActive || NeuralNetworkQLearningActive) && Time.time > this.nextUpdateTime) || this.nextUpdateTime == 0f || GameManager.Instance.WorldChanged)
         {
             GameManager.Instance.WorldChanged = false;
             this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
@@ -282,7 +298,7 @@ public class AutonomousCharacter : NPC
             this.GetRichGoal.InsistenceValue = NormalizeGoalValues(this.GetRichGoal.InsistenceValue, 0, 40);
             this.previousGold = baseStats.Money;
             
-            if (QLearningActive) {
+            if (QLearningActive || NeuralNetworkQLearningActive) {
                 this.GainXPGoalText.text = "Runs: " + GameManager.Instance.runCounter;
                 this.SurviveGoalText.text = "Deaths: " + GameManager.Instance.deathCounter;
                 this.BeQuickGoalText.text = "Timeouts: " + GameManager.Instance.timeoutCounter;
@@ -321,6 +337,10 @@ public class AutonomousCharacter : NPC
                 // TODO: does the final state reach this?
                 // TODO: Change initialize and update table location
                 this.QLearning.UpdateQTable();
+            }
+            else if (NeuralNetworkQLearningActive)
+            {
+                this.NNQLearning.UpdateNeuralNetwork();
             }
         }
 
@@ -372,6 +392,10 @@ public class AutonomousCharacter : NPC
         else if (this.QLearningActive)
         {
             this.UpdateQLearning();
+        }
+        else if (this.NeuralNetworkQLearningActive)
+        {
+            this.UpdateNNQLearning();
         }
 
         if (this.CurrentAction != null)
@@ -594,12 +618,22 @@ public class AutonomousCharacter : NPC
                 this.CurrentAction = action;
                 AddToDiary(" I decided to " + action.Name);
                 this.BestActionSequence.text = "Best action: " + action.Name + " with value " + QLearning.Store.GetQValues()[QLearning.State.ToString()][action.Name].ToString("F05");
-
             }
             this.BestActionText.text = QLearning.State.ToString();
         }
     }
 
+    private void UpdateNNQLearning() {
+        if (this.NNQLearning.InProgress) {
+            var action = this.NNQLearning.ChooseAction();
+            if (action != null) {
+                this.CurrentAction = action;
+                AddToDiary(" I decided to " + action.Name);
+                this.BestActionSequence.text = "Best action: " + action.Name + " with value " + NNQLearning.OutputNode.Value;
+            }
+            this.BestActionText.text = NNQLearning.State.ToString();
+        }
+    }
 
     void DrawPath()
     {
@@ -728,8 +762,10 @@ public class AutonomousCharacter : NPC
     }
 
     private void OnDestroy() {
-        if (QLearningActive && QLearningSave)
-            QLearning.SaveQTable();
+        if (QLearningSave) {
+            if(QLearningActive) QLearning.SaveQTable();
+            else if (NeuralNetworkQLearningActive) NNQLearning.SaveNeuralNetwork();
+        }
     }
 
     public override void Restart() {

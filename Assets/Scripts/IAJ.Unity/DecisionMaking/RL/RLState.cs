@@ -68,7 +68,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             this.PreviousState = null;
             this.GameManager.Character.Restart();
             InitializePropertiesArray();
-             this.PropertiesArray[5] = MacroStateDragonAndOrc.EitherAlive;
+            this.PropertiesArray[5] = MacroStateDragonAndOrc.EitherAlive;
         }
 
         public void Initialize()

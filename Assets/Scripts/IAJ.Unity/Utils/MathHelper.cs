@@ -166,5 +166,17 @@ namespace Assets.Scripts.IAJ.Unity.Utils
             return line2P0 + tC*v;
         }
 
+        public static float[,] Transpose(float[,] matrix)
+        {
+            var rows = matrix.GetLength(0);
+            var cols = matrix.GetLength(1);
+            var result = new float[cols, rows];
+            for (var i = 0; i < rows; i++)
+            {
+                for (var j = 0; j < cols; j++) result[j, i] = matrix[i, j];
+            }
+            return result;
+        }
+
     }
 }

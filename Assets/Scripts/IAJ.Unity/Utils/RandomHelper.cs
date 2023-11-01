@@ -52,5 +52,16 @@ namespace Assets.Scripts.IAJ.Unity.Utils
                 list[n] = value;
             }
         }
+
+        public static int[] IndexesShuffled(int size)
+        {
+            var indexes = new int[size];
+            for (int i = 0; i < size; i++)
+            {
+                indexes[i] = i;
+            }
+            indexes.Shuffle();
+            return indexes;
+        }
     }
 }
