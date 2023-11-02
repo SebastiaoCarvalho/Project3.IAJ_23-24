@@ -36,6 +36,7 @@
   Alpha and Gamma are the learning parameters.
   Alpha, is the learning rate, takes a value between 0 and 1, so how much the new Q value will change because of the new reward.
   Gamma, is how much the indirect reward will propagate backwards, takes a value between 0 and 1 as well.\\
+  We kept Alpha at 0.5 and Gamma at 0.1 throught all iterations.
   
   After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
   For our exploration strategy, we choose ε-greedy, this means that for learning we get the action with the highest Q value for
@@ -48,7 +49,7 @@
   in the state that he was missing.\\
   After this we would change what we though was necessary and train the agent again.
 
-  \subsection{1st iteration}
+  \subsection{1st Version}
   // states
   // 
   // learning parameters
@@ -135,9 +136,8 @@
   character is attacked by an orc independently of his effective health for example, we found these values to be descriptive enough that we
   didn't need to do in intervals of the skeletons health.\\
   In terms of Time we considered 3 intervals, (I don't really remember the logic behing these 3 intervals)\\
-  For money, we gave it 3 states, we represent each 2 values in a state essencially, 
-  we did this in the hopes that the agent wouldn't need these intermediate values to learn that he should pick up the chests.\\
-  Level, only has 2 states, this is because out of observation we can see that it is possible to win only by being in level 2, and we don't want
+  For money, we gave it 3 states, we represent each 2 values in a state essencially. We did this in the hopes that the agent wouldn't need these intermediate values to learn that he should pick up the chests.\\
+  Level only has 2 states, this is because out of observation we can see that it is possible to win only by being in level 2, and we don't want
   to waste any more time than we need leveling up or killing enemies.\\
   The last statistic is position, in here we divided the level into rectangles, this was done by analyzing the map and seeing what areas where more
   connected so that the character would prefer actions in one area.\\
@@ -145,30 +145,88 @@
   \subsection{Reward Function}
 
   Our initial reward function only rewarded the agent for reaching the win condition, in which case the reward was 100, or any of the loss conditions,
-  where the reward was -100.\\
+  where the reward was -100, as well as +0.1 for any state that was Level2.\\
 
   \subsection{Learning Parameters}
 
-  At this point we didn't have a clear idea of what values where better for the learning parameters for this situation, so we chose an alpha of 0.5 and a gamma of 0.1.
-  The random action chance was 5percent.\\
+  We used Alpha at 0.5 and Gamma at 0.1, like specified before. The random action chance, epsilon, was 5percent.\\
 
   \subsection{Results}
 
-  Not very good, the guy did not win a single time :/\\
+  In 400 iterations Sir Uthgard hadn't learnt much and won 0 times.\\
+  With so few rewards, the algorithm didn't have enough guidance, and our whole approach to rewards was wrong. 
+  We had to reward executing an action in a certain state, and not reward the states themselves. To do this, we had to consider the state we were in, and the state the action led to. 
+  This also meant death and win states were useless, we simply had to reward the action.\\
 
-  \subsection{Conclusions}
+  \subsection{2nd Version}
 
-  We must really improve.
+  \subsection{Improvements}
 
+  In this second version we kept the same states. We focused mainly on improving the reward function.
+  We rewarded +10 for going up a money state, +10 for actions that made a VeryLow hp state go to Good, +20 for leveling up. 
+  Actions that made Uthgard change the quadrant of the map he was on were penalizezed with -1.
 
+  \subsection{Results}
 
-  \subsection{2nd iteration}
+  Sir Uthgard displayed a much more intelligent behavior, and we saw him get his first win. After 252 runs, he had 168 deaths, 83 timeouts, and 1 win. 
+  But unfortunately, after 2749 iterations, he had only won 15 times. The algorithm was still lacking direction, got stuck trying bad actions for too long and kept goofing around in the late game.
 
-  \subsection{3rd iteration}
+  \subsection{3rd Version}
 
-  \subsection{4th iteration}
+  \subsection{Improvements}
 
-  \subsection{5th iteration}
+  We increased the number of money states from 3 to 5: VeryPoor, Poor, Mid, Rich, and VeryRich. 
+  
+  // do table
+  
+  This way, Uthgard would always be instantly rewarded for picking up a chest. This increased the number of states to 480. \\
+  For the reward funtion, we added a -5 reward for actions in a Late game state that didn't lead to an increase in money. And we increased epsilon to 0.1, so he'd try new things more often.
+
+  \subsection{Results}
+
+  These changes were very effective. After 1013 runs, he had 666 deaths, 319 timeouts, and 28 wins. This is when we started to notice the biggest challenge to using Q learning for this problem. 
+  Actions were getting mislabeled as bad. If Uthgard got killed or timed out while walking to a chest, picking up the chest would get a negative reward. 
+  Sometimes, this was a good thing, for example, when he decided to pick up the chest on the bottom left as his first move. But would be very bad late game, as Uthgard was too scared to pick up the last chests.
+
+  \subsection{4th Version}
+
+  \subsection{Improvements}
+
+  To avoid Sir Uthgard getting spooked of chests due to the timeouts, we removed the negative reward for timeouts all together. The action itself wasn't responsible for the loss, it was the combination of all actions that led to that point.  
+  
+  \subsection{Results}
+
+  The change didn't have the impact we expected. The behavior was looking better, but the results were slightly worse. In 1005 iterations, he died 770 times, timed out 224, and won 11. We were still seeing the same problem.
+
+  \subsection{5th Version}
+
+  \subsection{Improvements}
+  
+  In the late game, since Sir Uthgard was often killed by the bottom left orc or by the dragon while going for those chests, he started doing everything except picking them up, even if those enemies were dead.
+  So, we added a new variable to the state. DragonAndOrc: EitherAlive if at least one was alive, and BothDead. This would help him understand that the chests weren't scary if those enemies weren't there. 
+  Theoretically, this would increase the number of states to 960, but, since most of the time one of them was alive, there wouldn't be that many more states in practice. 
+  We also added a +10 reward for transitioning to a state where they were both dead.
+
+  \subsection{Results}
+
+  Now, in 1001 runs, he had 691 deaths, 264 timeouts, and 46 wins. At this point, putting epsilon at 0, Uthgard won 15/20 runs. And after arduous over-night training with an epsilon of 0.1, and some extra runs with epsilon at 0 to refine his strategy, he had a 20/20 win rate. 
+  4585 runs, 2279 deaths, 1776, and 530 wins later, Uthgard had learnt how to clear the dungeon. But we were still not satisfied.
+
+  \subsection{6th Version}
+
+  \subsection{Improvements}
+
+  For this version, we wanted him to learn faster, in a more stable way and win in less time.\\
+  We tried increasing the reward for picking up chest to +15. We decreased the penalty for actions that didn't lead to an increase in money in the late game to -4 and changed how it worked. Previously, if Uthgard was attacked by an orc while going for a chest, picking it up would get a -5 rewarded because the state would be updated, and the action had not led to more money. 
+  Now, we made it so picking up chest actions can't get this penalty. We made the transition from Low hp to Good hp also get a +10 reward, instead of only VeryLow to Good. We changed Late to start at 90 seconds. And finally, the win reward is now +100 + [time remaining], to incentivize faster runs.
+
+  \subsection{Results}
+
+  This didn't lead to him learning faster. After more than 4000 iterations with an epsilon of 0.1, he had won less times. The difference wasn't significant enough not to be blamed on luck, but also didn't improve the learning timewise in any noticeable way.
+  However, he seemed a lot more stable as we started to have him run without random actions. Within less runs than previously, he had 100percent win rate in 141 runs. And won, on average, 20 seconds faster than before. At the end, the algorithm had run 4781 times, with 2885 deaths, 1441 timeouts and 455 wins. The Q table saw 403 states.
+
+  \section{Final Version}
+
 
 
   \section{Conclusions}
