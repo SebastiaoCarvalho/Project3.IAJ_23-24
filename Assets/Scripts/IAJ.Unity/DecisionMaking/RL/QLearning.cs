@@ -17,7 +17,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         //protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
         protected float Nu { get; set; }
-        protected float Epsilon { get; set; }
+        public float Epsilon { get; set; }
         protected float Alpha { get; set; }
         protected float Gamma { get; set; }
         protected bool NewAction { get; set; }
@@ -30,7 +30,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Store = new QTable();
             Alpha = 0.5f;
             Gamma = 0.1f;
-            Epsilon = 0;
+            Epsilon = 0.1f;
             NewAction = false;
         }
 

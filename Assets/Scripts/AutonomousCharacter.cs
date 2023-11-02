@@ -229,6 +229,12 @@ public class AutonomousCharacter : NPC
             {
                 this.QLearning.UpdateQTable();
                 this.QLearning.InitializeQLearning();
+                if (GameManager.Instance.runCounter % 100 == 98) {
+                    this.QLearning.Epsilon = 0;
+                }
+                else {
+                    this.QLearning.Epsilon = 0.1f;
+                }
                 GameManager.Instance.WorldChanged = false;
             }
             return;
