@@ -54,8 +54,8 @@ public class QTableSerializer
         foreach (string line in lines) {
             if (line.Contains("{")) {
                 tabCount++;
-                if (line != "{") {
-                    string trimmed = line.Trim();
+                string trimmed = line.Trim();
+                if (trimmed != "{") {
                     string key = trimmed.Substring(0, trimmed.Length - 2).Trim('"');
                     state = key;
                     qValues.Add(key, new Dictionary<string, float>());
