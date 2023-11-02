@@ -31,15 +31,16 @@
   algorithm will keep a Q Table that stores the quality of an action giving a certain state, this is called the Q value.
 
   \[Q(s,a) = (1-alpha)Q(s, a) + alpha(r + gamma * max(Q(s', a'))),\]
-  \[\text{s - current state \\a - action performed\\ r - direct reward for the performed action\\ s' - new state\\ a' - best action in the new state.}\]
 
+  Where $s$ is the current state, $a$ is the action performed, $r$ is the direct reward for the performed action,
+  $s'$ is the new state and $a'$ is the best action in the new state.\\
   Alpha and Gamma are the learning parameters.
-  Alpha, is the learning rate, takes a value between 0 and 1, so how much the new Q value will change because of the new reward.
-  Gamma, is how much the indirect reward will propagate backwards, takes a value between 0 and 1 as well.\\
+  Alpha $\in$ [0,1] is the learning rate. Represents how much the new Q value will change because of the new reward.
+  Gamma $\in$ [0,1] is how much the indirect reward will propagate backwards\\
   We kept Alpha at 0.5 and Gamma at 0.1 throught all iterations.
   
   After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
-  For our exploration strategy, we choose ε-greedy, this means that for learning we get the action with the highest Q value for
+  For our exploration strategy, we choose greedy, this means that for learning we get the action with the highest Q value for
   the state, most of the time, but we have a low chance of using a random action.\\
   
   \subsection{Training process}
@@ -49,85 +50,79 @@
   in the state that he was missing.\\
   After this we would change what we though was necessary and train the agent again.
 
+  \section{Q-Learning Versions}
   \subsection{1st Version}
-  // states
-  // 
-  // learning parameters
-  // results
-  // conclusions/o que melhorar
-
   For our states, we started by capturing what we felt was most important while still keeping the total amount of states as low as possible.
   We captured the characters' health, money, level, position and the time of the game.\\
   These stats were simplified in the following way.\\
 
-  \subsection{States}
+  \subsubsection{States}
   \begin{table}[h!]
-      \parbox{.3\linewidth}{
+      \parbox{.45\linewidth}{
         \centering
         \caption{Simplified states of Health}
         \label{tab:tableA*1}
-        \begin{tabular}{c|c|c}
-          \textbf{Status} & \textbf{Interval (health + shield values)}\\
+        \begin{tabular}{c|c}
+          \textbf{Status} & \textbf{Health + Shield (interval)}\\
           \hline
           VeryLow & [0,6]\\
-          Low & [6,12]\\
-          OK & [12,18]\\
-          Good & [18,30]\\
+          Low & [7,12]\\
+          OK & [13,18]\\
+          Good & [19,30]\\
         \end{tabular}
       }
       \hfil
-      \parbox{.3\linewidth}{
+      \parbox{.45\linewidth}{
         \centering
         \caption{Simplified states of Time}
         \label{tab:tableA*2}
-        \begin{tabular}{c|c|c}
-          \textbf{Status} & \textbf{Interval (time values)}\\
+        \begin{tabular}{c|c}
+          \textbf{Status} & \textbf{Time (interval)}\\
           \hline
           Early  & [0,49]\\
           Mid & [50,99]\\
           Late & [100,150]\\
         \end{tabular}
       }
-      \hfil
-      \parbox{.3\linewidth}{
-        \centering
-        \caption{Simplified states of Money}
-        \label{tab:tableA*2}
-        \begin{tabular}{c|c|c}
-          \textbf{Status} & \textbf{Values}\\
-          \hline
-          Poor & 0 and 5\\
-          Mid & 10 and 15\\
-          Rich & 15, 20 and 25\\
-        \end{tabular}
-      }
   \end{table}
   \begin{table}[h!]
     \parbox{.45\linewidth}{
       \centering
+      \caption{Simplified states of Money}
+      \label{tab:tableA*3}
+      \begin{tabular}{c|c}
+        \textbf{Status} & \textbf{Money}\\
+        \hline
+        Poor & 0 and 5\\
+        Mid & 10 and 15\\
+        Rich & 15, 20 and 25\\
+      \end{tabular}
+    }
+    \hfil
+    \parbox{.45\linewidth}{
+      \centering
       \caption{Simplified states of Level}
-      \label{tab:tableA*1}
-      \begin{tabular}{c|c|c}
+      \label{tab:tableA*4}
+      \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Level}\\
         \hline
         Level2 & 2\\
         NotLevel2 & 1 and 3\\
       \end{tabular}
     }
-    \hfil
-    \parbox{.45\linewidth}{
-      \centering
-      \caption{Simplified states of Position}
-      \label{tab:tableA*2}
-      \begin{tabular}{c|c|c}
-        \textbf{Status} & \textbf{Interval (x coordinates)} & \textbf{Interval (z coordinates)}\\
-        \hline
-        TopLeft  & <=66 && >=48.27\\
-        TopRight & >66 && >=48.27\\
-        BottomLeft & <=66 && <48.27\\
-        BottomRight & >66 && <48.27\\
-      \end{tabular}
-    }
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{Simplified states of Position}
+    \label{tab:tableA*5}
+    \begin{tabular}{c|c|c}
+      \textbf{Status} & \textbf{x Coordinates} & \textbf{z Coordinates}\\
+      \hline
+      TopLeft & $<=$ 66 & $>=$ 48.27\\
+      TopRight & $>$ 66 & $>=$ 48.27\\
+      BottomLeft & $<=$ 66 & $<$ 48.27\\
+      BottomRight & $>$ 66 & $<$ 48.27\\
+    \end{tabular}
   \end{table}
 
   This gave us a total amount of 288 possible states.\\
@@ -142,16 +137,16 @@
   The last statistic is position, in here we divided the level into rectangles, this was done by analyzing the map and seeing what areas where more
   connected so that the character would prefer actions in one area.\\
 
-  \subsection{Reward Function}
+  \subsubsection{Reward Function}
 
   Our initial reward function only rewarded the agent for reaching the win condition, in which case the reward was 100, or any of the loss conditions,
   where the reward was -100, as well as +0.1 for any state that was Level2.\\
 
-  \subsection{Learning Parameters}
+  \subsubsection{Learning Parameters}
 
   We used Alpha at 0.5 and Gamma at 0.1, like specified before. The random action chance, epsilon, was 5percent.\\
 
-  \subsection{Results}
+  \subsubsection{Results}
 
   In 400 iterations Sir Uthgard hadn't learnt much and won 0 times.\\
   With so few rewards, the algorithm didn't have enough guidance, and our whole approach to rewards was wrong. 
@@ -160,29 +155,42 @@
 
   \subsection{2nd Version}
 
-  \subsection{Improvements}
+  \subsubsection{Improvements}
 
   In this second version we kept the same states. We focused mainly on improving the reward function.
   We rewarded +10 for going up a money state, +10 for actions that made a VeryLow hp state go to Good, +20 for leveling up. 
   Actions that made Uthgard change the quadrant of the map he was on were penalizezed with -1.
 
-  \subsection{Results}
+  \subsubsection{Results}
 
   Sir Uthgard displayed a much more intelligent behavior, and we saw him get his first win. After 252 runs, he had 168 deaths, 83 timeouts, and 1 win. 
   But unfortunately, after 2749 iterations, he had only won 15 times. The algorithm was still lacking direction, got stuck trying bad actions for too long and kept goofing around in the late game.
 
   \subsection{3rd Version}
 
-  \subsection{Improvements}
+  \subsubsection{Improvements}
 
   We increased the number of money states from 3 to 5: VeryPoor, Poor, Mid, Rich, and VeryRich. 
   
-  // do table
+  \begin{table}[h!]
+    \centering
+    \caption{New simplified states of Money}
+    \label{tab:tableA*6}
+    \begin{tabular}{c|c}
+      \textbf{Status} & \textbf{Money}\\
+      \hline
+      VeryPoor & 0\\
+      Poor & 5\\
+      Mid & 10\\
+      Rich &  15\\
+      VeryRich & 20\\
+    \end{tabular}
+  \end{table}
   
   This way, Uthgard would always be instantly rewarded for picking up a chest. This increased the number of states to 480. \\
   For the reward funtion, we added a -5 reward for actions in a Late game state that didn't lead to an increase in money. And we increased epsilon to 0.1, so he'd try new things more often.
 
-  \subsection{Results}
+  \subsubsection{Results}
 
   These changes were very effective. After 1013 runs, he had 666 deaths, 319 timeouts, and 28 wins. This is when we started to notice the biggest challenge to using Q learning for this problem. 
   Actions were getting mislabeled as bad. If Uthgard got killed or timed out while walking to a chest, picking up the chest would get a negative reward. 
@@ -190,44 +198,59 @@
 
   \subsection{4th Version}
 
-  \subsection{Improvements}
+  \subsubsection{Improvements}
 
   To avoid Sir Uthgard getting spooked of chests due to the timeouts, we removed the negative reward for timeouts all together. The action itself wasn't responsible for the loss, it was the combination of all actions that led to that point.  
   
-  \subsection{Results}
+  \subsubsection{Results}
 
   The change didn't have the impact we expected. The behavior was looking better, but the results were slightly worse. In 1005 iterations, he died 770 times, timed out 224, and won 11. We were still seeing the same problem.
 
   \subsection{5th Version}
 
-  \subsection{Improvements}
+  \subsubsection{Improvements}
   
   In the late game, since Sir Uthgard was often killed by the bottom left orc or by the dragon while going for those chests, he started doing everything except picking them up, even if those enemies were dead.
   So, we added a new variable to the state. DragonAndOrc: EitherAlive if at least one was alive, and BothDead. This would help him understand that the chests weren't scary if those enemies weren't there. 
+
+  \begin{table}[h!]
+    \centering
+    \caption{States for Dragon and bottom left Orc}
+    \label{tab:tableA*7}
+    \begin{tabular}{c|c|c}
+      \textbf{Status} & \textbf{Dragon} & \textbf{Botton Left Orc}\\
+      \hline
+      EitherAlive & Alive & Alive\\
+      EitherAlive & Alive & Dead\\
+      EitherAlive & Dead & Alive\\
+      BothDead & Dead & Dead\\
+    \end{tabular}
+  \end{table}
+
   Theoretically, this would increase the number of states to 960, but, since most of the time one of them was alive, there wouldn't be that many more states in practice. 
   We also added a +10 reward for transitioning to a state where they were both dead.
 
-  \subsection{Results}
+  \subsubsection{Results}
 
   Now, in 1001 runs, he had 691 deaths, 264 timeouts, and 46 wins. At this point, putting epsilon at 0, Uthgard won 15/20 runs. And after arduous over-night training with an epsilon of 0.1, and some extra runs with epsilon at 0 to refine his strategy, he had a 20/20 win rate. 
   4585 runs, 2279 deaths, 1776, and 530 wins later, Uthgard had learnt how to clear the dungeon. But we were still not satisfied.
 
   \subsection{6th Version}
 
-  \subsection{Improvements}
+  \subsubsection{Improvements}
 
   For this version, we wanted him to learn faster, in a more stable way and win in less time.\\
   We tried increasing the reward for picking up chest to +15. We decreased the penalty for actions that didn't lead to an increase in money in the late game to -4 and changed how it worked. Previously, if Uthgard was attacked by an orc while going for a chest, picking it up would get a -5 rewarded because the state would be updated, and the action had not led to more money. 
   Now, we made it so picking up chest actions can't get this penalty. We made the transition from Low hp to Good hp also get a +10 reward, instead of only VeryLow to Good. We changed Late to start at 90 seconds. And finally, the win reward is now +100 + [time remaining], to incentivize faster runs.
 
-  \subsection{Results}
+  \subsubsection{Results}
 
   This didn't lead to him learning faster. After more than 4000 iterations with an epsilon of 0.1, he had won less times. The difference wasn't significant enough not to be blamed on luck, but also didn't improve the learning timewise in any noticeable way.
   However, he seemed a lot more stable as we started to have him run without random actions. Within less runs than previously, he had 100percent win rate in 141 runs. And won, on average, 20 seconds faster than before. At the end, the algorithm had run 4781 times, with 2885 deaths, 1441 timeouts and 455 wins. The Q table saw 403 states.
 
-  \section{Final Version}
+  \section{Final Version of Q-Learning}
 
-
+  fazer grafico com rewards e stats e whatever de x em x iteracoes
 
   \section{Conclusions}
   
