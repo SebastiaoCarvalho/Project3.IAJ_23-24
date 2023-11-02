@@ -400,6 +400,7 @@ public class AutonomousCharacter : NPC
     {
         foreach (var enemy in GameManager.Instance.enemies)
         {
+            if (! enemy.activeSelf) continue;
             Transform characterTransform = this.navMeshAgent.GetComponent<Transform>();
             Vector3 enemyDirection = enemy.GetComponent<Transform>().position - characterTransform.position;
             Vector3 characterDirection = navMeshAgent.velocity.normalized;
