@@ -20,7 +20,7 @@
   The goal of the project was to change the game of the second project, and implement a Reinforcement Learning algorithm to play it.\\
   For this, we first started with making the game restart when the player dies or wins the game, so that we can leave the agent to train
   without having to restart the simulation each time.\\
-  We implemented 2 Reinforcement Learning algorithms: Q-Learning and a Neural Network.\\
+  We implemented the Q-Learning algorithm.\\
   \section{Q-Learning}
   \subsection{Algorithm}
   Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments in result of
@@ -30,25 +30,27 @@
   we improved the algorithm. For each state, the algorithm must also know what actions are available to it. This is because the
   algorithm will keep a Q Table that stores the quality of an action giving a certain state, this is called the Q value.
 
-  \[Q(s,a) = (1-alpha)Q(s, a) + alpha(r + gamma * max(Q(s', a'))),\]
+  \[Q(s,a) = (1-\alpha)Q(s, a) + \alpha(r + \gamma * max(Q(s', a')))\]
 
+  \noindent
   Where $s$ is the current state, $a$ is the action performed, $r$ is the direct reward for the performed action,
   $s'$ is the new state and $a'$ is the best action in the new state.\\
-  Alpha and Gamma are the learning parameters.
-  Alpha $\in$ [0,1] is the learning rate. Represents how much the new Q value will change because of the new reward.
-  Gamma $\in$ [0,1] is how much the indirect reward will propagate backwards\\
-  We kept Alpha at 0.5 and Gamma at 0.1 throught all iterations.
-  
+  $\alpha$ and $\gamma$ are the learning parameters.
+  $\alpha$ $\in$ [0,1] is the learning rate and represents how much the new Q value will change because of the new reward.
+  $\gamma$ $\in$ [0,1] is how much the indirect reward will propagate backwards.\\
+  We kept $\alpha$ at 0.5 and $\gamma$ at 0.1 throught all iterations.
+  \noindent
   After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
-  For our exploration strategy, we choose greedy, this means that for learning we get the action with the highest Q value for
-  the state, most of the time, but we have a low chance of using a random action.\\
+  For our exploration strategy, we choose $\epsilon$-greedy, this means that for learning we get the action with the highest Q value for
+  the state, most of the time, but we have a low chance of using a random action, $\epsilon$.\\
   
   \subsection{Training process}
-  For the training process, we let the algorithm first run for about 1000 iterations.
-  We would then see the amount of victories and perform 20 runs to see the win rate.
+  For the training process, we let the algorithm first run and calculate the Q values.
+  We would then see the amount of victories and determine if we should let it run for longer. If the version seemed to be learning very little
+  we cut the learning short but in other cases we let it run for about 1000 iterations.
   We would also note what the agent did in the run, to see if there was any any information
   in the state that he was missing.\\
-  After this we would change what we though was necessary and train the agent again.
+  After this we would change what we thought was necessary and train the agent again.
 
   \section{Q-Learning Versions}
   \subsection{1st Version}
@@ -95,7 +97,7 @@
         \hline
         Poor & 0 and 5\\
         Mid & 10 and 15\\
-        Rich & 15, 20 and 25\\
+        Rich & 20\\
       \end{tabular}
     }
     \hfil
@@ -124,13 +126,14 @@
       BottomRight & $>$ 66 & $<$ 48.27\\
     \end{tabular}
   \end{table}
-
+  \newpage
+  \noindent
   This gave us a total amount of 288 possible states.\\
   The reason as to why we choose these divisions was due to our previous experiences with the game.\\
   Health is divided into intervals of 6 because that's the attack damage of the orcs, VeryLow will result in death if the
   character is attacked by an orc independently of his effective health for example, we found these values to be descriptive enough that we
   didn't need to do in intervals of the skeletons health.\\
-  In terms of Time we considered 3 intervals, (I don't really remember the logic behing these 3 intervals)\\
+  In terms of Time we considered 3 intervals. We simply considered that having 3 phases of the game was enough for Sir Uthgard to understand when it was more urgent to get the chests.\\
   For money, we gave it 3 states, we represent each 2 values in a state essencially. We did this in the hopes that the agent wouldn't need these intermediate values to learn that he should pick up the chests.\\
   Level only has 2 states, this is because out of observation we can see that it is possible to win only by being in level 2, and we don't want
   to waste any more time than we need leveling up or killing enemies.\\
@@ -144,7 +147,7 @@
 
   \subsubsection{Learning Parameters}
 
-  We used Alpha at 0.5 and Gamma at 0.1, like specified before. The random action chance, epsilon, was 5percent.\\
+  We used $\alpha$ at 0.5 and $\gamma$ at 0.1, like specified before. The random action chance, $\epsilon$, was 5\%.\\
 
   \subsubsection{Results}
 
@@ -159,7 +162,7 @@
 
   In this second version we kept the same states. We focused mainly on improving the reward function.
   We rewarded +10 for going up a money state, +10 for actions that made a VeryLow hp state go to Good, +20 for leveling up. 
-  Actions that made Uthgard change the quadrant of the map he was on were penalizezed with -1.
+  Actions that made Uthgard change the quadrant of the map he was on were penalized with -1.
 
   \subsubsection{Results}
 
@@ -186,7 +189,7 @@
       VeryRich & 20\\
     \end{tabular}
   \end{table}
-  
+  \noindent
   This way, Uthgard would always be instantly rewarded for picking up a chest. This increased the number of states to 480. \\
   For the reward funtion, we added a -5 reward for actions in a Late game state that didn't lead to an increase in money. And we increased epsilon to 0.1, so he'd try new things more often.
 
@@ -226,7 +229,7 @@
       BothDead & Dead & Dead\\
     \end{tabular}
   \end{table}
-
+  \noindent
   Theoretically, this would increase the number of states to 960, but, since most of the time one of them was alive, there wouldn't be that many more states in practice. 
   We also added a +10 reward for transitioning to a state where they were both dead.
 
@@ -246,7 +249,7 @@
   \subsubsection{Results}
 
   This didn't lead to him learning faster. After more than 4000 iterations with an epsilon of 0.1, he had won less times. The difference wasn't significant enough not to be blamed on luck, but also didn't improve the learning timewise in any noticeable way.
-  However, he seemed a lot more stable as we started to have him run without random actions. Within less runs than previously, he had 100percent win rate in 141 runs. And won, on average, 20 seconds faster than before. At the end, the algorithm had run 4781 times, with 2885 deaths, 1441 timeouts and 455 wins. The Q table saw 403 states.
+  However, he seemed a lot more stable as we started to have him run without random actions. Within less runs than previously, he had 100\% win rate in 141 runs. And won, on average, 20 seconds faster than before. At the end, the algorithm had run 4781 times, with 2885 deaths, 1441 timeouts and 455 wins. The Q table saw 403 states.
 
   \section{Final Version of Q-Learning}
 
