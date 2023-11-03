@@ -30,14 +30,14 @@
   we improved the algorithm. For each state, the algorithm must also know what actions are available to it. This is because the
   algorithm will keep a Q Table that stores the quality of an action giving a certain state, this is called the Q value.
 
-  \[Q(s,a) = (1-\alpha)Q(s, a) + \alpha(r + \gamma * max(Q(s', a')))\]
+  \[Q(s,a) = (1-\alpha)Q(s, a) + \alpha(r + \gamma * max(Q(s', a'))) \text{, $\alpha$ $\in$ [0,1], $\gamma$ $\in$ [0,1]}\]
 
   \noindent
   Where $s$ is the current state, $a$ is the action performed, $r$ is the direct reward for the performed action,
   $s'$ is the new state and $a'$ is the best action in the new state.\\
   $\alpha$ and $\gamma$ are the learning parameters.
-  $\alpha$ $\in$ [0,1] is the learning rate and represents how much the new Q value will change because of the new reward.
-  $\gamma$ $\in$ [0,1] is how much the indirect reward will propagate backwards.\\
+  $\alpha$ is the learning rate and represents how much the new Q value will change because of the new reward.
+  $\gamma$ is how much the indirect reward will propagate backwards.\\
   We kept $\alpha$ at 0.5 and $\gamma$ at 0.1 throught all iterations.
   \noindent
   After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
