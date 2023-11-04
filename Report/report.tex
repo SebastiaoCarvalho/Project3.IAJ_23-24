@@ -267,6 +267,128 @@
 
   \section{Final Version of Q-Learning}
 
+  To recap all the changes we did, we'll present the final version of the implementation here.
+
+  \subsection{States}
+
+  \begin{table}[h!]
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Health}
+      \label{tab:tableA*1}
+      \begin{tabular}{c|c}
+        \textbf{Status} & \textbf{Health + Shield (interval)}\\
+        \hline
+        VeryLow & [0,6]\\
+        Low & [7,12]\\
+        OK & [13,18]\\
+        Good & $>$18\\
+      \end{tabular}
+    }
+    \hfil
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Time}
+      \label{tab:tableA*2}
+      \begin{tabular}{c|c}
+        \textbf{Status} & \textbf{Time (interval)}\\
+        \hline
+        Early  & [0,50[\\
+        Mid & [50,90[\\
+        Late & [90,150]\\
+      \end{tabular}
+    }
+  \end{table}
+  \begin{table}[h!]
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Money}
+      \label{tab:tableA*3}
+      \begin{tabular}{c|c}
+        \textbf{Status} & \textbf{Money}\\
+        \hline
+        VeryPoor & 0\\
+        Poor & 5\\
+        Mid & 10\\
+        Rich &  15\\
+        VeryRich & 20\\
+      \end{tabular}
+    }
+    \hfil
+    \parbox{.45\linewidth}{
+      \centering
+      \caption{Simplified states of Level}
+      \label{tab:tableA*4}
+      \begin{tabular}{c|c}
+        \textbf{Status} & \textbf{Level}\\
+        \hline
+        Level2 & 2\\
+        NotLevel2 & 1 and 3\\
+      \end{tabular}
+    }
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{Simplified states of Position}
+    \label{tab:tableA*5}
+    \begin{tabular}{c|c|c}
+      \textbf{Status} & \textbf{x Coordinates} & \textbf{z Coordinates}\\
+      \hline
+      TopLeft & $<=$ 66 & $>=$ 48.27\\
+      TopRight & $>$ 66 & $>=$ 48.27\\
+      BottomLeft & $<=$ 66 & $<$ 48.27\\
+      BottomRight & $>$ 66 & $<$ 48.27\\
+    \end{tabular}
+  \end{table}
+  \begin{table}[h!]
+    \centering
+    \caption{States for Dragon and bottom left Orc}
+    \label{tab:tableA*7}
+    \begin{tabular}{c|c|c}
+      \textbf{Status} & \textbf{Dragon} & \textbf{Botton Left Orc}\\
+      \hline
+      EitherAlive & Alive & Alive\\
+      EitherAlive & Alive & Dead\\
+      EitherAlive & Dead & Alive\\
+      BothDead & Dead & Dead\\
+    \end{tabular}
+  \end{table}
+  \noindent
+  We have a total amount of 960 possible states.
+
+  \subsection{Reward Function}
+  Our rewards are awarded acording to what the action changed given the current state.\\
+  Rewards for money changes:
+  \begin{itemize}
+    \item If money is 25 (win condition), the reward is +100 + [time remaining].
+    \item If we picked up a chest the reward is +15.
+    \item If we are in the Late time state and the action wasn't picking up a chest we reward -4.
+  \end{itemize}
+  Rewards for Health changes:
+  \begin{itemize}
+    \item If we reach a value smaller or equal to zero (loss condition), we reward -100 for the action.
+    \item When we pass from health VeryLow or Low to Good, we reward the action with +10.
+  \end{itemize}
+  Rewards for level changes:
+  \begin{itemize}
+    \item We reward +20 to an action that takes us to Level2.
+  \end{itemize}
+  Rewards for position changes:
+  \begin{itemize}
+    \item We reward -1 to actions that makes us change the quadrant we are on.
+  \end{itemize}
+  Rewards for the Dragon and Orc state changes:
+  \begin{itemize}
+    \item If we executed an action that changed this state to BothDead and we are in Late time state we reward +10 for the action.
+  \end{itemize}
+  Time state changes are not rewarded directly.\\
+
+  \subsection{Hyperparameters}
+  In the end, our learning parameters were $\alpha$ at 0.5 and $\gamma$ at 0.1 and $\epsilon$ at 0.05.
+  After 4000(?) iterations we changed $\epsilon$ to 0.
+
+  \subsection{Learning}
+  
   \includegraphics{graph.png}
 
   \section{Conclusions}
