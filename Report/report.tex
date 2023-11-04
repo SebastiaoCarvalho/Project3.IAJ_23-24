@@ -78,7 +78,7 @@
       \parbox{.45\linewidth}{
         \centering
         \caption{Simplified states of Health}
-        \label{tab:tableA*1}
+        \label{tab:healthStates}
         \begin{tabular}{c|c}
           \textbf{Status} & \textbf{Health + Shield (interval)}\\
           \hline
@@ -92,7 +92,7 @@
       \parbox{.45\linewidth}{
         \centering
         \caption{Simplified states of Time}
-        \label{tab:tableA*2}
+        \label{tab:timeStates}
         \begin{tabular}{c|c}
           \textbf{Status} & \textbf{Time (interval)}\\
           \hline
@@ -106,7 +106,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Money}
-      \label{tab:tableA*3}
+      \label{tab:moneyStates}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Money}\\
         \hline
@@ -119,7 +119,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Level}
-      \label{tab:tableA*4}
+      \label{tab:levelStates}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Level}\\
         \hline
@@ -131,7 +131,7 @@
   \begin{table}[h!]
     \centering
     \caption{Simplified states of Position}
-    \label{tab:tableA*5}
+    \label{tab:positionStates}
     \begin{tabular}{c|c|c}
       \textbf{Status} & \textbf{x Coordinates} & \textbf{z Coordinates}\\
       \hline
@@ -192,7 +192,7 @@
   \begin{table}[h!]
     \centering
     \caption{New simplified states of Money}
-    \label{tab:tableA*6}
+    \label{tab:moneyStates2}
     \begin{tabular}{c|c}
       \textbf{Status} & \textbf{Money}\\
       \hline
@@ -233,7 +233,7 @@
   \begin{table}[h!]
     \centering
     \caption{States for Dragon and bottom left Orc}
-    \label{tab:tableA*7}
+    \label{tab:enemiesStates}
     \begin{tabular}{c|c|c}
       \textbf{Status} & \textbf{Dragon} & \textbf{Botton Left Orc}\\
       \hline
@@ -275,7 +275,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Health}
-      \label{tab:tableA*1}
+      \label{tab:healthStates2}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Health + Shield (interval)}\\
         \hline
@@ -289,7 +289,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Time}
-      \label{tab:tableA*2}
+      \label{tab:timeStates2}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Time (interval)}\\
         \hline
@@ -303,7 +303,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Money}
-      \label{tab:tableA*3}
+      \label{tab:moneyStates3}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Money}\\
         \hline
@@ -318,7 +318,7 @@
     \parbox{.45\linewidth}{
       \centering
       \caption{Simplified states of Level}
-      \label{tab:tableA*4}
+      \label{tab:levelStates2}
       \begin{tabular}{c|c}
         \textbf{Status} & \textbf{Level}\\
         \hline
@@ -330,7 +330,7 @@
   \begin{table}[h!]
     \centering
     \caption{Simplified states of Position}
-    \label{tab:tableA*5}
+    \label{tab:positionStates2}
     \begin{tabular}{c|c|c}
       \textbf{Status} & \textbf{x Coordinates} & \textbf{z Coordinates}\\
       \hline
@@ -343,7 +343,7 @@
   \begin{table}[h!]
     \centering
     \caption{States for Dragon and bottom left Orc}
-    \label{tab:tableA*7}
+    \label{tab:enemiesStates2}
     \begin{tabular}{c|c|c}
       \textbf{Status} & \textbf{Dragon} & \textbf{Botton Left Orc}\\
       \hline
@@ -384,14 +384,26 @@
   Time state changes are not rewarded directly.\\
 
   \subsection{Hyperparameters}
-  In the end, our learning parameters were $\alpha$ at 0.5 and $\gamma$ at 0.1 and $\epsilon$ at 0.05.
-  After 4000(?) iterations we changed $\epsilon$ to 0.
+  In the end, our learning parameters were $\alpha$ at 0.5, $\gamma$ at 0.1 and $\epsilon$ at 0.05.
+  After 4200 iterations we changed $\epsilon$ to 0.
 
-  \subsection{Learning}
+  \subsection{Learning (Data collected)}
   
   \includegraphics{graph.png}
+  \newline
+  This data shows a training session of our agent with the final version of Q-Learning, where 4200 iterations were done.\\
 
   \section{Conclusions}
-  
+  With our final version of Q-Learning, we can see that the agent learns fast not to die, dying by timeout on the 100th iteration.
+  But still in some iterations, the player gets worse results. This might be due to the $\epsilon$ value being too high, and the agent 
+  choosing a random action that is not optimal.\\
+  One solution we could use to solve this problem, would be to have a variable $\epsilon$, that starts at 1 and decreases over time, preventing random actions 
+  from happening too late in the training. We could do the same with the learning rate $\alpha$, so that the agent would learn faster in the beginning, and slower
+  as it got better.\\
+  Overall, we think our reward function is good, since it quickly makes our agent learn to pick up chests, avoid enemies and heal itself.
+  Even though we have an iteration when the player dies with 5 money, we consider it an outlier, since there isn't any repetition of this behavior.\\
+  Q-Learning is a very simple algorithm, so other RL algorithms using Neural Networks might show better results, but we think that Q-Learning is a good algorithm 
+  since with the right reward function and states, it can learn very fast.\\
+
 
 \end{document}
