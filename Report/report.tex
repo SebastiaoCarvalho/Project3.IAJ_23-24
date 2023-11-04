@@ -20,7 +20,22 @@
   The goal of the project was to change the game of the second project, and implement a Reinforcement Learning algorithm to play it.\\
   For this, we first started with making the game restart when the player dies or wins the game, so that we can leave the agent to train
   without having to restart the simulation each time.\\
-  We implemented the Q-Learning algorithm.\\
+  We only implemented one Reinforcement Learning Algorithm: Q-Learning.\\
+  \section{Game Changes and new States}
+  \subsection{Game Changes}
+  As said before, to make the game restart when the player dies or wins, we had to change certain aspects of the game.\\
+  First, we started by not destroying the objects like chests and enemies when they were collected or killed. Instead, we just disabled 
+  them by setting their active boolean to false. When the game ended, we simply changed all the objects' active flag back to true.
+  We also created a restart function for NPCs, so that their base stats would go back to their initial stats. This is extremely useful for Sir Uthgard,
+  to recover his health, level, etc., and for the enemies, so that they would respawn in their initial positions.\\
+  We also created a new Script for collectable items like the potions and the chests, because sometimes the player would collide with them, 
+  changing their position, and we needed this position to reset back whenever the game restarted.
+  \subsection{New States}
+  Since we decided to use Q-Learning, we also needed to change how we represented the state, since too many different states would make our 
+  Q-Table too big and need a lot of memory. So, we decided to create another state representation, with less states, but still enough to 
+  distinguish between different situations.\\
+  We decided to use macro states, which are states that represent the current game state in a more simplified way, reducing the total number of possible states.
+  The representation we chose varied across the development, so we decided to describe each one in the next section.
   \section{Q-Learning}
   \subsection{Algorithm}
   Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments as a result of
@@ -126,7 +141,6 @@
       BottomRight & $>$ 66 & $<$ 48.27\\
     \end{tabular}
   \end{table}
-  \newpage
   \noindent
   This gave us a total amount of 288 possible states.\\
   The reason as to why we choose these divisions was due to our previous experiences with the game.\\
@@ -253,7 +267,7 @@
 
   \section{Final Version of Q-Learning}
 
-  fazer grafico com rewards e stats e whatever de x em x iteracoes
+  \includegraphics{graph.png}
 
   \section{Conclusions}
   
