@@ -65,6 +65,8 @@
   After every execution of an action in a state, we update it's respective Q value acording to the formula above. 
   For our exploration strategy, we choose $\epsilon$-greedy, this means that for learning we get the action with the highest Q value for
   the state, most of the time, but we have a low chance of using a random action, $\epsilon$.\\
+  We implemented our Q-Table using dictionaries, where the key is the state and the value is another dictionary, where the key is the action. This way,
+  we only keep in memory states that were already seen, instead of having all possible states, and thus saving memory.\\
   
   \subsection{Training process}
   For the training process, we let the algorithm first run and calculate the Q values.
