@@ -36,6 +36,13 @@
   distinguish between different situations.\\
   We decided to use macro states, which are states that represent the current game state in a more simplified way, reducing the total number of possible states.
   The representation we chose varied across the development, so we decided to describe each one in the next section.
+  \subsection{Serialization} 
+  To use a Reinforcement Learning algorithm, we needed to save the Q-Table, so that we could load it in the next training session.\\
+  For this, we created 2 serializers, one to serialzie the Q-Table, and another to serialize the stats of the run (wins, deaths, timeouts, etc.).\\
+  We also added 2 flags to the AutonomousCharacter script, in the section QLearningOptions, that allows us to choose if we want to save the Q-Table 
+  in the end of the session, and if we want to load the Q-Table from previous training sessions in the beginning of the game.\\
+  We use 2 JSON files to store the data: "qtable.json" and "run.json". If the flag to save the table is selected, the file will be overwritten, 
+  so be careful to not lose any data unintentionally.\\
   \section{Q-Learning}
   \subsection{Algorithm}
   Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments as a result of
@@ -403,6 +410,8 @@
     \caption{Performance over time for 6th and final version of Q-Learning}
     \label{fig:graph2}
   \end{figure}
+
+  \newpage
 
   \section{Conclusions}
   With our final version of Q-Learning, we can see that the agent learns fast not to die, dying by timeout on the 100th iteration.
