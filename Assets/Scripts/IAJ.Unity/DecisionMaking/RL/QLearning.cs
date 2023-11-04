@@ -6,7 +6,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 {
     public class QLearning
     {
-        public const float C = 1.4f;
         public bool InProgress { get; private set; }
         public float TotalProcessingTime { get; set; }
         protected int CurrentIterations { get; set; }
@@ -14,7 +13,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         public RLState State {  get; protected set; }
         public QTable Store { get; protected set; }
         protected Action ExecutedAction { get; set; }
-        //protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
         public float Epsilon { get; set; }
         protected float Alpha { get; set; }
@@ -29,7 +27,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
             Store = new QTable();
             Alpha = 0.5f;
             Gamma = 0.1f;
-            Epsilon = 0.1f;
+            Epsilon = 0f;
             NewAction = false;
         }
 
