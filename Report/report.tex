@@ -23,12 +23,12 @@
   We implemented the Q-Learning algorithm.\\
   \section{Q-Learning}
   \subsection{Algorithm}
-  Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments in result of
+  Q-Learning is a Reinforcement Learning algorithm, this means that occasionally the agent has rewards or punishments as a result of
   performing actions.\\
   For this algorithm we use macro states, these represent the current game state in a more simplified way, reducing the total
-  amount of possible states for the game. Anything that is not encoded in these states cannot be learned, so these changed as
+  number of possible states for the game. Anything that is not encoded in these states cannot be learned, so these changed as
   we improved the algorithm. For each state, the algorithm must also know what actions are available to it. This is because the
-  algorithm will keep a Q Table that stores the quality of an action giving a certain state, this is called the Q value.
+  algorithm will keep a Q Table that stores the quality of an action given a certain state, this is called the Q value.
 
   \[Q(s,a) = (1-\alpha)Q(s, a) + \alpha(r + \gamma * max(Q(s', a'))) \text{, $\alpha$ $\in$ [0,1], $\gamma$ $\in$ [0,1]}\]
 
@@ -131,8 +131,8 @@
   This gave us a total amount of 288 possible states.\\
   The reason as to why we choose these divisions was due to our previous experiences with the game.\\
   Health is divided into intervals of 6 because that's the attack damage of the orcs, VeryLow will result in death if the
-  character is attacked by an orc independently of his effective health for example, we found these values to be descriptive enough that we
-  didn't need to do in intervals of the skeletons health.\\
+  character is attacked by an orc. We found these values to be descriptive enough that we
+  didn't need to do intervals for the skeletons' damage.\\
   In terms of Time we considered 3 intervals. We simply considered that having 3 phases of the game was enough for Sir Uthgard to understand when it was more urgent to get the chests.\\
   For money, we gave it 3 states, we represent each 2 values in a state essencially. We did this in the hopes that the agent wouldn't need these intermediate values to learn that he should pick up the chests.\\
   Level only has 2 states, this is because out of observation we can see that it is possible to win only by being in level 2, and we don't want
@@ -213,7 +213,7 @@
 
   \subsubsection{Improvements}
   
-  In the late game, since Sir Uthgard was often killed by the bottom left orc or by the dragon while going for those chests, he started doing everything except picking them up, even if those enemies were dead.
+  In the late game, since Sir Uthgard was often killed by the bottom left orc or by the dragon while going for those chests. He started doing everything except picking them up, even if those enemies were dead.
   So, we added a new variable to the state. DragonAndOrc: EitherAlive if at least one was alive, and BothDead. This would help him understand that the chests weren't scary if those enemies weren't there. 
 
   \begin{table}[h!]
@@ -236,7 +236,7 @@
   \subsubsection{Results}
 
   Now, in 1001 runs, he had 691 deaths, 264 timeouts, and 46 wins. At this point, putting epsilon at 0, Uthgard won 15/20 runs. And after arduous over-night training with an epsilon of 0.1, and some extra runs with epsilon at 0 to refine his strategy, he had a 20/20 win rate. 
-  4585 runs, 2279 deaths, 1776, and 530 wins later, Uthgard had learnt how to clear the dungeon. But we were still not satisfied.
+  4585 runs, 2279 deaths, 1776 timeouts, and 530 wins later, Uthgard had learnt how to clear the dungeon. But we were still not satisfied.
 
   \subsection{6th Version}
 
