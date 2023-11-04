@@ -225,16 +225,10 @@ public class AutonomousCharacter : NPC
     void FixedUpdate()
     {
         if (GameManager.Instance.gameEnded) {
-            if (QLearningActive && GameManager.Instance.WorldChanged)
+            if (QLearningActive && GameManager.Instance.WorldChanged) // update q table of death action
             {
                 this.QLearning.UpdateQTable();
                 this.QLearning.InitializeQLearning();
-                if (GameManager.Instance.runCounter % 100 == 98) {
-                    this.QLearning.Epsilon = 0;
-                }
-                else {
-                    this.QLearning.Epsilon = 0.1f;
-                }
                 GameManager.Instance.WorldChanged = false;
             }
             return;
@@ -322,8 +316,6 @@ public class AutonomousCharacter : NPC
             }
             else if (QLearningActive)
             {
-                // TODO: does the final state reach this?
-                // TODO: Change initialize and update table location
                 this.QLearning.UpdateQTable();
             }
         }

@@ -16,7 +16,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
         protected Action ExecutedAction { get; set; }
         //protected MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
-        protected float Nu { get; set; }
         public float Epsilon { get; set; }
         protected float Alpha { get; set; }
         protected float Gamma { get; set; }

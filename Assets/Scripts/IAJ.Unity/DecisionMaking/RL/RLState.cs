@@ -66,12 +66,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.RL
 
         public void Reset() {
             this.PreviousState = null;
-            if (GameManager.Instance.runCounter % 100 == 99) {
-                Debug.Log("run counter : " + GameManager.Instance.runCounter + " money " + GameManager.Instance.Character.baseStats.Money + " hp " + GameManager.Instance.Character.baseStats.HP);
-            }
             this.GameManager.Character.Restart();
             InitializePropertiesArray();
-             this.PropertiesArray[5] = MacroStateDragonAndOrc.EitherAlive;
+            this.PropertiesArray[5] = MacroStateDragonAndOrc.EitherAlive;
         }
 
         public void Initialize()
